@@ -1,4 +1,4 @@
-# Welcome to the Windows Subsystem for Linux (WSL) repository
+# Welcome to the Linux Subsystem for Windows (LSW) repository (Because dear god that was a bad name)
 
 <p align="center">
   <img src="./Images/Square44x44Logo.targetsize-256.png" alt="WSL logo"/>
