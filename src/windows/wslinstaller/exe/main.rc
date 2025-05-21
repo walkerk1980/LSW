@@ -8,21 +8,21 @@ Module Name:
 
 Abstract:
 
-    This file contains resources for wslinstaller.
+    This file contains resources for lswinstaller.
 
 --*/
 
 #include <windows.h>
-#include "wslversioninfo.h"
+#include "lswversioninfo.h"
 
 #define ID_ICON 1
-#define VER_INTERNALNAME_STR "wslinstaller.exe"
-#define VER_ORIGINALFILENAME_STR "wslinstaller.exe"
+#define VER_INTERNALNAME_STR "lswinstaller.exe"
+#define VER_ORIGINALFILENAME_STR "lswinstaller.exe"
 
 #define VER_FILETYPE VFT_APP
 #define VER_FILESUBTYPE VFT2_UNKNOWN
-#define VER_FILEDESCRIPTION_STR "Windows Subsystem for Linux Installer Service"
-ID_ICON ICON PRELOAD DISCARDABLE "..\..\..\images\wsl.ico"
+#define VER_FILEDESCRIPTION_STR "Linux Subsystem for Windows Installer Service"
+ID_ICON ICON PRELOAD DISCARDABLE "..\..\..\images\lsw.ico"
 
 
 #include <common.ver>

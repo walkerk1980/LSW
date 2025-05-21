@@ -6,7 +6,7 @@
 #include "lxinitshared.h"
 #include "SocketChannel.h"
 
-namespace wsl::core::networking {
+namespace lsw::core::networking {
 
 using DnsTunnelingCallback = std::function<void(const gsl::span<gsl::byte>, const LX_GNS_DNS_CLIENT_IDENTIFIER&)>;
 
@@ -39,7 +39,7 @@ private:
 
     wil::unique_event m_stopEvent{wil::EventOptions::ManualReset};
 
-    wsl::shared::SocketChannel m_channel;
+    lsw::shared::SocketChannel m_channel;
 
     std::thread m_receiveWorkerThread;
 
@@ -47,4 +47,4 @@ private:
     DnsTunnelingCallback m_reportDnsRequest;
 };
 
-} // namespace wsl::core::networking
+} // namespace lsw::core::networking

@@ -16,8 +16,8 @@ Abstract:
 #include "configfile.h"
 #include "util.h"
 
-using wsl::linux::WslDistributionConfig;
-using namespace wsl::linux;
+using lsw::linux::WslDistributionConfig;
+using namespace lsw::linux;
 
 WslDistributionConfig::WslDistributionConfig(const char* configFilePath)
 {
@@ -83,7 +83,7 @@ WslDistributionConfig::WslDistributionConfig(const char* configFilePath)
     }
 
     //
-    // Using boot.systemd is only supported on WSL2.
+    // Using boot.systemd is only supported on LSW2.
     //
 
     BootInit &= UtilIsUtilityVm();
@@ -97,13 +97,13 @@ WslDistributionConfig::WslDistributionConfig(const char* configFilePath)
     // Apply safe mode overrides.
     //
 
-    const char* Value = getenv(LX_WSL2_SAFE_MODE);
+    const char* Value = getenv(LX_LSW2_SAFE_MODE);
     if (Value && (strcmp(Value, "1") == 0))
     {
         auto DisableBoolOption = [&](const char* Option, bool& ConfigValue) {
             if (ConfigValue)
             {
-                LOG_WARNING("{} - {} disabled", WSL_SAFE_MODE_WARNING, Option);
+                LOG_WARNING("{} - {} disabled", LSW_SAFE_MODE_WARNING, Option);
                 ConfigValue = false;
             }
         };

@@ -8,7 +8,7 @@
 #include "WslCoreNetworkEndpointSettings.h"
 #include "WslCoreTcpIpStateTracking.h"
 
-namespace wsl::core::networking {
+namespace lsw::core::networking {
 
 struct NetworkEndpoint
 {
@@ -40,7 +40,7 @@ struct NetworkEndpoint
     {
         if (Network)
         {
-            WSL_LOG(
+            LSW_LOG(
                 "NetworkEndpoint::TraceLoggingRundown",
                 TraceLoggingValue(NetworkId, "networkId"),
                 TraceLoggingValue(EndpointId, "endpointId"),
@@ -50,7 +50,7 @@ struct NetworkEndpoint
         }
         else
         {
-            WSL_LOG(
+            LSW_LOG(
                 "NetworkEndpoint::TraceLoggingRundown",
                 TraceLoggingValue(NetworkId, "networkId"),
                 TraceLoggingValue(EndpointId, "endpointId"),
@@ -60,4 +60,4 @@ struct NetworkEndpoint
         }
     }
 };
-} // namespace wsl::core::networking
+} // namespace lsw::core::networking

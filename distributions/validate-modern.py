@@ -13,9 +13,9 @@ import re
 from github import Github
 
 
-USR_LIB_WSL = '/usr/lib/wsl'
-USR_LIBEXEC_WSL = '/usr/libexec/wsl'
-USR_SHARE_WSL = '/usr/share/wsl'
+USR_LIB_LSW = '/usr/lib/lsw'
+USR_LIBEXEC_LSW = '/usr/libexec/lsw'
+USR_SHARE_LSW = '/usr/share/lsw'
 
 MAGIC = magic.Magic()
 X64_ELF_MAGIC = re.compile('^ELF 64-bit.* x86-64, version 1')
@@ -34,7 +34,7 @@ DISCOURAGED_SYSTEM_UNITS = ['systemd-resolved.service',
                             'NetworkManager.service',
                             'networking.service']
 
-WSL1_UNSUPPORTED_XATTRS = ['security.selinux', 'security.ima', 'security.evm']
+LSW1_UNSUPPORTED_XATTRS = ['security.selinux', 'security.ima', 'security.evm']
 
 errors = {}
 warnings = {}
@@ -330,7 +330,7 @@ def find_unsupported_attrs(tar):
 
     for e in tar.getmembers():
         for name in e.pax_headers:
-            if any(name.startswith('SCHILY.xattr.' + xattr) for xattr in WSL1_UNSUPPORTED_XATTRS):
+            if any(name.startswith('SCHILY.xattr.' + xattr) for xattr in LSW1_UNSUPPORTED_XATTRS):
                 found_xattrs.add(name.replace('SCHILY.xattr.', ''))
 
                 if first_file is None:
@@ -399,14 +399,14 @@ def read_tar(node, file, elf_magic: str):
             return keys
 
         defaultUid = None
-        if validate_mode('/etc/wsl-distribution.conf', [oct(0o664), oct(0o644)], 0, 0, follow_symlink=True):
-            config = validate_config('/etc/wsl-distribution.conf', ['oobe.command', 'oobe.defaultuid', 'shortcut.icon', 'shortcut.enabled', 'oobe.defaultname', 'windowsterminal.profiletemplate'])
+        if validate_mode('/etc/lsw-distribution.conf', [oct(0o664), oct(0o644)], 0, 0, follow_symlink=True):
+            config = validate_config('/etc/lsw-distribution.conf', ['oobe.command', 'oobe.defaultuid', 'shortcut.icon', 'shortcut.enabled', 'oobe.defaultname', 'windowsterminal.profiletemplate'])
 
             if oobe_command := config.get('oobe.command', None):
                 validate_mode(oobe_command, [oct(0o775), oct(0o755)], 0, 0)
 
-                if not oobe_command.startswith(USR_LIB_WSL) and not oobe_command.startswith(USR_LIBEXEC_WSL):
-                    warning(node, f'value for oobe.command is not under {USR_LIB_WSL} or {USR_LIBEXEC_WSL}: "{oobe_command}"')
+                if not oobe_command.startswith(USR_LIB_LSW) and not oobe_command.startswith(USR_LIBEXEC_LSW):
+                    warning(node, f'value for oobe.command is not under {USR_LIB_LSW} or {USR_LIBEXEC_LSW}: "{oobe_command}"')
 
             if defaultUid := config.get('oobe.defaultuid', None):
                 if defaultUid != '1000':
@@ -417,19 +417,19 @@ def read_tar(node, file, elf_magic: str):
             if shortcut_icon := config.get('shortcut.icon', None):
                 validate_mode(shortcut_icon, [oct(0o664), oct(0o644)], 0, 0, 1024 * 1024)
 
-                if not shortcut_icon.startswith(USR_LIB_WSL) and not shortcut_icon.startswith(USR_SHARE_WSL):
-                    warning(node, f'value for shortcut.icon is not under {USR_LIB_WSL} or {USR_SHARE_WSL}: "{shortcut_icon}"')
+                if not shortcut_icon.startswith(USR_LIB_LSW) and not shortcut_icon.startswith(USR_SHARE_LSW):
+                    warning(node, f'value for shortcut.icon is not under {USR_LIB_LSW} or {USR_SHARE_LSW}: "{shortcut_icon}"')
             else:
                 warning(node, 'No shortcut.icon provided')
 
             if terminal_profile := config.get('windowsterminal.profileTemplate', None):
                 validate_mode(terminal_profile, [oct(0o660), oct(0o640)], 0, 0, 1024 * 1024)
 
-                if not terminal_profile.startswith(USR_LIB_WSL):
-                    warning(node, f'value for windowsterminal.profileTemplate is not under {USR_LIB_WSL}: "{terminal_profile}"')
+                if not terminal_profile.startswith(USR_LIB_LSW):
+                    warning(node, f'value for windowsterminal.profileTemplate is not under {USR_LIB_LSW}: "{terminal_profile}"')
 
-        if validate_mode('/etc/wsl.conf', [oct(0o664), oct(0o644)], 0, 0, optional=True, follow_symlink=True):
-            config = validate_config('/etc/wsl.conf', ['boot.systemd'])
+        if validate_mode('/etc/lsw.conf', [oct(0o664), oct(0o644)], 0, 0, optional=True, follow_symlink=True):
+            config = validate_config('/etc/lsw.conf', ['boot.systemd'])
             if config.get('boot.systemd', False):
                 validate_mode('/sbin/init', [oct(0o775), oct(0o755)], 0, 0, magic=elf_magic, follow_symlink=True)
 
@@ -445,14 +445,14 @@ def read_tar(node, file, elf_magic: str):
 
         first_file, found_xattrs = find_unsupported_attrs(tar)
         if first_file is not None:
-            warning(node, f'Found extended attributes that are not supported in WSL1: {found_xattrs}. Sample file: {first_file}')
+            warning(node, f'Found extended attributes that are not supported in LSW1: {found_xattrs}. Sample file: {first_file}')
 
 def read_url(url: dict, elf_magic):
      hash = hashlib.sha256()
      address = url['Url']()
 
-     if not address.endswith('.wsl'):
-         warning(url, f'Url does not point to a .wsl file: {address}')
+     if not address.endswith('.lsw'):
+         warning(url, f'Url does not point to a .lsw file: {address}')
 
      tar_format = None
      if address.startswith('file://'):
@@ -507,7 +507,7 @@ def read_url(url: dict, elf_magic):
      if known_format is None:
         error(url, f'Unknown tar format: {tar_format}')
      elif not known_format:
-        warning(url, f'Tar format not supported by WSL1: {tar_format}')
+        warning(url, f'Tar format not supported by LSW1: {tar_format}')
 
 def error(node, message: str):
     if node is None:

@@ -19,12 +19,12 @@ public partial class DeveloperViewModel : WslConfigSettingViewModel
 
     override protected void InitializeConfigSettings()
     {
-        var wslConfigService = App.GetService<IWslConfigService>();
-        _debugConsole = wslConfigService.GetWslConfigSetting(WslConfigEntry.DebugConsoleEnabled);
-        _hWPerfCounters = wslConfigService.GetWslConfigSetting(WslConfigEntry.HardwarePerformanceCountersEnabled);
-        _kernelPath = wslConfigService.GetWslConfigSetting(WslConfigEntry.KernelPath);
-        _kernelModulesPath = wslConfigService.GetWslConfigSetting(WslConfigEntry.KernelModulesPath);
-        _systemDistroPath = wslConfigService.GetWslConfigSetting(WslConfigEntry.SystemDistroPath);
+        var lswConfigService = App.GetService<IWslConfigService>();
+        _debugConsole = lswConfigService.GetWslConfigSetting(WslConfigEntry.DebugConsoleEnabled);
+        _hWPerfCounters = lswConfigService.GetWslConfigSetting(WslConfigEntry.HardwarePerformanceCountersEnabled);
+        _kernelPath = lswConfigService.GetWslConfigSetting(WslConfigEntry.KernelPath);
+        _kernelModulesPath = lswConfigService.GetWslConfigSetting(WslConfigEntry.KernelModulesPath);
+        _systemDistroPath = lswConfigService.GetWslConfigSetting(WslConfigEntry.SystemDistroPath);
     }
 
     public bool IsOnDebugConsole

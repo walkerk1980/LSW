@@ -15,7 +15,7 @@
                 <TextBlock x:Uid="Settings_OOBEDistroManagement_InstallNamedDistrosSample"/>
                 <TextBlock x:Uid="Settings_OOBEDistroManagement_AvailableDistrosTitle" Style="{StaticResource OobeSubtitleStyle}" Margin="0,24,0,6"/>
                 <TextBlock x:Uid="Settings_OOBEDistroManagement_AvailableDistrosSample"/>
-                <HyperlinkButton x:Uid="Settings_OOBEDistroManagementBasicWSLCommandsLink" Style="{StaticResource TextButtonStyle}" Margin="0,12,0,-12"/>
+                <HyperlinkButton x:Uid="Settings_OOBEDistroManagementBasicLSWCommandsLink" Style="{StaticResource TextButtonStyle}" Margin="0,12,0,-12"/>
                 <HyperlinkButton x:Uid="Settings_OOBEDistroManagementImportCustomDistroLink" Style="{StaticResource TextButtonStyle}"/>
             </StackPanel>
         </controls:OOBEContent.PageContent>

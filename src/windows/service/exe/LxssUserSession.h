@@ -24,16 +24,16 @@ Abstract:
 #include "Lifetime.h"
 #include "DistributionRegistration.h"
 
-#define WSL_NEW_DISTRO_LXFS L"NewDistributionLxFs"
-#define WSL_DISTRO_CONFIG_DEFAULT_UID L"DefaultUid"
+#define LSW_NEW_DISTRO_LXFS L"NewDistributionLxFs"
+#define LSW_DISTRO_CONFIG_DEFAULT_UID L"DefaultUid"
 
 #define LXSS_DELETE_DISTRO_FLAGS_ROOTFS 0x1
 #define LXSS_DELETE_DISTRO_FLAGS_VHD 0x2
-#define LXSS_DELETE_DISTRO_FLAGS_WSLG_SHORTCUTS 0x4
+#define LXSS_DELETE_DISTRO_FLAGS_LSWG_SHORTCUTS 0x4
 #define LXSS_DELETE_DISTRO_FLAGS_SHORTCUTS 0x8
 #define LXSS_DELETE_DISTRO_FLAGS_UNMOUNT 0x10
 #define LXSS_DELETE_DISTRO_FLAGS_ALL \
-    (LXSS_DELETE_DISTRO_FLAGS_ROOTFS | LXSS_DELETE_DISTRO_FLAGS_VHD | LXSS_DELETE_DISTRO_FLAGS_WSLG_SHORTCUTS | \
+    (LXSS_DELETE_DISTRO_FLAGS_ROOTFS | LXSS_DELETE_DISTRO_FLAGS_VHD | LXSS_DELETE_DISTRO_FLAGS_LSWG_SHORTCUTS | \
      LXSS_DELETE_DISTRO_FLAGS_SHORTCUTS | LXSS_DELETE_DISTRO_FLAGS_UNMOUNT)
 
 class ConsoleManager;
@@ -304,7 +304,7 @@ private:
 class LxssUserSessionImpl
 {
 public:
-    LxssUserSessionImpl(_In_ PSID userSid, _In_ DWORD sessionId, _Inout_ wsl::windows::service::PluginManager& pluginManager);
+    LxssUserSessionImpl(_In_ PSID userSid, _In_ DWORD sessionId, _Inout_ lsw::windows::service::PluginManager& pluginManager);
     virtual ~LxssUserSessionImpl();
     LxssUserSessionImpl(const LxssUserSessionImpl&) = delete;
     LxssUserSessionImpl& operator=(const LxssUserSessionImpl&) = delete;
@@ -494,7 +494,7 @@ public:
     HRESULT Shutdown(_In_ bool PreventNewInstances = false, _In_ bool ForceTerminate = false);
 
     /// <summary>
-    /// Worker thread for logging telemetry about processes running inside of WSL.
+    /// Worker thread for logging telemetry about processes running inside of LSW.
     /// </summary>
     void TelemetryWorker(_In_ wil::unique_socket&& socket, _In_ bool drvFsNotifications) const;
 
@@ -546,9 +546,9 @@ private:
     void _CreateLegacyRegistration(_In_ HKEY LxssKey, _In_ HANDLE UserToken);
 
     /// <summary>
-    /// Creates the set of WSL mounts required for setup and ext4 conversion.
+    /// Creates the set of LSW mounts required for setup and ext4 conversion.
     /// </summary>
-    static std::vector<wsl::windows::common::filesystem::unique_lxss_addmount> _CreateSetupMounts(_In_ const LXSS_DISTRO_CONFIGURATION& Configuration);
+    static std::vector<lsw::windows::common::filesystem::unique_lxss_addmount> _CreateSetupMounts(_In_ const LXSS_DISTRO_CONFIGURATION& Configuration);
 
     /// <summary>
     /// Creates and initializes a utility VM. If a VM is already running, the
@@ -558,13 +558,13 @@ private:
     std::shared_ptr<LxssRunningInstance> _CreateInstance(_In_opt_ LPCGUID DistroGuid, _In_ ULONG Flags = LXSS_CREATE_INSTANCE_FLAGS_ALLOW_FS_UPGRADE);
 
     static void _CreateDistributionShortcut(
-        _In_ LPCWSTR DistributionName, LPCWSTR Shortcut, LPCWSTR ExecutablePath, wsl::windows::service::DistributionRegistration& registration);
+        _In_ LPCWSTR DistributionName, LPCWSTR Shortcut, LPCWSTR ExecutablePath, lsw::windows::service::DistributionRegistration& registration);
 
     static void _CreateTerminalProfile(
         _In_ const std::string_view& Template,
         _In_ const std::filesystem::path& IconPath,
         _In_ const LXSS_DISTRO_CONFIGURATION& Configuration,
-        wsl::windows::service::DistributionRegistration& Registration);
+        lsw::windows::service::DistributionRegistration& Registration);
 
     /// <summary>
     /// Ensures that the utility VM has been created.
@@ -589,7 +589,7 @@ private:
     /// those that are in the progress of being installed or uninstalled.
     /// </summary>
     _Requires_exclusive_lock_held_(m_instanceLock)
-    std::vector<wsl::windows::service::DistributionRegistration> _EnumerateDistributions(
+    std::vector<lsw::windows::service::DistributionRegistration> _EnumerateDistributions(
         _In_ HKEY LxssKey, _In_ bool ListAll = false, _In_ const std::optional<GUID>& Exclude = {});
 
     /// <summary>
@@ -613,7 +613,7 @@ private:
     /// <summary>
     /// Return a new config after policies have been applied.
     /// </summary>
-    wsl::core::Config _GetResultantConfig(_In_ const HANDLE userToken);
+    lsw::core::Config _GetResultantConfig(_In_ const HANDLE userToken);
 
     _Requires_exclusive_lock_held_(m_instanceLock)
     void _LoadDiskMount(_In_ HKEY Key, _In_ const std::wstring& LunStr) const;
@@ -622,14 +622,14 @@ private:
     void _LoadDiskMounts();
 
     _Requires_exclusive_lock_held_(m_instanceLock)
-    void _LoadNetworkingSettings(_Inout_ wsl::core::Config& config, _In_ HANDLE userToken);
+    void _LoadNetworkingSettings(_Inout_ lsw::core::Config& config, _In_ HANDLE userToken);
 
     void _ProcessImportResultMessage(
         const LX_MINI_INIT_IMPORT_RESULT& message,
         const gsl::span<gsl::byte> span,
         HKEY LxssKey,
         LXSS_DISTRO_CONFIGURATION& configuration,
-        wsl::windows::service::DistributionRegistration& registration);
+        lsw::windows::service::DistributionRegistration& registration);
 
     /// <summary>
     /// Runs a single ELF binary without using the init daemon.
@@ -675,7 +675,7 @@ private:
     bool _TerminateInstanceInternal(_In_ LPCGUID DistroGuid, _In_ bool CheckForClients = false);
 
     /// <summary>
-    /// Ensures the WSL1 init binary is up-to-date.
+    /// Ensures the LSW1 init binary is up-to-date.
     /// </summary>
     wil::srwlock m_initUpdateLock;
     _Guarded_by_(m_initUpdateLock) std::vector<GUID> m_updatedInitDistros;
@@ -747,7 +747,7 @@ private:
     /// <summary>
     /// Query information about a distribution config.
     /// </summary>
-    static LXSS_DISTRO_CONFIGURATION s_GetDistributionConfiguration(const wsl::windows::service::DistributionRegistration& Distro, bool skipName = false);
+    static LXSS_DISTRO_CONFIGURATION s_GetDistributionConfiguration(const lsw::windows::service::DistributionRegistration& Distro, bool skipName = false);
 
     /// <summary>
     /// Impersonate the user and open the lxss registry key
@@ -789,7 +789,7 @@ private:
     /// <summary>
     /// Contains the currently running utility VM's.
     /// </summary>
-    _Guarded_by_(m_instanceLock) std::map<GUID, std::shared_ptr<LxssRunningInstance>, wsl::windows::common::helpers::GuidLess> m_runningInstances;
+    _Guarded_by_(m_instanceLock) std::map<GUID, std::shared_ptr<LxssRunningInstance>, lsw::windows::common::helpers::GuidLess> m_runningInstances;
 
     /// <summary>
     /// Contains a list of instances that have been terminated.
@@ -803,7 +803,7 @@ private:
     _Guarded_by_(m_instanceLock) std::list<std::pair<GUID, LxssDistributionState>> m_lockedDistributions;
 
     /// <summary>
-    /// The running utility vm for WSL2 distributions.
+    /// The running utility vm for LSW2 distributions.
     ///
     _Guarded_by_(m_instanceLock) std::unique_ptr<WslCoreVm> m_utilityVm;
 
@@ -835,7 +835,7 @@ private:
     wil::unique_event m_vmTerminating{wil::EventOptions::ManualReset};
 
     /// <summary>
-    /// Thread for logging usage telemetry from the WSL VM.
+    /// Thread for logging usage telemetry from the LSW VM.
     /// </summary>
     std::thread m_telemetryThread;
 
@@ -850,9 +850,9 @@ private:
     /// </summary>
     wil::shared_handle m_userToken;
 
-    WSLSessionInformation m_session{};
+    LSWSessionInformation m_session{};
 
-    wsl::windows::service::PluginManager& m_pluginManager;
+    lsw::windows::service::PluginManager& m_pluginManager;
 
     /// <summary>
     /// Listens to host http proxy setting changes, tracks ongoing proxy queries, and stores current settings.

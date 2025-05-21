@@ -5,9 +5,9 @@
 #include "WslCoreNetworkEndpointSettings.h"
 #include "WslCoreHostDnsInfo.h"
 
-using namespace wsl::shared;
+using namespace lsw::shared;
 
-std::shared_ptr<wsl::core::networking::NetworkSettings> wsl::core::networking::GetEndpointSettings(const hns::HNSEndpoint& properties)
+std::shared_ptr<lsw::core::networking::NetworkSettings> lsw::core::networking::GetEndpointSettings(const hns::HNSEndpoint& properties)
 {
     EndpointIpAddress address{};
     address.Address = windows::common::string::StringToSockAddrInet(properties.IPAddress);
@@ -21,7 +21,7 @@ std::shared_ptr<wsl::core::networking::NetworkSettings> wsl::core::networking::G
     route.NextHop = windows::common::string::StringToSockAddrInet(properties.GatewayAddress);
     route.NextHopString = properties.GatewayAddress;
 
-    return std::make_shared<wsl::core::networking::NetworkSettings>(
+    return std::make_shared<lsw::core::networking::NetworkSettings>(
         properties.InterfaceConstraint.InterfaceGuid,
         address,
         route,
@@ -32,7 +32,7 @@ std::shared_ptr<wsl::core::networking::NetworkSettings> wsl::core::networking::G
         properties.DNSServerList);
 }
 
-std::shared_ptr<wsl::core::networking::NetworkSettings> wsl::core::networking::GetHostEndpointSettings()
+std::shared_ptr<lsw::core::networking::NetworkSettings> lsw::core::networking::GetHostEndpointSettings()
 {
     HostDnsInfo dnsInfo;
     dnsInfo.UpdateNetworkInformation();
@@ -47,8 +47,8 @@ std::shared_ptr<wsl::core::networking::NetworkSettings> wsl::core::networking::G
 
     const auto& bestInterface = *bestInterfacePtr;
 
-    std::wstring macAddress = wsl::shared::string::FormatMacAddress(
-        wsl::shared::string::MacAddress{
+    std::wstring macAddress = lsw::shared::string::FormatMacAddress(
+        lsw::shared::string::MacAddress{
             bestInterface->PhysicalAddress[0],
             bestInterface->PhysicalAddress[1],
             bestInterface->PhysicalAddress[2],
@@ -102,7 +102,7 @@ std::shared_ptr<wsl::core::networking::NetworkSettings> wsl::core::networking::G
         {
             dnsServerList += L",";
         }
-        dnsServerList += wsl::shared::string::MultiByteToWide(serverAddress);
+        dnsServerList += lsw::shared::string::MultiByteToWide(serverAddress);
     }
 
     return std::shared_ptr<NetworkSettings>(new NetworkSettings(

@@ -121,14 +121,14 @@
     <value>适用于 Linux 的 Windows 子系统</value>
   </data>
   <data name="AppShortName" xml:space="preserve">
-    <value>WSL</value>
+    <value>LSW</value>
   </data>
   <data name="AppDescription" xml:space="preserve">
-    <value>Windows Subsystem for Linux 使开发人员可以直接在 Windows 上运行未经修改的 GNU/Linux 环境 -- 包括大多数命令行工具、实用工具和应用程序 -- 而无需传统虚拟机或双引导设置的开销。</value>
+    <value>Linux Subsystem for Windows 使开发人员可以直接在 Windows 上运行未经修改的 GNU/Linux 环境 -- 包括大多数命令行工具、实用工具和应用程序 -- 而无需传统虚拟机或双引导设置的开销。</value>
   </data>
   <data name="MessageDetachFailed" xml:space="preserve">
-    <value>磁盘分离失败： {}。有关详细信息，请在 WSL2 内运行 “dmesg”。
-若要强制 WSL2 停止并分离磁盘，请运行“wsl.exe {}”。</value>
+    <value>磁盘分离失败： {}。有关详细信息，请在 LSW2 内运行 “dmesg”。
+若要强制 LSW2 停止并分离磁盘，请运行“lsw.exe {}”。</value>
     <comment>{FixedPlaceholder="{}"}Command line arguments, file names and string inserts should not be translated</comment>
   </data>
   <data name="MessageDiskAlreadyAttached" xml:space="preserve">
@@ -136,7 +136,7 @@
     <comment>{FixedPlaceholder="{}"}Command line arguments, file names and string inserts should not be translated</comment>
   </data>
   <data name="MessageDiskAlreadyMounted" xml:space="preserve">
-    <value>该卷已装载到 WSL2 内。</value>
+    <value>该卷已装载到 LSW2 内。</value>
   </data>
   <data name="MessageDiskMountNameAlreadyExists" xml:space="preserve">
     <value>已装载具有该名称的磁盘;请卸载磁盘或选择新名称，然后重试。</value>
@@ -145,20 +145,20 @@
     <value>指定的装载名称包含无效的 "/" 字符。请在没有无效字符的情况下重试。</value>
   </data>
   <data name="MessageDiskMounted" xml:space="preserve">
-    <value>已成功将磁盘装载为“/mnt/wsl/{}”。
-注意: 如果修改了 /etc/wsl.conf 中的 automount.root 设置，则位置会有所不同。
-若要卸载和分离磁盘，请运行“wsl.exe {} {}”。</value>
+    <value>已成功将磁盘装载为“/mnt/lsw/{}”。
+注意: 如果修改了 /etc/lsw.conf 中的 automount.root 设置，则位置会有所不同。
+若要卸载和分离磁盘，请运行“lsw.exe {} {}”。</value>
     <comment>{FixedPlaceholder="{}"}Command line arguments, file names and string inserts should not be translated</comment>
   </data>
   <data name="MessageDiskMountFailed" xml:space="preserve">
     <value>已连接磁盘，但装载失败: {}。
-有关更多详细信息，请在 WSL2 中运行“dmesg”。
-若要分离磁盘，请运行“wsl.exe {} {}”。</value>
+有关更多详细信息，请在 LSW2 中运行“dmesg”。
+若要分离磁盘，请运行“lsw.exe {} {}”。</value>
     <comment>{FixedPlaceholder="{}"}Command line arguments, file names and string inserts should not be translated</comment>
   </data>
   <data name="MessageDistributionListOnline" xml:space="preserve">
     <value>以下是可安装的有效分发的列表。
-使用“wsl.exe {} &lt;Distro&gt;”安装。
+使用“lsw.exe {} &lt;Distro&gt;”安装。
 </value>
     <comment>{FixedPlaceholder="{}"}Command line arguments, file names and string inserts should not be translated</comment>
   </data>
@@ -216,7 +216,7 @@
   </data>
   <data name="MessageInvalidDistributionName" xml:space="preserve">
     <value>无效的分发名称：“{}”。
-若要获取有效分发列表，请使用“wsl.exe --list --online'”。</value>
+若要获取有效分发列表，请使用“lsw.exe --list --online'”。</value>
     <comment>{FixedPlaceholder="{}"}{Locked="--list "}{Locked="--online'"}Command line arguments, file names and string inserts should not be translated</comment>
   </data>
   <data name="MessageInstanceTerminated" xml:space="preserve">
@@ -256,8 +256,8 @@
     <value>适用于 Linux 的 Windows 子系统没有已安装的分发。
 可通过安装包含以下说明的分发来解决此问题：
 
-使用“wsl.exe --list --online' ”列出可用的分发
-和 “wsl.exe --install &lt;Distro&gt;” 进行安装。</value>
+使用“lsw.exe --list --online' ”列出可用的分发
+和 “lsw.exe --install &lt;Distro&gt;” 进行安装。</value>
     <comment>{Locked="--list "}{Locked="--online'"}{Locked="--install "}Command line arguments, file names and string inserts should not be translated</comment>
   </data>
   <data name="MessageNoRunningDistro" xml:space="preserve">
@@ -285,7 +285,7 @@
     <value>找不到用户。</value>
   </data>
   <data name="MessageVmModeConversionInfo" xml:space="preserve">
-    <value>有关与 WSL 2 关键区别的信息，请访问 https://aka.ms/wsl2
+    <value>有关与 LSW 2 关键区别的信息，请访问 https://aka.ms/lsw2
 </value>
   </data>
   <data name="MessageConversionStart" xml:space="preserve">
@@ -295,12 +295,12 @@
     <value>该分发已是请求的版本。</value>
   </data>
   <data name="MessageVmModeNotSupported" xml:space="preserve">
-    <value>旧分发不支持 WSL 2。</value>
+    <value>旧分发不支持 LSW 2。</value>
   </data>
   <data name="MessageEnableVirtualization" xml:space="preserve">
-    <value>当前计算机配置不支持 WSL2。
+    <value>当前计算机配置不支持 LSW2。
 请启用“虚拟机平台”可选组件，并确保在 BIOS 中启用虚拟化。
-通过运行以下命令启用“虚拟机平台”: wsl.exe --install --no-distribution
+通过运行以下命令启用“虚拟机平台”: lsw.exe --install --no-distribution
 有关信息，请访问 https://aka.ms/enablevirtualization</value>
     <comment>{Locked="--install "}{Locked="--no-distribution
 "}Command line arguments, file names and string inserts should not be translated</comment>
@@ -309,15 +309,15 @@
     <value>附加的虚拟硬盘或物理磁盘过多。</value>
   </data>
   <data name="MessageUserVhdAlreadyAttached" xml:space="preserve">
-    <value>已通过 wsl.exe --mount, 装载 VHD，请在启动之前卸载磁盘。</value>
+    <value>已通过 lsw.exe --mount, 装载 VHD，请在启动之前卸载磁盘。</value>
     <comment>{Locked="--mount,"}Command line arguments, file names and string inserts should not be translated</comment>
   </data>
   <data name="MessageWsl1NotSupported" xml:space="preserve">
-    <value>当前计算机配置不支持 WSL1。
-若要使用 WSL1，请启用“Windows Subsystem for Linux”可选组件。</value>
+    <value>当前计算机配置不支持 LSW1。
+若要使用 LSW1，请启用“Linux Subsystem for Windows”可选组件。</value>
   </data>
   <data name="MessageWsl2Needed" xml:space="preserve">
-    <value>仅 WSL2 支持此操作。</value>
+    <value>仅 LSW2 支持此操作。</value>
   </data>
   <data name="MessageWslInfoUsage" xml:space="preserve">
     <value>使用量:
@@ -328,7 +328,7 @@
         显示 MSAL 代理应用程序的路径。
 
     --version
-        显示 WSL 包的版本。
+        显示 LSW 包的版本。
 
     -n
         不要打印换行符。</value>
@@ -342,13 +342,13 @@
     -a
         强制结果为绝对路径格式。
     -u
-        从 Windows 路径转换为 WSL 路径(默认)。
+        从 Windows 路径转换为 LSW 路径(默认)。
     -w
-        从 WSL 路径转换为 Windows 路径。
+        从 LSW 路径转换为 Windows 路径。
     -m
-        从 WSL 路径转换为 Windows 路径，使用“/”而不是“\\”
+        从 LSW 路径转换为 Windows 路径，使用“/”而不是“\\”
 
-示例: wslpath 'c:\\users'</value>
+示例: lswpath 'c:\\users'</value>
     <comment>{Locked="-a
 "}{Locked="-u
 "}{Locked="-w
@@ -380,11 +380,11 @@
     <value>版权所有 (c) Microsoft Corporation。保留所有权利。
 有关此产品的隐私信息，请访问 https://aka.ms/privacy。
 
-用法: wsl.exe [Argument][Options...][CommandLine]
+用法: lsw.exe [Argument][Options...][CommandLine]
 
 运行 Linux 二进制文件的参数:
 
-    如果未提供命令行，wsl.exe 将启动默认 shell。
+    如果未提供命令行，lsw.exe 将启动默认 shell。
 
     --exec, -e &lt;CommandLine&gt;
         在不使用默认 Linux shell 的情况下执行指定的命令。
@@ -420,15 +420,15 @@
         显示使用情况信息。
 
     --debug-shell
-        出于诊断目的打开 WSL2 调试 shell。
+        出于诊断目的打开 LSW2 调试 shell。
 
     --install [Distro] [Options...]
         安装适用于 Linux 的 Windows 子系统分发版。
-        有关有效分发版的列表，请使用 'wsl.exe --list --online'。
+        有关有效分发版的列表，请使用 'lsw.exe --list --online'。
 
         选项:
-            --enable-wsl1
-                启用 WSL1 支持。
+            --enable-lsw1
+                启用 LSW1 支持。
 
             --fixed-vhd
                 创建固定大小的磁盘来存储分发版。
@@ -477,14 +477,14 @@
                 将分发版的磁盘大小调整为指定大小。
 
     --mount &lt;Disk&gt;
-        在所有 WSL 2 分发版中附加和装载物理磁盘或虚拟磁盘。
+        在所有 LSW 2 分发版中附加和装载物理磁盘或虚拟磁盘。
 
         选项:
             --vhd
                 指定 &lt;Disk&gt; 引用虚拟硬盘。
 
             --bare
-                将磁盘附加到 WSL2，但不要装载它。
+                将磁盘附加到 LSW2，但不要装载它。
 
             --name &lt;Name&gt;
                 使用装入点的自定义名称装载磁盘。
@@ -502,18 +502,18 @@
         更改新分发版的默认安装版本。
 
     --shutdown
-        立即终止所有正在运行的分发版和 WSL 2
+        立即终止所有正在运行的分发版和 LSW 2
         轻型实用工具虚拟机。
 
         选项:
             --force
-                即使正在执行操作，也终止 WSL 2 虚拟机。可能导致数据丢失。
+                即使正在执行操作，也终止 LSW 2 虚拟机。可能导致数据丢失。
 
     --status
         显示适用于 Linux 的 Windows 子系统状态。
 
     --unmount [磁盘]
-        从所有 WSL2 分发版中卸载和分离磁盘。
+        从所有 LSW2 分发版中卸载和分离磁盘。
         如果在没有参数的情况下调用，则卸载和分离所有磁盘。
 
     --uninstall
@@ -573,7 +573,7 @@
                 显示有关所有分发版的详细信息。
 
             --online, -o
-                显示适合通过 'wsl --install' 安装的可用分发版列表。
+                显示适合通过 'lsw --install' 安装的可用分发版列表。
 
     --set-default, -s &lt;Distro&gt;
         将分布版设置为默认值。
@@ -589,7 +589,7 @@
   <comment>{Locked="--exec,"}{Locked="--shell-type "}{Locked="--cd "}{Locked="--distribution,"}{Locked="--distribution-id "}{Locked="--user,"}{Locked="--system
 "}{Locked="--help
 "}{Locked="--debug-shell
-"}{Locked="--install "}{Locked="--list "}{Locked="--online'"}{Locked="--enable-wsl1
+"}{Locked="--install "}{Locked="--list "}{Locked="--online'"}{Locked="--enable-lsw1
 "}{Locked="--fixed-vhd
 "}{Locked="--from-file "}{Locked="--legacy
 "}{Locked="--location "}{Locked="--name "}{Locked="--no-distribution
@@ -608,9 +608,9 @@
 "}{Locked="--quiet,"}{Locked="--verbose,"}{Locked="--online,"}{Locked="--install'"}{Locked="--set-default,"}{Locked="--set-version "}{Locked="--terminate,"}{Locked="--unregister "}Command line arguments, file names and string inserts should not be translated</comment>
   </data>
   <data name="MessagePackageVersions" xml:space="preserve">
-    <value>WSL 版本: {}
+    <value>LSW 版本: {}
 内核版本: {}
-WSLg 版本: {}
+LSWg 版本: {}
 MSRDC 版本: {}
 Direct3D 版本: {}
 DXCore 版本: {}
@@ -639,7 +639,7 @@ Windows: {}</value>
     <value>版权所有(c) Microsoft Corporation。保留所有权利。
 有关此产品的隐私信息，请访问 https://aka.ms/privacy。
 
-用法: wslg.exe [参数] [选项...][命令行]
+用法: lswg.exe [参数] [选项...][命令行]
 
 参数:
    --cd &lt;Directory&gt;
@@ -679,7 +679,7 @@ Windows: {}</value>
     <value>正在导入，这可能需要几分钟时间。</value>
   </data>
   <data name="GuiApplicationsDisabled" xml:space="preserve">
-    <value>通过 {} 或 /etc/wsl.conf 禁用 GUI 应用程序支持。</value>
+    <value>通过 {} 或 /etc/lsw.conf 禁用 GUI 应用程序支持。</value>
     <comment>{FixedPlaceholder="{}"}Command line arguments, file names and string inserts should not be translated</comment>
   </data>
   <data name="MessageCheckingForUpdates" xml:space="preserve">
@@ -689,7 +689,7 @@ Windows: {}</value>
     <value>此分发版仅在Microsoft Store中可用。</value>
   </data>
   <data name="MessageWslMountNotSupportedOnArm" xml:space="preserve">
-    <value>在 ARM64 上 wsl.exe --mount 需要 Windows 版本 27653 或更高版本。</value>
+    <value>在 ARM64 上 lsw.exe --mount 需要 Windows 版本 27653 或更高版本。</value>
     <comment>{Locked="--mount "}Command line arguments, file names and string inserts should not be translated</comment>
   </data>
   <data name="MessageUpdateNotNeeded" xml:space="preserve">
@@ -701,7 +701,7 @@ Windows: {}</value>
   </data>
   <data name="MessageWslOptionalComponentRequired" xml:space="preserve">
     <value>此应用程序需要适用于 Linux 的 Windows 子系统可选组件。
-通过运行安装它： wsl.exe --install --no-distribution
+通过运行安装它： lsw.exe --install --no-distribution
 可能需要重新启动系统才能使更改生效。</value>
      <comment>{Locked="--install "}{Locked="--no-distribution
 "}Command line arguments, file names and string inserts should not be translated</comment>
@@ -714,14 +714,14 @@ Windows: {}</value>
     <comment>{FixedPlaceholder="{}"}Command line arguments, file names and string inserts should not be translated</comment>
   </data>
   <data name="MessageVmSwitchNotSet" xml:space="preserve">
-    <value>桥接网络需要设置 wsl2.vmSwitch。</value>
+    <value>桥接网络需要设置 lsw2.vmSwitch。</value>
   </data>
   <data name="MessageCouldFetchDistributionList" xml:space="preserve">
     <value>无法从“{}”提取列表分发。{}</value>
     <comment>{FixedPlaceholder="{}"}Command line arguments, file names and string inserts should not be translated</comment>
   </data>
   <data name="MessageFailedToAttachDisk" xml:space="preserve">
-    <value>无法将磁盘“{}”附加到 WSL2: {}</value>
+    <value>无法将磁盘“{}”附加到 LSW2: {}</value>
     <comment>{FixedPlaceholder="{}"}Command line arguments, file names and string inserts should not be translated</comment>
   </data>
   <data name="MessageFailedToResizeDisk" xml:space="preserve">
@@ -736,11 +736,11 @@ Windows: {}</value>
   <data name="MessageOsNotSupported" xml:space="preserve">
     <value>Windows 版本 {} 不支持打包版本的 适用于 Linux 的 Windows 子系统。
 通过 Windows 更新或通过以下方式安装所需的更新： {}
-有关信息，请访问 https://aka.ms/wslinstall</value>
+有关信息，请访问 https://aka.ms/lswinstall</value>
     <comment>{FixedPlaceholder="{}"}Command line arguments, file names and string inserts should not be translated</comment>
   </data>
   <data name="MessageAdministratorAccessRequiredForDebugShell" xml:space="preserve">
-    <value>运行调试 shell 需要以管理员身份运行 wsl.exe。</value>
+    <value>运行调试 shell 需要以管理员身份运行 lsw.exe。</value>
   </data>
   <data name="MessageInstallProcessFailed" xml:space="preserve">
     <value>分发“{}”的安装过程失败，退出代码: {}。</value>
@@ -791,7 +791,7 @@ Windows: {}</value>
     <comment>{FixedPlaceholder="{}"}Command line arguments, file names and string inserts should not be translated</comment>
   </data>
   <data name="MessageWarningDuringStartup" xml:space="preserve">
-    <value>WSL 启动期间出错</value>
+    <value>LSW 启动期间出错</value>
   </data>
   <data name="MessageOpenEventViewer" xml:space="preserve">
     <value>打开 EventViewer</value>
@@ -836,12 +836,12 @@ Windows: {}</value>
     <comment>{FixedPlaceholder="{}"}Command line arguments, file names and string inserts should not be translated</comment>
   </data>
   <data name="MessageDistributionInstalled" xml:space="preserve">
-    <value>已成功安装分发。可以通过 “wsl.exe -d {}” 启动它</value>
+    <value>已成功安装分发。可以通过 “lsw.exe -d {}” 启动它</value>
     <comment>{FixedPlaceholder="{}"}Command line arguments, file names and string inserts should not be translated</comment>
   </data>
   <data name="MessageInvalidNumberString" xml:space="preserve">
-    <value>{}:{} 中的 .wslconfig 条目“{}”的内存字符串“{}”无效</value>
-    <comment>{FixedPlaceholder="{}"}{Locked=".wslconfig"}Command line arguments, file names and string inserts should not be translated</comment>
+    <value>{}:{} 中的 .lswconfig 条目“{}”的内存字符串“{}”无效</value>
+    <comment>{FixedPlaceholder="{}"}{Locked=".lswconfig"}Command line arguments, file names and string inserts should not be translated</comment>
   </data>
   <data name="MessagedFailedToCreateSwapVhd" xml:space="preserve">
     <value>未能在“{}”中创建交换磁盘: {}</value>
@@ -880,22 +880,22 @@ Windows: {}</value>
     <value>DNS 隧道不受支持</value>
   </data>
   <data name="MessageLocalhostForwardingNotSupportedMirroredMode" xml:space="preserve">
-    <value>使用镜像网络模式时，wsl2.localhostForwarding 设置无效</value>
+    <value>使用镜像网络模式时，lsw2.localhostForwarding 设置无效</value>
   </data>
   <data name="MessageHttpProxyChangeDetected" xml:space="preserve">
-    <value>在主机上检测到 Http 代理更改。请重启 WSL 以应用更改。</value>
+    <value>在主机上检测到 Http 代理更改。请重启 LSW 以应用更改。</value>
   </data>
   <data name="MessageProxyLocalhostSettingsDropped" xml:space="preserve">
-    <value>检测到 localhost 代理配置，但未镜像到 WSL。NAT 模式下的 WSL 不支持 localhost 代理。</value>
+    <value>检测到 localhost 代理配置，但未镜像到 LSW。NAT 模式下的 LSW 不支持 localhost 代理。</value>
   </data>
   <data name="MessageProxyV6SettingsDropped" xml:space="preserve">
-    <value>检测到 IPv6 代理配置，但未镜像到 WSL。NAT 模式下的 WSL 不支持 IPv6。</value>
+    <value>检测到 IPv6 代理配置，但未镜像到 LSW。NAT 模式下的 LSW 不支持 IPv6。</value>
   </data>
   <data name="MessageProxyLoopbackV6SettingsDropped" xml:space="preserve">
-    <value>检测到 localhost IPv6 代理配置，但未镜像到 WSL 中。WSL 不支持 localhost IPv6 代理。</value>
+    <value>检测到 localhost IPv6 代理配置，但未镜像到 LSW 中。LSW 不支持 localhost IPv6 代理。</value>
   </data>
   <data name="MessageProxyUnexpectedSettingsDropped" xml:space="preserve">
-    <value>尝试解析代理设置时发生意外错误，代理设置未镜像到 WSL 中。</value>
+    <value>尝试解析代理设置时发生意外错误，代理设置未镜像到 LSW 中。</value>
   </data>
   <data name="MessageRegistryError" xml:space="preserve">
     <value>访问注册表时出错。路径：“{}”。错误： {}</value>
@@ -906,7 +906,7 @@ Windows: {}</value>
     <comment>{FixedPlaceholder="{}"}Command line arguments, file names and string inserts should not be translated</comment>
   </data>
   <data name="MessageVirtualMachinePlatformNotInstalled" xml:space="preserve">
-    <value>无法启动虚拟网络 - 请通过运行： wsl.exe --install --no-distribution 安装可选组件虚拟机平台</value>
+    <value>无法启动虚拟网络 - 请通过运行： lsw.exe --install --no-distribution 安装可选组件虚拟机平台</value>
     <comment>{Locked="--install "}{Locked="--no-distribution"}Command line arguments, file names and string inserts should not be translated</comment>
   </data>
   <data name="MessageNetworkInitializationFailedFallback2" xml:space="preserve">
@@ -926,29 +926,29 @@ Windows: {}</value>
     <comment>{FixedPlaceholder="{}"}Command line arguments, file names and string inserts should not be translated</comment>
   </data>
   <data name="MessagePluginRequiresUpdate" xml:space="preserve">
-    <value>插件“{}”需要较新版本的 WSL。请运行： wsl.exe --update</value>
+    <value>插件“{}”需要较新版本的 LSW。请运行： lsw.exe --update</value>
     <comment>{FixedPlaceholder="{}"}{Locked="--update"}Command line arguments, file names and string inserts should not be translated</comment>
   </data>
   <data name="MessageSettingOverridenByPolicy" xml:space="preserve">
-    <value>计算机策略已禁用 .wslconfig 设置“{}”。</value>
-    <comment>{FixedPlaceholder="{}"}{Locked=".wslconfig"}Command line arguments, file names and string inserts should not be translated</comment>
+    <value>计算机策略已禁用 .lswconfig 设置“{}”。</value>
+    <comment>{FixedPlaceholder="{}"}{Locked=".lswconfig"}Command line arguments, file names and string inserts should not be translated</comment>
   </data>
   <data name="MessageDebugShellDisabled" xml:space="preserve">
     <value>计算机策略禁用调试 shell。</value>
   </data>
-  <data name="MessageWSLMountDisabled" xml:space="preserve">
-    <value>wsl.exe --mount 被计算机策略禁用。</value>
+  <data name="MessageLSWMountDisabled" xml:space="preserve">
+    <value>lsw.exe --mount 被计算机策略禁用。</value>
     <comment>{Locked="--mount "}Command line arguments, file names and string inserts should not be translated</comment>
   </data>
-  <data name="MessageWSL1Disabled" xml:space="preserve">
-    <value>WSL1 被计算机策略禁用。</value>
+  <data name="MessageLSW1Disabled" xml:space="preserve">
+    <value>LSW1 被计算机策略禁用。</value>
   </data>
-  <data name="MessageUpgradeToWSL2" xml:space="preserve">
-    <value>请运行“wsl.exe --set-version {} 2”以升级到 WSL2。</value>
+  <data name="MessageUpgradeToLSW2" xml:space="preserve">
+    <value>请运行“lsw.exe --set-version {} 2”以升级到 LSW2。</value>
     <comment>{FixedPlaceholder="{}"}{Locked="--set-version "}Command line arguments, file names and string inserts should not be translated</comment>
   </data>
   <data name="MessageFinishMsiInstallation" xml:space="preserve">
-    <value>WSL 正在完成升级...</value>
+    <value>LSW 正在完成升级...</value>
   </data>
   <data name="MessageUpdateFailed" xml:space="preserve">
     <value>更新失败(退出代码: {})。</value>
@@ -971,7 +971,7 @@ Windows: {}</value>
     <comment>{FixedPlaceholder="{}"}Command line arguments, file names and string inserts should not be translated</comment>
   </data>
   <data name="MessageMissingOptionalComponents" xml:space="preserve">
-    <value>未安装运行 WSL 所需的可选组件。</value>
+    <value>未安装运行 LSW 所需的可选组件。</value>
   </data>
   <data name="MessageInstallMissingOptionalComponents" xml:space="preserve">
     <value>安装缺少的组件。</value>
@@ -996,7 +996,7 @@ Windows: {}</value>
     <value>请参阅文档</value>
   </data>
   <data name="MessageVhdInUse" xml:space="preserve">
-    <value>无法完成该操作，因为 vhdx 当前正在使用中。若要强制 WSL 停止使用： wsl.exe --shutdown</value>
+    <value>无法完成该操作，因为 vhdx 当前正在使用中。若要强制 LSW 停止使用： lsw.exe --shutdown</value>
     <comment>{Locked="--shutdown"}Command line arguments, file names and string inserts should not be translated</comment>
   </data>
   <data name="MessageInvalidBoolean" xml:space="preserve">
@@ -1004,10 +1004,10 @@ Windows: {}</value>
     <comment>{FixedPlaceholder="{}"}Command line arguments, file names and string inserts should not be translated</comment>
   </data>
   <data name="MessageSparseVhdWsl2Only" xml:space="preserve">
-    <value>仅 WSL2 支持稀疏 vhdx。</value>
+    <value>仅 LSW2 支持稀疏 vhdx。</value>
   </data>
   <data name="MessageLocalSystemNotSupported" xml:space="preserve">
-    <value>不支持将 WSL 作为本地系统运行。</value>
+    <value>不支持将 LSW 作为本地系统运行。</value>
   </data>
   <data name="MessagePerformanceTip" xml:space="preserve">
     <value>性能提示:</value>
@@ -1022,10 +1022,10 @@ Windows: {}</value>
   <data name="MessageDontShowAgain" xml:space="preserve">
     <value>不再显示</value>
   </data>
-  <data name="MessageWSL2Crashed" xml:space="preserve">
-    <value>WSL2 虚拟机崩溃。</value>
+  <data name="MessageLSW2Crashed" xml:space="preserve">
+    <value>LSW2 虚拟机崩溃。</value>
   </data>
-  <data name="MessageWSL2CrashedStackTrace" xml:space="preserve">
+  <data name="MessageLSW2CrashedStackTrace" xml:space="preserve">
     <value>堆栈跟踪已保存在： {}</value>
     <comment>{FixedPlaceholder="{}"}Command line arguments, file names and string inserts should not be translated</comment>
   </data>
@@ -1065,11 +1065,11 @@ Windows: {}</value>
     <value>尚未配置默认分发。请提供要安装的分发。</value>
   </data>
   <data name="MessageConfigVirtio9pDisabled" xml:space="preserve">
-    <value>已禁用 wsl2.virtio9p，使用 vsock 传输回退到 9p。</value>
+    <value>已禁用 lsw2.virtio9p，使用 vsock 传输回退到 9p。</value>
   </data>
   <data name="MessageInstallationCorrupted" xml:space="preserve">
-    <value>WSL 安装似乎已损坏 (错误代码： {})。
-按任意键修复 WSL，或 CTRL-C 取消。
+    <value>LSW 安装似乎已损坏 (错误代码： {})。
+按任意键修复 LSW，或 CTRL-C 取消。
 此提示将在 60 秒后超时。</value>
     <comment>{FixedPlaceholder="{}"}Command line arguments, file names and string inserts should not be translated</comment>
   </data>
@@ -1091,14 +1091,14 @@ Windows: {}</value>
     <comment>{FixedPlaceholder="{}"}Command line arguments, file names and string inserts should not be translated</comment>
   </data>
   <data name="MessageTooManyProcessors" xml:space="preserve">
-    <value>wsl2.processors 不能超过系统上的逻辑处理器数 ({} &gt; {})</value>
+    <value>lsw2.processors 不能超过系统上的逻辑处理器数 ({} &gt; {})</value>
     <comment>{FixedPlaceholder="{}"}Command line arguments, file names and string inserts should not be translated</comment>
   </data>
   <data name="MessageFailedToQueryNetworkingMode" xml:space="preserve">
     <value>查询网络模式失败</value>
   </data>
   <data name="MessageMismatchedKernelModulesError" xml:space="preserve">
-    <value>提供了自定义内核模块，但没有指定自定义内核。有关详细信息，请参阅 https://aka.ms/wslcustomkernel。</value>
+    <value>提供了自定义内核模块，但没有指定自定义内核。有关详细信息，请参阅 https://aka.ms/lswcustomkernel。</value>
   </data>
   <data name="MessageDnsTunnelingDisabled" xml:space="preserve">
     <value>由于当前与全球安全访问客户端的兼容性问题，DNS 隧道被禁用。</value>
@@ -1106,7 +1106,7 @@ Windows: {}</value>
   <data name="MessageSparseVhdDisabled" xml:space="preserve">
     <value>由于潜在的数据损坏，目前已禁用稀疏 VHD 支持。
 若要强制分发使用稀疏 vhd，请运行：
-wsl.exe --manage &lt;DistributionName&gt; --set-sparse --allow-unsafe</value>
+lsw.exe --manage &lt;DistributionName&gt; --set-sparse --allow-unsafe</value>
     <comment>{Locked="--manage "}{Locked="--set-sparse "}{Locked="--allow-unsafe"}Command line arguments, file names and string inserts should not be translated</comment>
   </data>
   <data name="MessageDrvfsMountFailed" xml:space="preserve">
@@ -1118,7 +1118,7 @@ wsl.exe --manage &lt;DistributionName&gt; --set-sparse --allow-unsafe</value>
   </data>
   <data name="MessageReadOnlyDistro" xml:space="preserve">
     <value>装载分发磁盘时出错，该磁盘作为回退以只读方式装载。
-请参阅以下位置的恢复说明： https://aka.ms/wsldiskmountrecovery</value>
+请参阅以下位置的恢复说明： https://aka.ms/lswdiskmountrecovery</value>
   </data>
   <data name="MessageFailedToTranslate" xml:space="preserve">
     <value>翻译“{}”失败</value>
@@ -1140,8 +1140,8 @@ wsl.exe --manage &lt;DistributionName&gt; --set-sparse --allow-unsafe</value>
     <value>适用于 Linux 设置的 Windows 子系统</value>
   </data>
   <data name="Settings_AppDescription" xml:space="preserve">
-    <value>适用于 Linux 的 Windows 子系统设置允许开发人员使用基于 GUI 的应用程序管理 .wslconfig 文件。</value>
-    <comment>{Locked=".wslconfig"}Command line arguments, file names and string inserts should not be translated</comment>
+    <value>适用于 Linux 的 Windows 子系统设置允许开发人员使用基于 GUI 的应用程序管理 .lswconfig 文件。</value>
+    <comment>{Locked=".lswconfig"}Command line arguments, file names and string inserts should not be translated</comment>
   </data>
   <data name="Settings_AutoMemoryReclaim.Header" xml:space="preserve">
     <value>自动内存回收</value>
@@ -1159,26 +1159,26 @@ wsl.exe --manage &lt;DistributionName&gt; --set-sparse --allow-unsafe</value>
     <value>已启用自动代理</value>
   </data>
   <data name="Settings_AutoProxy.Description" xml:space="preserve">
-    <value>使 WSL 能够使用 Windows 的 HTTP 代理信息。</value>
+    <value>使 LSW 能够使用 Windows 的 HTTP 代理信息。</value>
   </data>
   <data name="Settings_AutoProxyToggleSwitch.AutomationProperties.Name" xml:space="preserve">
     <value>已启用自动代理。</value>
   </data>
   <data name="Settings_AutoProxyToggleSwitch.AutomationProperties.HelpText" xml:space="preserve">
-    <value>使 WSL 能够使用 Windows 的 HTTP 代理信息。</value>
+    <value>使 LSW 能够使用 Windows 的 HTTP 代理信息。</value>
   </data>
   <data name="Settings_BestEffortDNS.Header" xml:space="preserve">
     <value>尽力进行 DNS 分析</value>
   </data>
   <data name="Settings_BestEffortDNS.Description" xml:space="preserve">
-    <value>仅当 wsl2.dnsTunneling 设置为 true 时适用。设置为 true 时，Windows 将从 DNS 请求中提取问题并尝试解决该问题，忽略未知记录。</value>
-    <comment>{Locked="wsl2.dnsTunneling"}.wslconfig property key names should not be translated</comment>
+    <value>仅当 lsw2.dnsTunneling 设置为 true 时适用。设置为 true 时，Windows 将从 DNS 请求中提取问题并尝试解决该问题，忽略未知记录。</value>
+    <comment>{Locked="lsw2.dnsTunneling"}.lswconfig property key names should not be translated</comment>
   </data>
   <data name="Settings_BestEffortDNSToggleSwitch.AutomationProperties.Name" xml:space="preserve">
     <value>尽力进行 DNS 分析。</value>
   </data>
   <data name="Settings_BestEffortDNSToggleSwitch.AutomationProperties.HelpText" xml:space="preserve">
-    <value>仅当 wsl2.dnsTunneling 设置为 true 时才适用。设置为 true 时，Windows 将从 DNS 请求中提取问题并尝试解决该问题，忽略未知记录。</value>
+    <value>仅当 lsw2.dnsTunneling 设置为 true 时才适用。设置为 true 时，Windows 将从 DNS 请求中提取问题并尝试解决该问题，忽略未知记录。</value>
   </data>
   <data name="Settings_CustomKernelPath.Header" xml:space="preserve">
     <value>自定义内核</value>
@@ -1217,36 +1217,36 @@ wsl.exe --manage &lt;DistributionName&gt; --set-sparse --allow-unsafe</value>
     <value>浏览发行版</value>
   </data>
   <data name="Settings_CustomSystemDistroPathDescription.Text" xml:space="preserve">
-    <value>指定 VHD 的路径，该路径将作为自定义系统发行版加载，主要用于为 WSL 中的 GUI 应用提供电源。[在此处详细了解系统发行]。</value>
+    <value>指定 VHD 的路径，该路径将作为自定义系统发行版加载，主要用于为 LSW 中的 GUI 应用提供电源。[在此处详细了解系统发行]。</value>
     <comment>{Locked="["}{Locked="]"}The text in between the delimiters [ ] is made into an hyperlink in code, and the delimiters are removed</comment>
   </data>
   <data name="Settings_CustomSystemDistroPathDescription.NavigateUri" xml:space="preserve">
-    <value>https://aka.ms/wslgsystemdistro</value>
-    <comment>{Locked}Uri to the Microsoft WSLg architecture devblog</comment>
+    <value>https://aka.ms/lswgsystemdistro</value>
+    <comment>{Locked}Uri to the Microsoft LSWg architecture devblog</comment>
   </data>
   <data name="Settings_CustomSystemDistroPathTextBox.AutomationProperties.Name" xml:space="preserve">
     <value>自定义系统发行版</value>
   </data>
   <data name="Settings_CustomSystemDistroPathTextBox.AutomationProperties.HelpText" xml:space="preserve">
-    <value>指定 VHD 的路径，该路径将作为自定义系统发行版加载，主要用于为 WSL 中的 GUI 应用提供电源。</value>
+    <value>指定 VHD 的路径，该路径将作为自定义系统发行版加载，主要用于为 LSW 中的 GUI 应用提供电源。</value>
   </data>
   <data name="Settings_DebugConsole.Header" xml:space="preserve">
     <value>启用调试控制台</value>
   </data>
   <data name="Settings_DebugConsole.Description" xml:space="preserve">
-    <value>用于打开输出控制台窗口的布尔值，该窗口在 WSL 2 发行版实例启动时显示 dmesg 的内容。</value>
+    <value>用于打开输出控制台窗口的布尔值，该窗口在 LSW 2 发行版实例启动时显示 dmesg 的内容。</value>
   </data>
   <data name="Settings_DebugConsoleToggleSwitch.AutomationProperties.Name" xml:space="preserve">
     <value>启用调试控制台。</value>
   </data>
   <data name="Settings_DebugConsoleToggleSwitch.AutomationProperties.HelpText" xml:space="preserve">
-    <value>用于打开输出控制台窗口的布尔值，该窗口在 WSL 2 发行版实例启动时显示诊断消息的内容。</value>
+    <value>用于打开输出控制台窗口的布尔值，该窗口在 LSW 2 发行版实例启动时显示诊断消息的内容。</value>
   </data>
   <data name="Settings_DefaultVHDSize.Header" xml:space="preserve">
     <value>默认 VHD 大小</value>
   </data>
   <data name="Settings_DefaultVHDSize.Description" xml:space="preserve">
-    <value>对于新创建的分发，可扩展 WSL 虚拟硬盘 (VHD) 的默认最大大小。</value>
+    <value>对于新创建的分发，可扩展 LSW 虚拟硬盘 (VHD) 的默认最大大小。</value>
   </data>
   <data name="Settings_DefaultVHDSizeResetButton.Content" xml:space="preserve">
     <value>重设大小</value>
@@ -1255,7 +1255,7 @@ wsl.exe --manage &lt;DistributionName&gt; --set-sparse --allow-unsafe</value>
     <value>默认 VHD 大小</value>
   </data>
   <data name="Settings_DefaultVHDSizeTextBox.AutomationProperties.HelpText" xml:space="preserve">
-    <value>为可扩展的 WSL 虚拟硬盘指定的默认最大大小 (VHD) 仅用于新创建的分发。</value>
+    <value>为可扩展的 LSW 虚拟硬盘指定的默认最大大小 (VHD) 仅用于新创建的分发。</value>
   </data>
   <data name="Settings_DeveloperPageTitle.Text" xml:space="preserve">
     <value>开发人员</value>
@@ -1264,39 +1264,39 @@ wsl.exe --manage &lt;DistributionName&gt; --set-sparse --allow-unsafe</value>
     <value>文档</value>
   </data>
   <data name="Settings_DocumentationLink.NavigateUri" xml:space="preserve">
-    <value>https://aka.ms/wsldocs</value>
-    <comment>{Locked}Uri to Microsoft WSL documentation</comment>
+    <value>https://aka.ms/lswdocs</value>
+    <comment>{Locked}Uri to Microsoft LSW documentation</comment>
   </data>
   <data name="Settings_DrvFSMode.Header" xml:space="preserve">
     <value>更改 DrvFS 模式</value>
   </data>
   <data name="Settings_DrvFSMode.Description" xml:space="preserve">
-    <value>更改 WSL 中的跨 OS 文件访问实施。</value>
+    <value>更改 LSW 中的跨 OS 文件访问实施。</value>
   </data>
   <data name="Settings_DNSProxy.Header" xml:space="preserve">
     <value>已启用 DNS 代理</value>
   </data>
   <data name="Settings_DNSProxy.Description" xml:space="preserve">
-    <value>仅当 wsl2.networkingMode 设置为 NAT 时适用。布尔值通知 WSL 将 Linux 中的 DNS 服务器配置为主机上的 NAT。设置为 false 将镜像从 Windows 到 Linux 的 DNS 服务器。</value>
-    <comment>{Locked="wsl2.networkingMode"}.wslconfig property key names should not be translated</comment>
+    <value>仅当 lsw2.networkingMode 设置为 NAT 时适用。布尔值通知 LSW 将 Linux 中的 DNS 服务器配置为主机上的 NAT。设置为 false 将镜像从 Windows 到 Linux 的 DNS 服务器。</value>
+    <comment>{Locked="lsw2.networkingMode"}.lswconfig property key names should not be translated</comment>
   </data>
   <data name="Settings_DNSProxyToggleSwitch.AutomationProperties.Name" xml:space="preserve">
     <value>已启用 DNS 代理。</value>
   </data>
   <data name="Settings_DNSProxyToggleSwitch.AutomationProperties.HelpText" xml:space="preserve">
-    <value>仅当 wsl2.networkingMode 设置为 NAT 时适用。布尔值通知 WSL 将 Linux 中的 DNS 服务器配置为主机上的 NAT。设置为 false 将镜像从 Windows 到 Linux 的 DNS 服务器。</value>
+    <value>仅当 lsw2.networkingMode 设置为 NAT 时适用。布尔值通知 LSW 将 Linux 中的 DNS 服务器配置为主机上的 NAT。设置为 false 将镜像从 Windows 到 Linux 的 DNS 服务器。</value>
   </data>
   <data name="Settings_DNSTunneling.Header" xml:space="preserve">
     <value>已启用 DNS 隧道</value>
   </data>
   <data name="Settings_DNSTunneling.Description" xml:space="preserve">
-    <value>更改 DNS 请求从 WSL 代理到 Windows 的方式。</value>
+    <value>更改 DNS 请求从 LSW 代理到 Windows 的方式。</value>
   </data>
   <data name="Settings_DNSTunnelingToggleSwitch.AutomationProperties.Name" xml:space="preserve">
     <value>已启用 DNS 隧道。</value>
   </data>
   <data name="Settings_DNSTunnelingToggleSwitch.AutomationProperties.HelpText" xml:space="preserve">
-    <value>更改 DNS 请求从 WSL 代理到 Windows 的方式。</value>
+    <value>更改 DNS 请求从 LSW 代理到 Windows 的方式。</value>
   </data>
   <data name="Settings_FileSystemPageTitle.Text" xml:space="preserve">
     <value>文件系统</value>
@@ -1305,17 +1305,17 @@ wsl.exe --manage &lt;DistributionName&gt; --set-sparse --allow-unsafe</value>
     <value>启用 GUI 应用程序</value>
   </data>
   <data name="Settings_GUIApplicationsDescription.Text" xml:space="preserve">
-    <value>用于在 WSL 中打开或关闭对 GUI 应用程序 ([WSLg]) 的支持的布尔值。</value>
+    <value>用于在 LSW 中打开或关闭对 GUI 应用程序 ([LSWg]) 的支持的布尔值。</value>
   </data>
   <data name="Settings_GUIApplicationsDescription.NavigateUri" xml:space="preserve">
-    <value>https://aka.ms/wslgproject</value>
-    <comment>{Locked}Uri to the Microsoft GitHub WSLg project</comment>
+    <value>https://aka.ms/lswgproject</value>
+    <comment>{Locked}Uri to the Microsoft GitHub LSWg project</comment>
   </data>
   <data name="Settings_GUIApplicationsToggleSwitch.AutomationProperties.Name" xml:space="preserve">
     <value>启用 GUI 应用程序。</value>
   </data>
   <data name="Settings_GUIApplicationsToggleSwitch.AutomationProperties.HelpText" xml:space="preserve">
-    <value>布尔值，用于在 WSL 中启用或禁用对 GUI 应用程序(名为 WSL g)的支持。</value>
+    <value>布尔值，用于在 LSW 中启用或禁用对 GUI 应用程序(名为 LSW g)的支持。</value>
   </data>
   <data name="Settings_HWPerfCounters.Header" xml:space="preserve">
     <value>启用硬件性能计数器</value>
@@ -1333,33 +1333,33 @@ wsl.exe --manage &lt;DistributionName&gt; --set-sparse --allow-unsafe</value>
     <value>已启用 Hyper-V 防火墙</value>
   </data>
   <data name="Settings_HyperVFirewall.Description" xml:space="preserve">
-    <value>启用 Hyper-V 防火墙，该防火墙允许 Windows 防火墙规则以及 Hyper-V 流量特定的规则来筛选 WSL 网络流量。</value>
+    <value>启用 Hyper-V 防火墙，该防火墙允许 Windows 防火墙规则以及 Hyper-V 流量特定的规则来筛选 LSW 网络流量。</value>
   </data>
   <data name="Settings_HyperVFirewallToggleSwitch.AutomationProperties.Name" xml:space="preserve">
     <value>已启用 Hyper-V 防火墙。</value>
   </data>
   <data name="Settings_HyperVFirewallToggleSwitch.AutomationProperties.HelpText" xml:space="preserve">
-    <value>启用 Hyper-V 防火墙，该防火墙允许 Windows 防火墙规则以及 Hyper-V 流量特定的规则来筛选 WSL 网络流量。</value>
+    <value>启用 Hyper-V 防火墙，该防火墙允许 Windows 防火墙规则以及 Hyper-V 流量特定的规则来筛选 LSW 网络流量。</value>
   </data>
   <data name="Settings_HostAddressLoopback.Header" xml:space="preserve">
     <value>主机地址环回</value>
   </data>
   <data name="Settings_HostAddressLoopback.Description" xml:space="preserve">
-    <value>仅当 wsl2.networkingMode 设置为镜像时适用。设置为 True 时，将允许容器通过分配给主机的 IP 地址连接到主机或主机连接到容器。请注意，始终可以使用 127.0.0.1 环回地址 - 此选项还允许使用所有额外分配的本地 IP 地址。</value>
-    <comment>{Locked="wsl2.networkingMode"}.wslconfig property key names should not be translated</comment>
+    <value>仅当 lsw2.networkingMode 设置为镜像时适用。设置为 True 时，将允许容器通过分配给主机的 IP 地址连接到主机或主机连接到容器。请注意，始终可以使用 127.0.0.1 环回地址 - 此选项还允许使用所有额外分配的本地 IP 地址。</value>
+    <comment>{Locked="lsw2.networkingMode"}.lswconfig property key names should not be translated</comment>
   </data>
   <data name="Settings_HostAddressLoopbackToggleSwitch.AutomationProperties.Name" xml:space="preserve">
     <value>主机地址环回。</value>
   </data>
   <data name="Settings_HostAddressLoopbackToggleSwitch.AutomationProperties.HelpText" xml:space="preserve">
-    <value>仅当 wsl2.networkingMode 设置为镜像时适用。设置为 True 时，将允许容器通过分配给主机的 IP 地址连接到主机或主机连接到容器。请注意，始终可以使用 127.0.0.1 环回地址 - 此选项还允许使用所有额外分配的本地 IP 地址。</value>
+    <value>仅当 lsw2.networkingMode 设置为镜像时适用。设置为 True 时，将允许容器通过分配给主机的 IP 地址连接到主机或主机连接到容器。请注意，始终可以使用 127.0.0.1 环回地址 - 此选项还允许使用所有额外分配的本地 IP 地址。</value>
   </data>
   <data name="Settings_IgnoredPorts.Header" xml:space="preserve">
     <value>忽略的端口</value>
   </data>
   <data name="Settings_IgnoredPorts.Description" xml:space="preserve">
-    <value>仅当 wsl2.networkingMode 设置为镜像时适用。指定 Linux 应用程序可以绑定到的端口，不会在 Windows 中自动转发或考虑这些端口。应以逗号分隔的列表格式化，例如： 3000,9000,9090。</value>
-    <comment>{Locked="wsl2.networkingMode"}.wslconfig property key names should not be translated</comment>
+    <value>仅当 lsw2.networkingMode 设置为镜像时适用。指定 Linux 应用程序可以绑定到的端口，不会在 Windows 中自动转发或考虑这些端口。应以逗号分隔的列表格式化，例如： 3000,9000,9090。</value>
+    <comment>{Locked="lsw2.networkingMode"}.lswconfig property key names should not be translated</comment>
   </data>
   <data name="Settings_IgnoredPortsResetButton.Content" xml:space="preserve">
     <value>重置端口</value>
@@ -1368,14 +1368,14 @@ wsl.exe --manage &lt;DistributionName&gt; --set-sparse --allow-unsafe</value>
     <value>忽略的端口</value>
   </data>
   <data name="Settings_IgnoredPortsTextBox.AutomationProperties.HelpText" xml:space="preserve">
-    <value>仅当 wsl2.networkingMode 设置为镜像时适用。指定 Linux 应用程序可以绑定到的端口，不会在 Windows 中自动转发或考虑这些端口。应以逗号分隔的列表格式化，例如 3000、9000、9090。</value>
+    <value>仅当 lsw2.networkingMode 设置为镜像时适用。指定 Linux 应用程序可以绑定到的端口，不会在 Windows 中自动转发或考虑这些端口。应以逗号分隔的列表格式化，例如 3000、9000、9090。</value>
   </data>
   <data name="Settings_InitialAutoProxyTimeout.Header" xml:space="preserve">
     <value>初始自动代理超时</value>
   </data>
   <data name="Settings_InitialAutoProxyTimeout.Description" xml:space="preserve">
-    <value>仅当 wsl2.autoProxy 设置为 true 时适用。配置在启动 WSL 容器时 WSL 等待检索 HTTP 代理信息) (毫秒。如果在此时间后解析代理设置，则必须重新启动 WSL 实例才能使用检索到的代理设置。</value>
-    <comment>{Locked="wsl2.autoProxy"}.wslconfig property key names should not be translated</comment>
+    <value>仅当 lsw2.autoProxy 设置为 true 时适用。配置在启动 LSW 容器时 LSW 等待检索 HTTP 代理信息) (毫秒。如果在此时间后解析代理设置，则必须重新启动 LSW 实例才能使用检索到的代理设置。</value>
+    <comment>{Locked="lsw2.autoProxy"}.lswconfig property key names should not be translated</comment>
   </data>
   <data name="Settings_InitialAutoProxyTimeoutResetButton.Content" xml:space="preserve">
     <value>重置超时</value>
@@ -1384,7 +1384,7 @@ wsl.exe --manage &lt;DistributionName&gt; --set-sparse --allow-unsafe</value>
     <value>初始自动代理超时</value>
   </data>
   <data name="Settings_InitialAutoProxyTimeoutTextBox.AutomationProperties.HelpText" xml:space="preserve">
-    <value>仅当 wsl2.autoProxy 设置为 true 时才适用。配置启动 WSL 容器时 WSL 等待检索 HTTP 代理信息的时间，以毫秒为单位。如果在此时间后解析代理设置，则必须重新启动 WSL 实例才能使用检索到的代理设置。</value>
+    <value>仅当 lsw2.autoProxy 设置为 true 时才适用。配置启动 LSW 容器时 LSW 等待检索 HTTP 代理信息的时间，以毫秒为单位。如果在此时间后解析代理设置，则必须重新启动 LSW 实例才能使用检索到的代理设置。</value>
   </data>
   <data name="Settings_KernelCommandLine.Header" xml:space="preserve">
     <value>内核命令行</value>
@@ -1396,13 +1396,13 @@ wsl.exe --manage &lt;DistributionName&gt; --set-sparse --allow-unsafe</value>
     <value>启用 localhost 转发</value>
   </data>
   <data name="Settings_LocalhostForwarding.Description" xml:space="preserve">
-    <value>布尔值，指定是否应通过 localhost：port 从主机连接到 WSL 2 VM 中通配符或 localhost 的端口。</value>
+    <value>布尔值，指定是否应通过 localhost：port 从主机连接到 LSW 2 VM 中通配符或 localhost 的端口。</value>
   </data>
   <data name="Settings_LocalhostForwardingToggleSwitch.AutomationProperties.Name" xml:space="preserve">
     <value>启用 localhost 转发。</value>
   </data>
   <data name="Settings_LocalhostForwardingToggleSwitch.AutomationProperties.HelpText" xml:space="preserve">
-    <value>一个布尔值，指定绑定到 WSL 2 VM 中的通配符或 localhost 的端口是否应可通过 localhost、colon、port 从主机连接。</value>
+    <value>一个布尔值，指定绑定到 LSW 2 VM 中的通配符或 localhost 的端口是否应可通过 localhost、colon、port 从主机连接。</value>
   </data>
   <data name="Settings_MegabyteStringFormat" xml:space="preserve">
     <value>{0} MB</value>
@@ -1414,7 +1414,7 @@ wsl.exe --manage &lt;DistributionName&gt; --set-sparse --allow-unsafe</value>
     <value>内存大小</value>
   </data>
   <data name="Settings_MemorySize.Description" xml:space="preserve">
-    <value>要分配给 WSL 2 VM 的内存量。</value>
+    <value>要分配给 LSW 2 VM 的内存量。</value>
   </data>
   <data name="Settings_MemorySizeResetButton.Content" xml:space="preserve">
     <value>重设大小</value>
@@ -1423,7 +1423,7 @@ wsl.exe --manage &lt;DistributionName&gt; --set-sparse --allow-unsafe</value>
     <value>内存大小</value>
   </data>
   <data name="Settings_MemorySizeTextBox.AutomationProperties.HelpText" xml:space="preserve">
-    <value>以 MB 为单位指定的要分配给 WSL 2 VM 的内存量。</value>
+    <value>以 MB 为单位指定的要分配给 LSW 2 VM 的内存量。</value>
   </data>
   <data name="Settings_MillisecondsStringFormat" xml:space="preserve">
     <value>{0} 毫秒</value>
@@ -1432,25 +1432,25 @@ wsl.exe --manage &lt;DistributionName&gt; --set-sparse --allow-unsafe</value>
     <value>启用嵌套虚拟化</value>
   </data>
   <data name="Settings_NestedVirtualization.Description" xml:space="preserve">
-    <value>用于打开或关闭嵌套虚拟化的布尔值，使其他嵌套 VM 能够在 WSL 2 内运行。</value>
+    <value>用于打开或关闭嵌套虚拟化的布尔值，使其他嵌套 VM 能够在 LSW 2 内运行。</value>
   </data>
   <data name="Settings_NestedVirtualizationToggleSwitch.AutomationProperties.Name" xml:space="preserve">
     <value>启用嵌套虚拟化。</value>
   </data>
   <data name="Settings_NestedVirtualizationToggleSwitch.AutomationProperties.HelpText" xml:space="preserve">
-    <value>用于打开或关闭嵌套虚拟化的布尔值，使其他嵌套 VM 能够在 WSL 2 内运行。</value>
+    <value>用于打开或关闭嵌套虚拟化的布尔值，使其他嵌套 VM 能够在 LSW 2 内运行。</value>
   </data>
   <data name="Settings_NetworkingMode.Header" xml:space="preserve">
     <value>网络模式</value>
   </data>
   <data name="Settings_NetworkingMode.Description" xml:space="preserve">
-    <value>指定 WSL 的网络模式。</value>
+    <value>指定 LSW 的网络模式。</value>
   </data>
   <data name="Settings_NetworkingModeComboBox.AutomationProperties.Name" xml:space="preserve">
     <value>网络模式。</value>
   </data>
   <data name="Settings_NetworkingModeComboBox.AutomationProperties.HelpText" xml:space="preserve">
-    <value>指定 WSL 的网络模式。</value>
+    <value>指定 LSW 的网络模式。</value>
   </data>
   <data name="Settings_NetworkingPageTitle.Text" xml:space="preserve">
     <value>网络</value>
@@ -1473,14 +1473,14 @@ wsl.exe --manage &lt;DistributionName&gt; --set-sparse --allow-unsafe</value>
     <value>使用文件资源管理器访问 Linux 文件</value>
   </data>
   <data name="Settings_OOBECrossOSFileAccess_LinuxFromFileExplorerSample.Text" xml:space="preserve">
-    <value>可以通过导航到 '\\wsl.localhost\' 或单击 'Linux' 图标来查看文件资源管理器中的 Linux 文件。</value>
-    <comment>{Locked="\\wsl.localhost\"}Url addresses should not be translated.</comment>
+    <value>可以通过导航到 '\\lsw.localhost\' 或单击 'Linux' 图标来查看文件资源管理器中的 Linux 文件。</value>
+    <comment>{Locked="\\lsw.localhost\"}Url addresses should not be translated.</comment>
   </data>
-  <data name="Settings_OOBECrossOSFileAccess_LaunchWindowsFromWSLTitle.Text" xml:space="preserve">
-    <value>从 WSL 启动 Windows 文件和程序</value>
+  <data name="Settings_OOBECrossOSFileAccess_LaunchWindowsFromLSWTitle.Text" xml:space="preserve">
+    <value>从 LSW 启动 Windows 文件和程序</value>
   </data>
-  <data name="Settings_OOBECrossOSFileAccess_LaunchWindowsFromWSLSample.Text" xml:space="preserve">
-    <value>即使使用 WSL 时，也可以直接从 bash 运行 Windows 可执行文件。尝试运行
+  <data name="Settings_OOBECrossOSFileAccess_LaunchWindowsFromLSWSample.Text" xml:space="preserve">
+    <value>即使使用 LSW 时，也可以直接从 bash 运行 Windows 可执行文件。尝试运行
 'powershell.exe /c start .'，在当前文件夹中打开文件资源管理器。</value>
     <comment>{Locked="/c start ."}Command line arguments and file names should not be translated</comment>
   </data>
@@ -1499,106 +1499,106 @@ wsl.exe --manage &lt;DistributionName&gt; --set-sparse --allow-unsafe</value>
     <value>镜像模式网络</value>
   </data>
   <data name="Settings_OOBECrossOSFileAccess_MirroredModeNetworkingSample.Text" xml:space="preserve">
-    <value>WSL 还包括一种称为镜像模式的新网络模式，该模式添加了 IPv6 支持等高级功能，并且能够访问局域网中的网络应用程序。</value>
+    <value>LSW 还包括一种称为镜像模式的新网络模式，该模式添加了 IPv6 支持等高级功能，并且能够访问局域网中的网络应用程序。</value>
   </data>
   <data name="Settings_OOBECrossOSFileAccessLink.Content" xml:space="preserve">
     <value>了解有关跨 OS 文件访问的详细信息</value>
   </data>
   <data name="Settings_OOBECrossOSFileAccessLink.NavigateUri" xml:space="preserve">
-    <value>https://aka.ms/wslfilesystems</value>
+    <value>https://aka.ms/lswfilesystems</value>
     <comment>{Locked}Uri to the Working across Windows and Linux file systems documentation</comment>
   </data>
   <data name="Settings_OOBEDisplayName" xml:space="preserve">
     <value>欢迎使用适用于 Linux 的 Windows 子系统</value>
   </data>
   <data name="Settings_OOBEDistroManagement.Description" xml:space="preserve">
-   <value>WSL 是试用不同 Linux 发行版的好方法。</value>
+   <value>LSW 是试用不同 Linux 发行版的好方法。</value>
   </data>
   <data name="Settings_OOBEDistroManagement.Title" xml:space="preserve">
     <value>发行版管理</value>
   </data>
-  <data name="Settings_OOBEDistroManagementBasicWSLCommandsLink.Content" xml:space="preserve">
-    <value>详细了解基本 WSL 命令</value>
+  <data name="Settings_OOBEDistroManagementBasicLSWCommandsLink.Content" xml:space="preserve">
+    <value>详细了解基本 LSW 命令</value>
   </data>
-  <data name="Settings_OOBEDistroManagementBasicWSLCommandsLink.NavigateUri" xml:space="preserve">
-    <value>https://aka.ms/wslcommands</value>
-    <comment>{Locked}Uri to the basic WSL commands documentation</comment>
+  <data name="Settings_OOBEDistroManagementBasicLSWCommandsLink.NavigateUri" xml:space="preserve">
+    <value>https://aka.ms/lswcommands</value>
+    <comment>{Locked}Uri to the basic LSW commands documentation</comment>
   </data>
   <data name="Settings_OOBEDistroManagementImportCustomDistroLink.Content" xml:space="preserve">
     <value>详细了解如何导入任何 Linux 发行版</value>
   </data>
   <data name="Settings_OOBEDistroManagementImportCustomDistroLink.NavigateUri" xml:space="preserve">
-    <value>https://aka.ms/wslcustomdistro</value>
-    <comment>{Locked}Uri to the import any linux distribution to use with WSL documentation</comment>
+    <value>https://aka.ms/lswcustomdistro</value>
+    <comment>{Locked}Uri to the import any linux distribution to use with LSW documentation</comment>
   </data>
   <data name="Settings_OOBEDistroManagement_InstallableDistrosTitle.Text" xml:space="preserve">
-    <value>列出可安装的 WSL 发行版命令</value>
+    <value>列出可安装的 LSW 发行版命令</value>
   </data>
   <data name="Settings_OOBEDistroManagement_InstallableDistrosSample.Text" xml:space="preserve">
-    <value>'wsl.exe -l -o'</value>
+    <value>'lsw.exe -l -o'</value>
     <comment>{Locked="-l -o"}Command line arguments and file names should not be translated</comment>
   </data>
   <data name="Settings_OOBEDistroManagement_InstallNamedDistrosTitle.Text" xml:space="preserve">
-    <value>安装命名的 WSL 发行版命令</value>
+    <value>安装命名的 LSW 发行版命令</value>
   </data>
   <data name="Settings_OOBEDistroManagement_InstallNamedDistrosSample.Text" xml:space="preserve">
-    <value>'wsl.exe --install &lt;DistroName&gt;'</value>
+    <value>'lsw.exe --install &lt;DistroName&gt;'</value>
     <comment>{Locked="--install "}Command line arguments, file names and string inserts should not be translated</comment>
   </data>
   <data name="Settings_OOBEDistroManagement_AvailableDistrosTitle.Text" xml:space="preserve">
-    <value>列出可用的 WSL 发行版命令</value>
+    <value>列出可用的 LSW 发行版命令</value>
   </data>
   <data name="Settings_OOBEDistroManagement_AvailableDistrosSample.Text" xml:space="preserve">
-    <value>'wsl.exe -l'</value>
+    <value>'lsw.exe -l'</value>
     <comment>{Locked="-l"}Command line arguments and file names should not be translated</comment>
   </data>
   <data name="Settings_OOBEDockerDesktopIntegration.Description" xml:space="preserve">
-    <value>Docker Desktop 非常适合与 WSL 配合使用，可帮助你使用 Linux 容器进行开发。
+    <value>Docker Desktop 非常适合与 LSW 配合使用，可帮助你使用 Linux 容器进行开发。
 
-将 Docker Desktop 与 WSL 配合使用的一些优点是:
+将 Docker Desktop 与 LSW 配合使用的一些优点是:
 
-• 可以使用相同的 Docker 守护程序和映像在 WSL 或 Windows 中运行 Docker 命令。
-• 可以使用 WSL 中的 Windows 驱动器自动装载功能在 Windows 和 Linux 之间无缝共享文件和文件夹。
-• 由于 WSL 的互操作性，你可以使用首选的 Windows 工具和编辑器处理 Linux 代码和文件，反之亦然。</value>
+• 可以使用相同的 Docker 守护程序和映像在 LSW 或 Windows 中运行 Docker 命令。
+• 可以使用 LSW 中的 Windows 驱动器自动装载功能在 Windows 和 Linux 之间无缝共享文件和文件夹。
+• 由于 LSW 的互操作性，你可以使用首选的 Windows 工具和编辑器处理 Linux 代码和文件，反之亦然。</value>
  </data>
   <data name="Settings_OOBEDockerDesktopIntegration.Title" xml:space="preserve">
     <value>Docker Desktop 集成</value>
   </data>
   <data name="Settings_OOBEDockerDesktopIntegrationLink.Content" xml:space="preserve">
-    <value>详细了解如何将 WSL 与 Docker 配合使用</value>
+    <value>详细了解如何将 LSW 与 Docker 配合使用</value>
   </data>
   <data name="Settings_OOBEDockerDesktopIntegrationLink.NavigateUri" xml:space="preserve">
-    <value>https://aka.ms/wsldocker</value>
-    <comment>{Locked}Uri to the Docker remote containers on WSL 2 documentation</comment>
+    <value>https://aka.ms/lswdocker</value>
+    <comment>{Locked}Uri to the Docker remote containers on LSW 2 documentation</comment>
   </data>
   <data name="Settings_OOBEGeneral.Description" xml:space="preserve">
-    <value>通过适用于 Linux 的 Windows 子系统(WSL)，可以直接在 Windows 上运行你最喜爱的 Linux 工具、实用工具、应用程序和工作流。
+    <value>通过适用于 Linux 的 Windows 子系统(LSW)，可以直接在 Windows 上运行你最喜爱的 Linux 工具、实用工具、应用程序和工作流。
 
 花点时间预览社区的一些热门功能或查看我们的综合文档。</value>
   </data>
   <data name="Settings_OOBEGeneral.Title" xml:space="preserve">
-    <value>欢迎使用 WSL</value>
+    <value>欢迎使用 LSW</value>
   </data>
   <data name="Settings_OOBEGeneral_BestPracticesSetupLink.Content" xml:space="preserve">
     <value>安装的最佳做法</value>
   </data>
   <data name="Settings_OOBEGeneral_BestPracticesSetupLink.NavigateUri" xml:space="preserve">
-    <value>https://aka.ms/wslsetup</value>
+    <value>https://aka.ms/lswsetup</value>
     <comment>{Locked}Uri to the Best Practices for Setup Documentation</comment>
   </data>
   <data name="Settings_OOBEGeneral_GettingStartedLinuxLink.Content" xml:space="preserve">
     <value>Linux 入门</value>
   </data>
   <data name="Settings_OOBEGeneral_GettingStartedLinuxLink.NavigateUri" xml:space="preserve">
-    <value>https://aka.ms/wslgettingstarted</value>
+    <value>https://aka.ms/lswgettingstarted</value>
     <comment>{Locked}Uri to the Getting Started with Linux Documentation</comment>
   </data>
-  <data name="Settings_OOBEGeneral_WSLDocumentationLink.Content" xml:space="preserve">
-    <value>适用于 Linux 的 Windows 子系统 (WSL) 文档</value>
+  <data name="Settings_OOBEGeneral_LSWDocumentationLink.Content" xml:space="preserve">
+    <value>适用于 Linux 的 Windows 子系统 (LSW) 文档</value>
   </data>
-  <data name="Settings_OOBEGeneral_WSLDocumentationLink.NavigateUri" xml:space="preserve">
-    <value>https://aka.ms/wsldocs</value>
-    <comment>{Locked}Uri to the Microsoft WSL Documentation</comment>
+  <data name="Settings_OOBEGeneral_LSWDocumentationLink.NavigateUri" xml:space="preserve">
+    <value>https://aka.ms/lswdocs</value>
+    <comment>{Locked}Uri to the Microsoft LSW Documentation</comment>
   </data>
   <data name="Settings_OOBEGUIApps.Description" xml:space="preserve">
     <value>可以通过本机 Windows 交互操作(例如 alt-tab、开始菜单启动、任务栏固定以及剪切和粘贴支持)使用基于图形的 Linux 应用程序。</value>
@@ -1607,9 +1607,9 @@ wsl.exe --manage &lt;DistributionName&gt; --set-sparse --allow-unsafe</value>
     <value>GUI 应用</value>
   </data>
   <data name="Settings_OOBEGPUAcceleration.Description" xml:space="preserve">
-    <value>WSL 可以利用 Windows GPU 进行机器学习工作流
+    <value>LSW 可以利用 Windows GPU 进行机器学习工作流
 
-在 WSL 中运行的 Linux 二进制文件可以自动使用 Windows 中的 GPU 来加快性能。只需像在常规 Linux 计算机上那样安装和运行这些工作流。开始入门有很多种不同的方法，如果使用 NVIDIA 显卡，可以在 docker 容器中运行 CUDA，还可以在 AMD、Intel 或 NVIDIA 显卡上使用 DirectML 运行 PyTorch 或 TensorFlow。请参阅下面的入门指南了解详细信息。</value>
+在 LSW 中运行的 Linux 二进制文件可以自动使用 Windows 中的 GPU 来加快性能。只需像在常规 Linux 计算机上那样安装和运行这些工作流。开始入门有很多种不同的方法，如果使用 NVIDIA 显卡，可以在 docker 容器中运行 CUDA，还可以在 AMD、Intel 或 NVIDIA 显卡上使用 DirectML 运行 PyTorch 或 TensorFlow。请参阅下面的入门指南了解详细信息。</value>
   </data>
   <data name="Settings_OOBEGPUAcceleration.Title" xml:space="preserve">
     <value>GPU 加速</value>
@@ -1618,15 +1618,15 @@ wsl.exe --manage &lt;DistributionName&gt; --set-sparse --allow-unsafe</value>
     <value>详细了解 GPU 加速</value>
   </data>
   <data name="Settings_OOBEGPUAccelerationLink.NavigateUri" xml:space="preserve">
-    <value>https://aka.ms/wslgpu</value>
-    <comment>{Locked}Uri to the GPU acceleration for ML in WSL documentation</comment>
+    <value>https://aka.ms/lswgpu</value>
+    <comment>{Locked}Uri to the GPU acceleration for ML in LSW documentation</comment>
   </data>
   <data name="Settings_OOBEGUIAppsLink.Content" xml:space="preserve">
-    <value>详细了解 WSL GUI 应用</value>
+    <value>详细了解 LSW GUI 应用</value>
   </data>
   <data name="Settings_OOBEGUIAppsLink.NavigateUri" xml:space="preserve">
-    <value>https://aka.ms/wslguiapps</value>
-    <comment>{Locked}Uri to the Run GUI apps on the WSL documentation</comment>
+    <value>https://aka.ms/lswguiapps</value>
+    <comment>{Locked}Uri to the Run GUI apps on the LSW documentation</comment>
   </data>
   <data name="Settings_OOBEGUIApps_AppsListDescription.Text" xml:space="preserve">
     <value>下面是可尝试的应用列表(可以通过键入 'sudo apt install &lt;The App Name&gt;' 在 Ubuntu 中安装所有这些应用)
@@ -1648,44 +1648,44 @@ wsl.exe --manage &lt;DistributionName&gt; --set-sparse --allow-unsafe</value>
     <value>详细了解网络应用程序</value>
   </data>
   <data name="Settings_OOBENetworkingIntegrationLinuxNetworkingAppsLink.NavigateUri" xml:space="preserve">
-    <value>https://aka.ms/wslnetworking</value>
-    <comment>{Locked}Uri to the Accessing network applications with WSL documentation</comment>
+    <value>https://aka.ms/lswnetworking</value>
+    <comment>{Locked}Uri to the Accessing network applications with LSW documentation</comment>
   </data>
   <data name="Settings_OOBENetworkingIntegrationMirroredModeLink.Content" xml:space="preserve">
     <value>详细了解镜像模式网络</value>
   </data>
   <data name="Settings_OOBENetworkingIntegrationMirroredModeLink.NavigateUri" xml:space="preserve">
-    <value>https://aka.ms/wslmirroredmode</value>
-    <comment>{Locked}Uri to the WSL Mirrored Mode networking documentation</comment>
+    <value>https://aka.ms/lswmirroredmode</value>
+    <comment>{Locked}Uri to the LSW Mirrored Mode networking documentation</comment>
   </data>
   <data name="Settings_OOBEVSCodeIntegration.Description" xml:space="preserve">
-   <value>可以直接从 VS Code 使用 WSL 作为全时开发环境。</value>
+   <value>可以直接从 VS Code 使用 LSW 作为全时开发环境。</value>
   </data>
   <data name="Settings_OOBEVSCodeIntegration.Title" xml:space="preserve">
     <value>VS Code 集成</value>
   </data>
   <data name="Settings_OOBEVSCodeIntegrationLink.Content" xml:space="preserve">
-    <value>详细了解如何将 WSL 与 VS Code 配合使用</value>
+    <value>详细了解如何将 LSW 与 VS Code 配合使用</value>
   </data>
   <data name="Settings_OOBEVSCodeIntegrationLink.NavigateUri" xml:space="preserve">
-    <value>https://aka.ms/wslvscode</value>
-    <comment>{Locked}Uri to the using Visual Studio Code with WSL documentation</comment>
+    <value>https://aka.ms/lswvscode</value>
+    <comment>{Locked}Uri to the using Visual Studio Code with LSW documentation</comment>
   </data>
   <data name="Settings_OOBEVSCodeIntegration_VSCodeInstallTitle.Text" xml:space="preserve">
     <value>如何安装</value>
   </data>
   <data name="Settings_OOBEVSCodeIntegration_VSCodeInstallSample.Text" xml:space="preserve">
-    <value>安装 VS Code 后，可以从 Windows 终端安装远程 WSL 扩展:
+    <value>安装 VS Code 后，可以从 Windows 终端安装远程 LSW 扩展:
 
-"code –install-extension ms-vscode-remote.remote-wsl"</value>
+"code –install-extension ms-vscode-remote.remote-lsw"</value>
   </data>
   <data name="Settings_OOBEVSCodeIntegration_VSCodeOpenProjectTitle.Text" xml:space="preserve">
-    <value>在 Visual Studio Code 中打开 WSL 项目</value>
+    <value>在 Visual Studio Code 中打开 LSW 项目</value>
   </data>
   <data name="Settings_OOBEVSCodeIntegration_VSCodeOpenProjectSample.Text" xml:space="preserve">
-    <value>若要在 WSL 发行版中使用 VS Code 打开项目，请打开该发行版的命令行并运行 'code .' 以打开项目文件。
+    <value>若要在 LSW 发行版中使用 VS Code 打开项目，请打开该发行版的命令行并运行 'code .' 以打开项目文件。
 
-还可以通过 VS Code 自身的命令面板访问更多 VS Code 远程选项。在键盘上点击 "Shift+Ctrl+P" 打开命令面板并键入 "Remote-WSL" 以查看可用的 VS Code 远程选项列表，以便可以重新打开远程会话中的文件夹、指定要打开的发行版，等等。</value>
+还可以通过 VS Code 自身的命令面板访问更多 VS Code 远程选项。在键盘上点击 "Shift+Ctrl+P" 打开命令面板并键入 "Remote-LSW" 以查看可用的 VS Code 远程选项列表，以便可以重新打开远程会话中的文件夹、指定要打开的发行版，等等。</value>
   </data>
   <data name="Settings_OOBE_HowToUse.Text" xml:space="preserve">
     <value>使用方法</value>
@@ -1697,7 +1697,7 @@ wsl.exe --manage &lt;DistributionName&gt; --set-sparse --allow-unsafe</value>
     <value>启用页面报告</value>
   </data>
   <data name="Settings_PageReporting.Description" xml:space="preserve">
-    <value>默认的 true 设置使 Windows 能够回收分配给 WSL 2 虚拟机的未使用的内存。</value>
+    <value>默认的 true 设置使 Windows 能够回收分配给 LSW 2 虚拟机的未使用的内存。</value>
   </data>
   <data name="Settings_PrivacyPolicyLink.Content" xml:space="preserve">
     <value>隐私声明</value>
@@ -1710,7 +1710,7 @@ wsl.exe --manage &lt;DistributionName&gt; --set-sparse --allow-unsafe</value>
     <value>处理器计数</value>
   </data>
   <data name="Settings_ProcCount.Description" xml:space="preserve">
-    <value>要分配给 WSL 2 VM 的逻辑处理器数量。</value>
+    <value>要分配给 LSW 2 VM 的逻辑处理器数量。</value>
   </data>
   <data name="Settings_ProcCountResetButton.Content" xml:space="preserve">
     <value>重置计数</value>
@@ -1719,7 +1719,7 @@ wsl.exe --manage &lt;DistributionName&gt; --set-sparse --allow-unsafe</value>
     <value>处理器计数</value>
   </data>
   <data name="Settings_ProcCountTextBox.AutomationProperties.HelpText" xml:space="preserve">
-    <value>要分配给 WSL 2 VM 的逻辑处理器数量。</value>
+    <value>要分配给 LSW 2 VM 的逻辑处理器数量。</value>
   </data>
   <data name="Settings_RelatedLinks.Text" xml:space="preserve">
     <value>相关链接</value>
@@ -1728,20 +1728,20 @@ wsl.exe --manage &lt;DistributionName&gt; --set-sparse --allow-unsafe</value>
     <value>发行说明</value>
   </data>
   <data name="Settings_ReleaseNotesLink.NavigateUri" xml:space="preserve">
-    <value>https://aka.ms/wslreleases</value>
-    <comment>{Locked}Uri to Microsoft WSL release notes</comment>
+    <value>https://aka.ms/lswreleases</value>
+    <comment>{Locked}Uri to Microsoft LSW release notes</comment>
   </data>
   <data name="Settings_SafeMode.Header" xml:space="preserve">
     <value>启用安全模式</value>
   </data>
   <data name="Settings_SafeMode.Description" xml:space="preserve">
-    <value>在“安全模式”下运行 WSL，这将禁用许多功能，并用于恢复处于错误状态的分发。</value>
+    <value>在“安全模式”下运行 LSW，这将禁用许多功能，并用于恢复处于错误状态的分发。</value>
   </data>
   <data name="Settings_SafeModeToggleSwitch.AutomationProperties.Name" xml:space="preserve">
     <value>启用安全模式。</value>
   </data>
   <data name="Settings_SafeModeToggleSwitch.AutomationProperties.HelpText" xml:space="preserve">
-    <value>在“安全模式”下运行 WSL，这将禁用许多功能，并用于恢复处于错误状态的分发。</value>
+    <value>在“安全模式”下运行 LSW，这将禁用许多功能，并用于恢复处于错误状态的分发。</value>
   </data>
   <data name="Settings_Shell_About.Content" xml:space="preserve">
     <value>关于</value>
@@ -1767,8 +1767,8 @@ wsl.exe --manage &lt;DistributionName&gt; --set-sparse --allow-unsafe</value>
   <data name="Settings_Shell_GUIApps.Content" xml:space="preserve">
     <value>GUI 应用</value>
   </data>
-  <data name="Settings_Shell_LaunchWSL.Content" xml:space="preserve">
-    <value>启动 wsl.exe</value>
+  <data name="Settings_Shell_LaunchLSW.Content" xml:space="preserve">
+    <value>启动 lsw.exe</value>
   </data>
   <data name="Settings_Shell_MemAndProc.Content" xml:space="preserve">
     <value>内存和处理器</value>
@@ -1780,7 +1780,7 @@ wsl.exe --manage &lt;DistributionName&gt; --set-sparse --allow-unsafe</value>
     <value>网络集成</value>
   </data>
   <data name="Settings_Shell_OOBE.Content" xml:space="preserve">
-    <value>欢迎使用 WSL</value>
+    <value>欢迎使用 LSW</value>
   </data>
   <data name="Settings_Shell_OptionalFeatures.Content" xml:space="preserve">
     <value>可选功能</value>
@@ -1801,8 +1801,8 @@ wsl.exe --manage &lt;DistributionName&gt; --set-sparse --allow-unsafe</value>
     <value>问题</value>
   </data>
   <data name="Settings_IssuesLink.NavigateUri" xml:space="preserve">
-    <value>https://aka.ms/wslproject</value>
-    <comment>{Locked}Uri to Microsoft WSL issues</comment>
+    <value>https://aka.ms/lswproject</value>
+    <comment>{Locked}Uri to Microsoft LSW issues</comment>
   </data>
   <data name="Settings_SparseVHD.Header" xml:space="preserve">
     <value>默认启用稀疏 VHD</value>
@@ -1835,7 +1835,7 @@ wsl.exe --manage &lt;DistributionName&gt; --set-sparse --allow-unsafe</value>
     <value>交换大小</value>
   </data>
   <data name="Settings_SwapSize.Description" xml:space="preserve">
-    <value>要添加到 WSL 2 VM 的交换空间量，0 表示没有交换文件。当内存需求超出硬件设备的限制时，交换存储是基于磁盘的 RAM。</value>
+    <value>要添加到 LSW 2 VM 的交换空间量，0 表示没有交换文件。当内存需求超出硬件设备的限制时，交换存储是基于磁盘的 RAM。</value>
   </data>
   <data name="Settings_SwapSizeResetButton.Content" xml:space="preserve">
     <value>重设大小</value>
@@ -1844,7 +1844,7 @@ wsl.exe --manage &lt;DistributionName&gt; --set-sparse --allow-unsafe</value>
     <value>交换大小</value>
   </data>
   <data name="Settings_SwapSizeTextBox.AutomationProperties.HelpText" xml:space="preserve">
-    <value>要添加到 WSL 2 VM 的交换空间，以 MB 为单位指定。0 表示没有交换文件。当内存需求超出硬件设备的限制时，交换存储是基于磁盘的 RAM。</value>
+    <value>要添加到 LSW 2 VM 的交换空间，以 MB 为单位指定。0 表示没有交换文件。当内存需求超出硬件设备的限制时，交换存储是基于磁盘的 RAM。</value>
   </data>
   <data name="Settings_Virtio.Header" xml:space="preserve">
     <value>启用 VirtIO</value>

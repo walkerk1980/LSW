@@ -4,7 +4,7 @@
 #include "socket.hpp"
 #include "GnsPortTrackerChannel.h"
 
-using wsl::core::GnsPortTrackerChannel;
+using lsw::core::GnsPortTrackerChannel;
 
 GnsPortTrackerChannel::GnsPortTrackerChannel(
     wil::unique_socket&& Socket,

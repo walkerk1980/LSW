@@ -65,8 +65,8 @@ Abstract:
 #define SESSION_LEADER_ACCEPT_TIMEOUT_MS (30 * 1000)
 #define INTEROP_TIMEOUT_SEC (10)
 #define RUN_FOLDER "/run"
-#define WSL_SAFE_MODE_WARNING "SAFE MODE ENABLED"
-#define CONFIG_FILE ETC_FOLDER "wsl.conf"
+#define LSW_SAFE_MODE_WARNING "SAFE MODE ENABLED"
+#define CONFIG_FILE ETC_FOLDER "lsw.conf"
 
 extern thread_local std::string g_threadName;
 extern int g_LogFd;
@@ -120,17 +120,17 @@ auto LogImpl(int fd, const std::format_string<Args...>& format, Args&&... args)
 
 #define LOG_ERROR(str, ...) \
     { \
-        LogImpl(g_LogFd, "<3>WSL ({} - {}) ERROR: {}:{}: " str "\n", getpid(), g_threadName.c_str(), __FUNCTION__, __LINE__, ##__VA_ARGS__); \
+        LogImpl(g_LogFd, "<3>LSW ({} - {}) ERROR: {}:{}: " str "\n", getpid(), g_threadName.c_str(), __FUNCTION__, __LINE__, ##__VA_ARGS__); \
     }
 
 #define LOG_INFO(str, ...) \
     { \
-        LogImpl(g_LogFd, "<6>WSL ({} - {}): " str "\n", getpid(), g_threadName.c_str(), ##__VA_ARGS__); \
+        LogImpl(g_LogFd, "<6>LSW ({} - {}): " str "\n", getpid(), g_threadName.c_str(), ##__VA_ARGS__); \
     }
 
 #define LOG_WARNING(str, ...) \
     { \
-        LogImpl(g_LogFd, "<4>WSL ({} - {}) WARNING: " str "\n", getpid(), g_threadName.c_str(), ##__VA_ARGS__); \
+        LogImpl(g_LogFd, "<4>LSW ({} - {}) WARNING: " str "\n", getpid(), g_threadName.c_str(), ##__VA_ARGS__); \
     }
 
 #define FATAL_ERROR_EX(status, str, ...) \

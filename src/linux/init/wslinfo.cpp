@@ -4,11 +4,11 @@ Copyright (c) Microsoft. All rights reserved.
 
 Module Name:
 
-    wslinfo.cpp
+    lswinfo.cpp
 
 Abstract:
 
-    This file wslpath function definitions.
+    This file lswpath function definitions.
 
 --*/
 
@@ -17,8 +17,8 @@ Abstract:
 #include <assert.h>
 #include "getopt.h"
 #include "util.h"
-#include "wslpath.h"
-#include "wslinfo.h"
+#include "lswpath.h"
+#include "lswinfo.h"
 #include "lxinitshared.h"
 #include "defs.h"
 #include "Localization.h"
@@ -37,7 +37,7 @@ int WslInfoEntry(int Argc, char* Argv[])
 
 Routine Description:
 
-    This routine is the entrypoint for the wslinfo binary.
+    This routine is the entrypoint for the lswinfo binary.
 
 Arguments:
 
@@ -52,7 +52,7 @@ Return Value:
 --*/
 
 {
-    using namespace wsl::shared;
+    using namespace lsw::shared;
 
     constexpr auto Usage = std::bind(Localization::MessageWslInfoUsage, Localization::Options::Default);
 
@@ -61,12 +61,12 @@ Return Value:
 
     ArgumentParser parser(Argc, Argv);
 
-    parser.AddArgument(UniqueSetValue<WslInfoMode, WslInfoMode::GetNetworkingMode>{Mode, Usage}, WSLINFO_NETWORKING_MODE);
-    parser.AddArgument(UniqueSetValue<WslInfoMode, WslInfoMode::MsalProxyPath>{Mode, Usage}, WSLINFO_MSAL_PROXY_PATH);
-    parser.AddArgument(UniqueSetValue<WslInfoMode, WslInfoMode::WslVersion>{Mode, Usage}, WSLINFO_WSL_VERSION);
-    parser.AddArgument(UniqueSetValue<WslInfoMode, WslInfoMode::WslVersion>{Mode, Usage}, WSLINFO_WSL_VERSION_LEGACY);
-    parser.AddArgument(NoOp{}, WSLINFO_WSL_HELP);
-    parser.AddArgument(noNewLine, nullptr, WSLINFO_NO_NEWLINE);
+    parser.AddArgument(UniqueSetValue<WslInfoMode, WslInfoMode::GetNetworkingMode>{Mode, Usage}, LSWINFO_NETWORKING_MODE);
+    parser.AddArgument(UniqueSetValue<WslInfoMode, WslInfoMode::MsalProxyPath>{Mode, Usage}, LSWINFO_MSAL_PROXY_PATH);
+    parser.AddArgument(UniqueSetValue<WslInfoMode, WslInfoMode::WslVersion>{Mode, Usage}, LSWINFO_LSW_VERSION);
+    parser.AddArgument(UniqueSetValue<WslInfoMode, WslInfoMode::WslVersion>{Mode, Usage}, LSWINFO_LSW_VERSION_LEGACY);
+    parser.AddArgument(NoOp{}, LSWINFO_LSW_HELP);
+    parser.AddArgument(noNewLine, nullptr, LSWINFO_NO_NEWLINE);
 
     try
     {
@@ -119,12 +119,12 @@ Return Value:
         }
         else
         {
-            std::cout << "wsl1";
+            std::cout << "lsw1";
         }
     }
     else if (Mode.value() == WslInfoMode::MsalProxyPath)
     {
-        auto value = UtilGetEnvironmentVariable(LX_WSL2_INSTALL_PATH);
+        auto value = UtilGetEnvironmentVariable(LX_LSW2_INSTALL_PATH);
         if (value.empty())
         {
             std::cerr << Localization::MessageNoValueFound() << "\n";
@@ -138,11 +138,11 @@ Return Value:
             return 1;
         }
 
-        std::cout << translatedPath << "/msal.wsl.proxy.exe";
+        std::cout << translatedPath << "/msal.lsw.proxy.exe";
     }
     else if (Mode.value() == WslInfoMode::WslVersion)
     {
-        std::cout << WSL_PACKAGE_VERSION;
+        std::cout << LSW_PACKAGE_VERSION;
     }
 
     if (!noNewLine)

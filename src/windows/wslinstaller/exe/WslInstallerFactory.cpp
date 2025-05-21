@@ -35,7 +35,7 @@ HRESULT WslInstallerFactory::CreateInstance(_In_ IUnknown* pUnkOuter, _In_ REFII
 
     RETURN_HR_IF(CLASS_E_NOAGGREGATION, pUnkOuter != nullptr);
 
-    WSL_LOG("WslInstallerCreateInstance", TraceLoggingLevel(WINEVENT_LEVEL_VERBOSE));
+    LSW_LOG("WslInstallerCreateInstance", TraceLoggingLevel(WINEVENT_LEVEL_VERBOSE));
 
     auto lock = g_mutex.lock_exclusive();
 

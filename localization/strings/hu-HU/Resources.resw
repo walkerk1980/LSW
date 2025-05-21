@@ -121,14 +121,14 @@
     <value>Linuxos Windows-alrendszer</value>
   </data>
   <data name="AppShortName" xml:space="preserve">
-    <value>WSL</value>
+    <value>LSW</value>
   </data>
   <data name="AppDescription" xml:space="preserve">
     <value>A Linuxos Windows-alrendszer lehetővé teszi, hogy a fejlesztők GNU/Linux környezetet futtassanak -- beleértve a legáltalánosabb parancssori eszközöket, segédprogramokat és alkalmazásokat -- közvetlenül a Windowsban, módosítások nélkül, a hagyományos virtuális gépek vagy kettős rendszerindítási beállítások okozta többletterhelés nélkül.</value>
   </data>
   <data name="MessageDetachFailed" xml:space="preserve">
-    <value>Nem sikerült leválasztani a lemezt: {}. További részletekért futtassa a dmesg parancsot a WSL2-ben.
-A WSL2 leállításának és leválasztásának kényszerítéséhez futtassa a wsl.exe {} parancsot.</value>
+    <value>Nem sikerült leválasztani a lemezt: {}. További részletekért futtassa a dmesg parancsot a LSW2-ben.
+A LSW2 leállításának és leválasztásának kényszerítéséhez futtassa a lsw.exe {} parancsot.</value>
     <comment>{FixedPlaceholder="{}"}Command line arguments, file names and string inserts should not be translated</comment>
   </data>
   <data name="MessageDiskAlreadyAttached" xml:space="preserve">
@@ -136,7 +136,7 @@ A WSL2 leállításának és leválasztásának kényszerítéséhez futtassa a 
     <comment>{FixedPlaceholder="{}"}Command line arguments, file names and string inserts should not be translated</comment>
   </data>
   <data name="MessageDiskAlreadyMounted" xml:space="preserve">
-    <value>A kötet már csatlakoztatva van a WSL2-ben.</value>
+    <value>A kötet már csatlakoztatva van a LSW2-ben.</value>
   </data>
   <data name="MessageDiskMountNameAlreadyExists" xml:space="preserve">
     <value>Már van ilyen nevű lemez csatlakoztatva; válassza le a lemezt, vagy válasszon egy új nevet, és próbálkozzon újra.</value>
@@ -145,20 +145,20 @@ A WSL2 leállításának és leválasztásának kényszerítéséhez futtassa a 
     <value>A megadott csatlakoztatásnév érvénytelen "/" karaktert tartalmaz. Próbálkozzon újra az érvénytelen karakter nélkül.</value>
   </data>
   <data name="MessageDiskMounted" xml:space="preserve">
-    <value>A lemez sikeresen csatlakoztatva a következőként: /mnt/wsl/{}.
-Megjegyzés: A hely eltérő lesz, ha módosította az automount.root beállítást az /etc/wsl.conf fájlban.
-A lemez csatlakoztatásának bontásához és leválasztásához futtassa a 'wsl.exe {} {}' parancsot.</value>
+    <value>A lemez sikeresen csatlakoztatva a következőként: /mnt/lsw/{}.
+Megjegyzés: A hely eltérő lesz, ha módosította az automount.root beállítást az /etc/lsw.conf fájlban.
+A lemez csatlakoztatásának bontásához és leválasztásához futtassa a 'lsw.exe {} {}' parancsot.</value>
     <comment>{FixedPlaceholder="{}"}Command line arguments, file names and string inserts should not be translated</comment>
   </data>
   <data name="MessageDiskMountFailed" xml:space="preserve">
     <value>A lemez csatlakoztatva van, de nem sikerült csatlakoztatni: {}.
-További részletekért futtassa a "dmesg" parancsot a WSL2-ben.
-A lemez leválasztásához futtassa a wsl.exe {} {} parancsot.</value>
+További részletekért futtassa a "dmesg" parancsot a LSW2-ben.
+A lemez leválasztásához futtassa a lsw.exe {} {} parancsot.</value>
     <comment>{FixedPlaceholder="{}"}Command line arguments, file names and string inserts should not be translated</comment>
   </data>
   <data name="MessageDistributionListOnline" xml:space="preserve">
     <value>Az alábbi lista az érvényes, telepíthető disztribúciókat tartalmazza.
-Telepítés a wsl.exe {} &lt;Distro&gt; használatával.
+Telepítés a lsw.exe {} &lt;Distro&gt; használatával.
 </value>
     <comment>{FixedPlaceholder="{}"}Command line arguments, file names and string inserts should not be translated</comment>
   </data>
@@ -214,7 +214,7 @@ Telepítés a wsl.exe {} &lt;Distro&gt; használatával.
   </data>
   <data name="MessageInvalidDistributionName" xml:space="preserve">
     <value>Érvénytelen disztribúciónév: {}.
-Az érvényes disztribúciók listájának eléréséhez használja a 'wsl.exe --list --online' parancsot.</value>
+Az érvényes disztribúciók listájának eléréséhez használja a 'lsw.exe --list --online' parancsot.</value>
     <comment>{FixedPlaceholder="{}"}{Locked="--list "}{Locked="--online'"}Command line arguments, file names and string inserts should not be translated</comment>
   </data>
   <data name="MessageInstanceTerminated" xml:space="preserve">
@@ -251,8 +251,8 @@ A támogatott argumentumok listájának lekéréséhez használja a '{} --help' 
     <value>A Linuxos Windows-alrendszer nem rendelkezik telepített disztribúciókkal.
 A probléma megoldásához telepítsen egy disztribúciót az alábbi utasításokat követve:
 
-A 'wsl.exe --list --online' parancs használatával listázhatja az elérhető disztribúciókat
-és a 'wsl.exe --install &lt;Distro&gt;' parancs használatával végezheti el a telepítést.</value>
+A 'lsw.exe --list --online' parancs használatával listázhatja az elérhető disztribúciókat
+és a 'lsw.exe --install &lt;Distro&gt;' parancs használatával végezheti el a telepítést.</value>
     <comment>{Locked="--list "}{Locked="--online'"}{Locked="--install "}Command line arguments, file names and string inserts should not be translated</comment>
   </data>
   <data name="MessageNoRunningDistro" xml:space="preserve">
@@ -280,7 +280,7 @@ A 'wsl.exe --list --online' parancs használatával listázhatja az elérhető d
     <value>A felhasználó nem található.</value>
   </data>
   <data name="MessageVmModeConversionInfo" xml:space="preserve">
-    <value>A WSL 2 fő különbségeivel kapcsolatos információkért látogasson el a https://aka.ms/wsl2 oldalra</value>
+    <value>A LSW 2 fő különbségeivel kapcsolatos információkért látogasson el a https://aka.ms/lsw2 oldalra</value>
   </data>
   <data name="MessageConversionStart" xml:space="preserve">
     <value>A konvertálás folyamatban van, ez eltarthat néhány percig.</value>
@@ -289,12 +289,12 @@ A 'wsl.exe --list --online' parancs használatával listázhatja az elérhető d
     <value>A disztribúció már a kért verzióval rendelkezik.</value>
   </data>
   <data name="MessageVmModeNotSupported" xml:space="preserve">
-    <value>Az örökölt disztribúció nem támogatja a WSL 2-t.</value>
+    <value>Az örökölt disztribúció nem támogatja a LSW 2-t.</value>
   </data>
   <data name="MessageEnableVirtualization" xml:space="preserve">
-    <value>A jelenlegi számítógép-konfiguráció nem támogatja a WSL2-t.
+    <value>A jelenlegi számítógép-konfiguráció nem támogatja a LSW2-t.
 Engedélyezze a „Virtuálisgép-platform” választható összetevőt, és győződjön meg arról, hogy a virtualizálás engedélyezve van a BIOS-ban.
-A „Virtuálisgép-platform” engedélyezéséhez futtassa a következőt: wsl.exe --install --no-distribution
+A „Virtuálisgép-platform” engedélyezéséhez futtassa a következőt: lsw.exe --install --no-distribution
 További információért látogasson el a https://aka.ms/enablevirtualization oldalra</value>
     <comment>{Locked="--install "}{Locked="--no-distribution
 "}Command line arguments, file names and string inserts should not be translated</comment>
@@ -303,15 +303,15 @@ További információért látogasson el a https://aka.ms/enablevirtualization o
     <value>Túl sok virtuális merevlemez vagy fizikai lemez van csatlakoztatva.</value>
   </data>
   <data name="MessageUserVhdAlreadyAttached" xml:space="preserve">
-    <value>A virtuális merevlemez már csatlakoztatva van a következővel: wsl.exe --mount, Kérjük, az indítás előtt válassza le a lemezt.</value>
+    <value>A virtuális merevlemez már csatlakoztatva van a következővel: lsw.exe --mount, Kérjük, az indítás előtt válassza le a lemezt.</value>
     <comment>{Locked="--mount,"}Command line arguments, file names and string inserts should not be translated</comment>
   </data>
   <data name="MessageWsl1NotSupported" xml:space="preserve">
-    <value>A jelenlegi gépkonfiguráció nem támogatja a WSL1-et.
-A WSL1 használatához engedélyezze a Linuxos Windows-alrendszer választható összetevőt.</value>
+    <value>A jelenlegi gépkonfiguráció nem támogatja a LSW1-et.
+A LSW1 használatához engedélyezze a Linuxos Windows-alrendszer választható összetevőt.</value>
   </data>
   <data name="MessageWsl2Needed" xml:space="preserve">
-    <value>Ezt a műveletet csak a WSL2 támogatja.</value>
+    <value>Ezt a műveletet csak a LSW2 támogatja.</value>
   </data>
   <data name="MessageWslInfoUsage" xml:space="preserve">
     <value>Használat:
@@ -322,7 +322,7 @@ A WSL1 használatához engedélyezze a Linuxos Windows-alrendszer választható 
         Az MSAL proxyalkalmazás elérési útjának megjelenítése.
 
     --version
-        A WSL-csomag verziójának megjelenítése.
+        A LSW-csomag verziójának megjelenítése.
 
     -n
         Ne nyomtasson új sort.</value>
@@ -336,13 +336,13 @@ A WSL1 használatához engedélyezze a Linuxos Windows-alrendszer választható 
     -a
         Az eredmény kényszerítése abszolút elérésiút-formátumra.
     -u
-        Fordítás Windows-útvonalról WSL-útvonalra (alapértelmezett).
+        Fordítás Windows-útvonalról LSW-útvonalra (alapértelmezett).
     -w
-        Fordítás WSL-útvonalról Windows-útvonalra.
+        Fordítás LSW-útvonalról Windows-útvonalra.
     -m
-        Fordítás WSL-útvonalról Windows-útvonalra '\\' helyett '/' karakterrel
+        Fordítás LSW-útvonalról Windows-útvonalra '\\' helyett '/' karakterrel
 
-Példa: wslpath 'c:\\users'</value>
+Példa: lswpath 'c:\\users'</value>
     <comment>{Locked="-a
 "}{Locked="-u
 "}{Locked="-w
@@ -374,11 +374,11 @@ Használat:
     <value>Szerzői jog (c) Microsoft Corporation. Minden jog fenntartva.
 További információ a termékről: https://aka.ms/privacy.
 
-Használat: wsl.exe [Argumentum] [Kapcsolók...] [Parancssor]
+Használat: lsw.exe [Argumentum] [Kapcsolók...] [Parancssor]
 
 Linuxos bináris fájlok futtatására szolgáló argumentumok:
 
-    Ha nincs megadva parancssor, a wsl.exe az alapértelmezett rendszerhéjat indítja el.
+    Ha nincs megadva parancssor, a lsw.exe az alapértelmezett rendszerhéjat indítja el.
 
     --exec, -e &lt;CommandLine&gt;
         A megadott parancs végrehajtása az alapértelmezett Linux-rendszerhéj használata nélkül.
@@ -414,15 +414,15 @@ A Linuxos Windows-alrendszer kezelésére szolgáló argumentumok:
         Használati információk megjelenítése.
 
     --debug-shell
-        A WSL2 hibakeresési rendszerhéjának diagnosztikai célból történő megnyitása.
+        A LSW2 hibakeresési rendszerhéjának diagnosztikai célból történő megnyitása.
 
     --install [Disztribúció] [Kapcsolók...]
-        WSL-disztribúció telepítése.
-        Az érvényes disztribúciók listája a 'wsl.exe --list --online' paranccsal jeleníthető meg.
+        LSW-disztribúció telepítése.
+        Az érvényes disztribúciók listája a 'lsw.exe --list --online' paranccsal jeleníthető meg.
 
         Kapcsolók:
-            --enable-wsl1
-                A WSL1-támogatás engedélyezése.
+            --enable-lsw1
+                A LSW1-támogatás engedélyezése.
 
             --fixed-vhd
                 Rögzített méretű lemez létrehozása a disztribúció tárolásához.
@@ -471,14 +471,14 @@ A Linuxos Windows-alrendszer kezelésére szolgáló argumentumok:
                 A disztribúció lemezének átméretezése a megadott méretre.
 
     --mount &lt;Disk&gt;
-        Fizikai vagy virtuális lemez csatlakoztatása és felcsatolása az összes WSL 2-disztribúcióban.
+        Fizikai vagy virtuális lemez csatlakoztatása és felcsatolása az összes LSW 2-disztribúcióban.
 
         Beállítások:
             --vhd
                 Annak megadása, hogy a &lt;Lemez&gt; virtuális merevlemezre hivatkozik.
 
             --bare
-                Csatlakoztatja a lemezt a WSL2-höz, de nem csatolja fel.
+                Csatlakoztatja a lemezt a LSW2-höz, de nem csatolja fel.
 
             --name &lt;Name&gt;
                 Felcsatolja a lemezt a csatlakoztatási pont egyéni nevének használatával.
@@ -496,18 +496,18 @@ A Linuxos Windows-alrendszer kezelésére szolgáló argumentumok:
         Az új disztribúciók alapértelmezett telepítési verziójának módosítása.
 
     --shutdown
-        Azonnal leállítja az összes futó disztribúciót és a WSL 2
+        Azonnal leállítja az összes futó disztribúciót és a LSW 2
         egyszerűsített segédprogram virtuális gépet.
 
         Beállítások:
             --force
-                Leállítja a WSL 2 virtuális gépet, még akkor is, ha egy művelet folyamatban van. Adatvesztést okozhat.
+                Leállítja a LSW 2 virtuális gépet, még akkor is, ha egy művelet folyamatban van. Adatvesztést okozhat.
 
     --status
         A Linuxos Windows-alrendszer állapotának megjelenítése.
 
     --unmount [Disk]
-        Lemez lecsatolása és leválasztása a WSL2 összes disztribúciójáról.
+        Lemez lecsatolása és leválasztása a LSW2 összes disztribúciójáról.
         Lecsatolja és leválasztja az összes lemezt, ha argumentum nélkül hívják meg.
 
     --uninstall
@@ -567,7 +567,7 @@ A disztribúcióknak a Linuxos Windows-alrendszerben való kezelésére szolgál
                 Az összes disztribúció részletes adatainak megjelenítése.
 
             --online, -o
-                Megjeleníti a 'wsl.exe --install' paranccsal telepíthető, elérhető disztribúciók listáját.
+                Megjeleníti a 'lsw.exe --install' paranccsal telepíthető, elérhető disztribúciók listáját.
 
     --set-default, -s &lt;Distro&gt;
         Az adott disztribúció beállítása alapértelmezettként.
@@ -583,7 +583,7 @@ A disztribúcióknak a Linuxos Windows-alrendszerben való kezelésére szolgál
   <comment>{Locked="--exec,"}{Locked="--shell-type "}{Locked="--cd "}{Locked="--distribution,"}{Locked="--distribution-id "}{Locked="--user,"}{Locked="--system
 "}{Locked="--help
 "}{Locked="--debug-shell
-"}{Locked="--install "}{Locked="--list "}{Locked="--online'"}{Locked="--enable-wsl1
+"}{Locked="--install "}{Locked="--list "}{Locked="--online'"}{Locked="--enable-lsw1
 "}{Locked="--fixed-vhd
 "}{Locked="--from-file "}{Locked="--legacy
 "}{Locked="--location "}{Locked="--name "}{Locked="--no-distribution
@@ -602,9 +602,9 @@ A disztribúcióknak a Linuxos Windows-alrendszerben való kezelésére szolgál
 "}{Locked="--quiet,"}{Locked="--verbose,"}{Locked="--online,"}{Locked="--install'"}{Locked="--set-default,"}{Locked="--set-version "}{Locked="--terminate,"}{Locked="--unregister "}Command line arguments, file names and string inserts should not be translated</comment>
   </data>
   <data name="MessagePackageVersions" xml:space="preserve">
-    <value>WSL-verzió: {}
+    <value>LSW-verzió: {}
 Kernelverzió: {}
-WSLg-verzió: {}
+LSWg-verzió: {}
 MSRDC-verzió: {}
 Direct3D-verzió: {}
 DXCore-verzió: {}
@@ -633,7 +633,7 @@ Létrehozás időpontja: {}</value>
     <value>Copyright (c) Microsoft Corporation. Minden jog fenntartva.
 A termékre vonatkozó adatvédelmi információkért keresse fel a következőt: https://aka.ms/privacy.
 
-Szintaxis: wslg.exe [Argumentum] [Beállítások...] [Parancssor]
+Szintaxis: lswg.exe [Argumentum] [Beállítások...] [Parancssor]
 
 Argumentumok:
     --cd &lt;Directory&gt;
@@ -673,7 +673,7 @@ Argumentumok:
     <value>Az importálás folyamatban van, ez eltarthat néhány percig.</value>
   </data>
   <data name="GuiApplicationsDisabled" xml:space="preserve">
-    <value>A grafikus felhasználói felületű alkalmazások támogatása le van tiltva a következőn keresztül: {} vagy /etc/wsl.conf.</value>
+    <value>A grafikus felhasználói felületű alkalmazások támogatása le van tiltva a következőn keresztül: {} vagy /etc/lsw.conf.</value>
     <comment>{FixedPlaceholder="{}"}Command line arguments, file names and string inserts should not be translated</comment>
   </data>
   <data name="MessageCheckingForUpdates" xml:space="preserve">
@@ -683,7 +683,7 @@ Argumentumok:
     <value>Ez a terjesztés csak a Microsoft Store áruházban érhető el.</value>
   </data>
   <data name="MessageWslMountNotSupportedOnArm" xml:space="preserve">
-    <value>az ARM64-wsl.exe --mount a Windows 27653-es vagy újabb verzióját igényli.</value>
+    <value>az ARM64-lsw.exe --mount a Windows 27653-es vagy újabb verzióját igényli.</value>
     <comment>{Locked="--mount "}Command line arguments, file names and string inserts should not be translated</comment>
   </data>
   <data name="MessageUpdateNotNeeded" xml:space="preserve">
@@ -695,7 +695,7 @@ Argumentumok:
   </data>
   <data name="MessageWslOptionalComponentRequired" xml:space="preserve">
     <value>Ehhez az alkalmazáshoz szükség van a Linuxos Windows-alrendszer választható összetevőre.
-Telepítse a következő futtatásával: wsl.exe --install --no-distribution
+Telepítse a következő futtatásával: lsw.exe --install --no-distribution
 Lehet, hogy újra kell indítani a rendszert, hogy a módosítások érvénybe lépjenek.</value>
      <comment>{Locked="--install "}{Locked="--no-distribution
 "}Command line arguments, file names and string inserts should not be translated</comment>
@@ -708,14 +708,14 @@ Lehet, hogy újra kell indítani a rendszert, hogy a módosítások érvénybe l
     <comment>{FixedPlaceholder="{}"}Command line arguments, file names and string inserts should not be translated</comment>
   </data>
   <data name="MessageVmSwitchNotSet" xml:space="preserve">
-    <value>A hálózati hídhoz be kell állítani a wsl2.vmSwitch kapcsolót.</value>
+    <value>A hálózati hídhoz be kell állítani a lsw2.vmSwitch kapcsolót.</value>
   </data>
   <data name="MessageCouldFetchDistributionList" xml:space="preserve">
     <value>Nem sikerült beolvasni a listaterjesztést a következőből: {}. {}</value>
     <comment>{FixedPlaceholder="{}"}Command line arguments, file names and string inserts should not be translated</comment>
   </data>
   <data name="MessageFailedToAttachDisk" xml:space="preserve">
-    <value>Nem sikerült csatlakoztatni a(z) {} lemezt a WSL2-höz: {}</value>
+    <value>Nem sikerült csatlakoztatni a(z) {} lemezt a LSW2-höz: {}</value>
     <comment>{FixedPlaceholder="{}"}Command line arguments, file names and string inserts should not be translated</comment>
   </data>
   <data name="MessageFailedToResizeDisk" xml:space="preserve">
@@ -730,11 +730,11 @@ Lehet, hogy újra kell indítani a rendszert, hogy a módosítások érvénybe l
   <data name="MessageOsNotSupported" xml:space="preserve">
     <value>A(z) {} Windows-verzió nem támogatja a Linuxos Windows-alrendszer csomagolt verzióját.
 Telepítse a szükséges frissítést a Windows Update-en vagy a következőn keresztül: {}
-További információért látogasson el a https://aka.ms/wslinstall</value>
+További információért látogasson el a https://aka.ms/lswinstall</value>
     <comment>{FixedPlaceholder="{}"}Command line arguments, file names and string inserts should not be translated</comment>
   </data>
   <data name="MessageAdministratorAccessRequiredForDebugShell" xml:space="preserve">
-    <value>A hibakeresési felület futtatásához rendszergazdai wsl.exe fájlt kell futtatni.</value>
+    <value>A hibakeresési felület futtatásához rendszergazdai lsw.exe fájlt kell futtatni.</value>
   </data>
   <data name="MessageInstallProcessFailed" xml:space="preserve">
     <value>A(z) {} disztribúció telepítési folyamata a következő kilépési kóddal meghiúsult: {}.</value>
@@ -785,7 +785,7 @@ További információért látogasson el a https://aka.ms/wslinstall</value>
     <comment>{FixedPlaceholder="{}"}Command line arguments, file names and string inserts should not be translated</comment>
   </data>
   <data name="MessageWarningDuringStartup" xml:space="preserve">
-    <value>Hiba történt a WSL indításakor</value>
+    <value>Hiba történt a LSW indításakor</value>
   </data>
   <data name="MessageOpenEventViewer" xml:space="preserve">
     <value>Eseménynapló megnyitása</value>
@@ -830,12 +830,12 @@ További információért látogasson el a https://aka.ms/wslinstall</value>
     <comment>{FixedPlaceholder="{}"}Command line arguments, file names and string inserts should not be translated</comment>
   </data>
   <data name="MessageDistributionInstalled" xml:space="preserve">
-    <value>A terjesztés telepítése sikerült. A wsl.exe -d {} használatával indítható el</value>
+    <value>A terjesztés telepítése sikerült. A lsw.exe -d {} használatával indítható el</value>
     <comment>{FixedPlaceholder="{}"}Command line arguments, file names and string inserts should not be translated</comment>
   </data>
   <data name="MessageInvalidNumberString" xml:space="preserve">
-    <value>Érvénytelen {} memóriasztring a(z) {} .wslconfig bejegyzéshez itt: {}:{}</value>
-    <comment>{FixedPlaceholder="{}"}{Locked=".wslconfig"}Command line arguments, file names and string inserts should not be translated</comment>
+    <value>Érvénytelen {} memóriasztring a(z) {} .lswconfig bejegyzéshez itt: {}:{}</value>
+    <comment>{FixedPlaceholder="{}"}{Locked=".lswconfig"}Command line arguments, file names and string inserts should not be translated</comment>
   </data>
   <data name="MessagedFailedToCreateSwapVhd" xml:space="preserve">
     <value>Nem sikerült létrehozni a felcserélési lemezt itt: {}: {}</value>
@@ -874,22 +874,22 @@ Visszaállás NAT-hálózatkezelésre.</value>
     <value>A DNS-alagút nem támogatott</value>
   </data>
   <data name="MessageLocalhostForwardingNotSupportedMirroredMode" xml:space="preserve">
-    <value>A wsl2.localhostForwarding beállításnak nincs hatása tükrözött hálózati mód használatakor</value>
+    <value>A lsw2.localhostForwarding beállításnak nincs hatása tükrözött hálózati mód használatakor</value>
   </data>
   <data name="MessageHttpProxyChangeDetected" xml:space="preserve">
-    <value>A rendszer HTTP-proxymódosítást észlelt a gazdagépen. A módosítás alkalmazásához indítsa újra a WSL-t.</value>
+    <value>A rendszer HTTP-proxymódosítást észlelt a gazdagépen. A módosítás alkalmazásához indítsa újra a LSW-t.</value>
   </data>
   <data name="MessageProxyLocalhostSettingsDropped" xml:space="preserve">
-    <value>A rendszer localhost-proxykonfigurációt észlelt, de nem tükrözte a WSL-be. A NAT módban futó WSL nem támogatja a localhost proxykat.</value>
+    <value>A rendszer localhost-proxykonfigurációt észlelt, de nem tükrözte a LSW-be. A NAT módban futó LSW nem támogatja a localhost proxykat.</value>
   </data>
   <data name="MessageProxyV6SettingsDropped" xml:space="preserve">
-    <value>A rendszer egy IPv6-proxykonfigurációt észlelt, de nem tükrözte a WSL-be. A WSL NAT-módban nem támogatja az IPv6 proxyt.</value>
+    <value>A rendszer egy IPv6-proxykonfigurációt észlelt, de nem tükrözte a LSW-be. A LSW NAT-módban nem támogatja az IPv6 proxyt.</value>
   </data>
   <data name="MessageProxyLoopbackV6SettingsDropped" xml:space="preserve">
-    <value>A rendszer localhost IPv6-proxykonfigurációt észlelt, de nem tükrözte a WSL-be. A WSL nem támogatja a localhost IPv6-proxykat.</value>
+    <value>A rendszer localhost IPv6-proxykonfigurációt észlelt, de nem tükrözte a LSW-be. A LSW nem támogatja a localhost IPv6-proxykat.</value>
   </data>
   <data name="MessageProxyUnexpectedSettingsDropped" xml:space="preserve">
-    <value>Váratlan hiba történt a proxybeállítások feloldása közben. A proxybeállítások nem lettek tükrözve a WSL-be.</value>
+    <value>Váratlan hiba történt a proxybeállítások feloldása közben. A proxybeállítások nem lettek tükrözve a LSW-be.</value>
   </data>
   <data name="MessageRegistryError" xml:space="preserve">
     <value>Hiba történt a beállításjegyzék elérésekor. Elérési út: {}. Hiba: {}</value>
@@ -900,7 +900,7 @@ Visszaállás NAT-hálózatkezelésre.</value>
     <comment>{FixedPlaceholder="{}"}Command line arguments, file names and string inserts should not be translated</comment>
   </data>
   <data name="MessageVirtualMachinePlatformNotInstalled" xml:space="preserve">
-    <value>Nem sikerült elindítani a virtuális hálózatot – telepítse a nem kötelező virtuálisgép-platform összetevőt a következő futtatásával: wsl.exe --install --no-distribution</value>
+    <value>Nem sikerült elindítani a virtuális hálózatot – telepítse a nem kötelező virtuálisgép-platform összetevőt a következő futtatásával: lsw.exe --install --no-distribution</value>
     <comment>{Locked="--install "}{Locked="--no-distribution"}Command line arguments, file names and string inserts should not be translated</comment>
   </data>
   <data name="MessageNetworkInitializationFailedFallback2" xml:space="preserve">
@@ -920,29 +920,29 @@ Visszaállás NAT-hálózatkezelésre.</value>
     <comment>{FixedPlaceholder="{}"}Command line arguments, file names and string inserts should not be translated</comment>
   </data>
   <data name="MessagePluginRequiresUpdate" xml:space="preserve">
-    <value>A(z) {} beépülő modulhoz a WSL újabb verziója szükséges. Futtassa a következőt: wsl.exe --update</value>
+    <value>A(z) {} beépülő modulhoz a LSW újabb verziója szükséges. Futtassa a következőt: lsw.exe --update</value>
     <comment>{FixedPlaceholder="{}"}{Locked="--update"}Command line arguments, file names and string inserts should not be translated</comment>
   </data>
   <data name="MessageSettingOverridenByPolicy" xml:space="preserve">
-    <value>A(z) {} .wslconfig beállítást letiltotta a számítógép-házirend.</value>
-    <comment>{FixedPlaceholder="{}"}{Locked=".wslconfig"}Command line arguments, file names and string inserts should not be translated</comment>
+    <value>A(z) {} .lswconfig beállítást letiltotta a számítógép-házirend.</value>
+    <comment>{FixedPlaceholder="{}"}{Locked=".lswconfig"}Command line arguments, file names and string inserts should not be translated</comment>
   </data>
   <data name="MessageDebugShellDisabled" xml:space="preserve">
     <value>A számítógép-házirend letiltotta a hibakeresési felületet.</value>
   </data>
-  <data name="MessageWSLMountDisabled" xml:space="preserve">
-    <value>wsl.exe --mount műveletet a számítógép-házirend letiltotta.</value>
+  <data name="MessageLSWMountDisabled" xml:space="preserve">
+    <value>lsw.exe --mount műveletet a számítógép-házirend letiltotta.</value>
     <comment>{Locked="--mount "}Command line arguments, file names and string inserts should not be translated</comment>
   </data>
-  <data name="MessageWSL1Disabled" xml:space="preserve">
-    <value>A WSL1-et a számítógép-házirend letiltotta.</value>
+  <data name="MessageLSW1Disabled" xml:space="preserve">
+    <value>A LSW1-et a számítógép-házirend letiltotta.</value>
   </data>
-  <data name="MessageUpgradeToWSL2" xml:space="preserve">
-    <value>A WSL2-re való frissítéshez futtassa a wsl.exe --set-version {} 2 parancsot.</value>
+  <data name="MessageUpgradeToLSW2" xml:space="preserve">
+    <value>A LSW2-re való frissítéshez futtassa a lsw.exe --set-version {} 2 parancsot.</value>
     <comment>{FixedPlaceholder="{}"}{Locked="--set-version "}Command line arguments, file names and string inserts should not be translated</comment>
   </data>
   <data name="MessageFinishMsiInstallation" xml:space="preserve">
-    <value>A WSL befejezi a frissítést...</value>
+    <value>A LSW befejezi a frissítést...</value>
   </data>
   <data name="MessageUpdateFailed" xml:space="preserve">
     <value>A frissítés nem sikerült (kilépési kód: {}).</value>
@@ -965,7 +965,7 @@ Visszaállás NAT-hálózatkezelésre.</value>
     <comment>{FixedPlaceholder="{}"}Command line arguments, file names and string inserts should not be translated</comment>
   </data>
   <data name="MessageMissingOptionalComponents" xml:space="preserve">
-    <value>A WSL futtatásához szükséges választható összetevők nincsenek telepítve.</value>
+    <value>A LSW futtatásához szükséges választható összetevők nincsenek telepítve.</value>
   </data>
   <data name="MessageInstallMissingOptionalComponents" xml:space="preserve">
     <value>Hiányzó összetevők telepítése.</value>
@@ -990,7 +990,7 @@ Visszaállás NAT-hálózatkezelésre.</value>
     <value>Dokumentumok megtekintése</value>
   </data>
   <data name="MessageVhdInUse" xml:space="preserve">
-    <value>A művelet nem hajtható végre, mert a vhdx jelenleg használatban van. A WSL használatának kényszerítése: wsl.exe --shutdown</value>
+    <value>A művelet nem hajtható végre, mert a vhdx jelenleg használatban van. A LSW használatának kényszerítése: lsw.exe --shutdown</value>
     <comment>{Locked="--shutdown"}Command line arguments, file names and string inserts should not be translated</comment>
   </data>
   <data name="MessageInvalidBoolean" xml:space="preserve">
@@ -998,10 +998,10 @@ Visszaállás NAT-hálózatkezelésre.</value>
     <comment>{FixedPlaceholder="{}"}Command line arguments, file names and string inserts should not be translated</comment>
   </data>
   <data name="MessageSparseVhdWsl2Only" xml:space="preserve">
-    <value>A ritka vhdx csak WSL2 esetén támogatott.</value>
+    <value>A ritka vhdx csak LSW2 esetén támogatott.</value>
   </data>
   <data name="MessageLocalSystemNotSupported" xml:space="preserve">
-    <value>A WSL helyi rendszerként való futtatása nem támogatott.</value>
+    <value>A LSW helyi rendszerként való futtatása nem támogatott.</value>
   </data>
   <data name="MessagePerformanceTip" xml:space="preserve">
     <value>Teljesítménytipp:</value>
@@ -1016,10 +1016,10 @@ Visszaállás NAT-hálózatkezelésre.</value>
   <data name="MessageDontShowAgain" xml:space="preserve">
     <value>Ne jelenjen meg többé</value>
   </data>
-  <data name="MessageWSL2Crashed" xml:space="preserve">
-    <value>A WSL2 virtuális gép összeomlott.</value>
+  <data name="MessageLSW2Crashed" xml:space="preserve">
+    <value>A LSW2 virtuális gép összeomlott.</value>
   </data>
-  <data name="MessageWSL2CrashedStackTrace" xml:space="preserve">
+  <data name="MessageLSW2CrashedStackTrace" xml:space="preserve">
     <value>A veremkivonat a következő helyre lett mentve: {}</value>
     <comment>{FixedPlaceholder="{}"}Command line arguments, file names and string inserts should not be translated</comment>
   </data>
@@ -1059,11 +1059,11 @@ Webes letöltési... megkísérlése</value>
     <value>Nincs konfigurálva alapértelmezett terjesztés. Adja meg a telepítendő terjesztést.</value>
   </data>
   <data name="MessageConfigVirtio9pDisabled" xml:space="preserve">
-    <value>A wsl2.virtio9p le van tiltva, vsock átvitellel visszaesik 9p értékre.</value>
+    <value>A lsw2.virtio9p le van tiltva, vsock átvitellel visszaesik 9p értékre.</value>
   </data>
   <data name="MessageInstallationCorrupted" xml:space="preserve">
-    <value>Úgy tűnik, hogy a WSL-telepítés sérült (hibakód: {}).
-Nyomjon meg egy billentyűt a WSL javításához, vagy CTRL-C a megszakításhoz.
+    <value>Úgy tűnik, hogy a LSW-telepítés sérült (hibakód: {}).
+Nyomjon meg egy billentyűt a LSW javításához, vagy CTRL-C a megszakításhoz.
 Ez a kérés 60 másodpercen belül túllépi az időkorlátot.</value>
     <comment>{FixedPlaceholder="{}"}Command line arguments, file names and string inserts should not be translated</comment>
   </data>
@@ -1085,14 +1085,14 @@ Hibakód: {}</value>
     <comment>{FixedPlaceholder="{}"}Command line arguments, file names and string inserts should not be translated</comment>
   </data>
   <data name="MessageTooManyProcessors" xml:space="preserve">
-    <value>A wsl2.processzorok száma nem haladhatja meg a rendszer logikai processzorainak számát ({} &gt; {})</value>
+    <value>A lsw2.processzorok száma nem haladhatja meg a rendszer logikai processzorainak számát ({} &gt; {})</value>
     <comment>{FixedPlaceholder="{}"}Command line arguments, file names and string inserts should not be translated</comment>
   </data>
   <data name="MessageFailedToQueryNetworkingMode" xml:space="preserve">
     <value>Nem sikerült lekérdezni a hálózati módot</value>
   </data>
   <data name="MessageMismatchedKernelModulesError" xml:space="preserve">
-    <value>Az egyéni rendszermagmodulok egyéni rendszermag megadása nélkül lettek megadva. További információért tekintse meg a https://aka.ms/wslcustomkernel.</value>
+    <value>Az egyéni rendszermagmodulok egyéni rendszermag megadása nélkül lettek megadva. További információért tekintse meg a https://aka.ms/lswcustomkernel.</value>
   </data>
   <data name="MessageDnsTunnelingDisabled" xml:space="preserve">
     <value>A Globális biztonságos hozzáférés ügyféllel kapcsolatos jelenlegi kompatibilitási probléma miatt a DNS-alagútképzés le van tiltva.</value>
@@ -1100,7 +1100,7 @@ Hibakód: {}</value>
   <data name="MessageSparseVhdDisabled" xml:space="preserve">
     <value>A ritka VHD-támogatás jelenleg le van tiltva, mivel lehetséges adatsérülés léphet fel.
 A ritka virtuális merevlemez használatának kényszerítéséhez futtassa a következő parancsot:
-wsl.exe --manage &lt;DistributionName&gt; --set-sparse --allow-unsafe</value>
+lsw.exe --manage &lt;DistributionName&gt; --set-sparse --allow-unsafe</value>
     <comment>{Locked="--manage "}{Locked="--set-sparse "}{Locked="--allow-unsafe"}Command line arguments, file names and string inserts should not be translated</comment>
   </data>
   <data name="MessageDrvfsMountFailed" xml:space="preserve">
@@ -1112,7 +1112,7 @@ wsl.exe --manage &lt;DistributionName&gt; --set-sparse --allow-unsafe</value>
   </data>
   <data name="MessageReadOnlyDistro" xml:space="preserve">
     <value>Hiba történt a terjesztési lemez csatlakoztatása közben. A lemez tartalékként írásvédettként lett csatlakoztatva.
-Helyreállítási utasítások megtekintése a következőn: https://aka.ms/wsldiskmountrecovery</value>
+Helyreállítási utasítások megtekintése a következőn: https://aka.ms/lswdiskmountrecovery</value>
   </data>
   <data name="MessageFailedToTranslate" xml:space="preserve">
     <value>Nem sikerült lefordítani a következőt: {}</value>
@@ -1134,8 +1134,8 @@ Helyreállítási utasítások megtekintése a következőn: https://aka.ms/wsld
     <value>Linuxos Windows-alrendszer Gépház</value>
   </data>
   <data name="Settings_AppDescription" xml:space="preserve">
-    <value>A Linuxos Windows-alrendszer Gépházban a fejlesztők grafikus felhasználói felületre épülő alkalmazással kezelhetik a .wslconfig fájlt.</value>
-    <comment>{Locked=".wslconfig"}Command line arguments, file names and string inserts should not be translated</comment>
+    <value>A Linuxos Windows-alrendszer Gépházban a fejlesztők grafikus felhasználói felületre épülő alkalmazással kezelhetik a .lswconfig fájlt.</value>
+    <comment>{Locked=".lswconfig"}Command line arguments, file names and string inserts should not be translated</comment>
   </data>
   <data name="Settings_AutoMemoryReclaim.Header" xml:space="preserve">
     <value>Automatikus memória-visszanyerés</value>
@@ -1153,26 +1153,26 @@ Helyreállítási utasítások megtekintése a következőn: https://aka.ms/wsld
     <value>Automatikus proxy engedélyezve</value>
   </data>
   <data name="Settings_AutoProxy.Description" xml:space="preserve">
-    <value>Lehetővé teszi a WSL-nek a Windows HTTP-proxyadatainak használatát.</value>
+    <value>Lehetővé teszi a LSW-nek a Windows HTTP-proxyadatainak használatát.</value>
   </data>
   <data name="Settings_AutoProxyToggleSwitch.AutomationProperties.Name" xml:space="preserve">
     <value>Automatikus proxy engedélyezve.</value>
   </data>
   <data name="Settings_AutoProxyToggleSwitch.AutomationProperties.HelpText" xml:space="preserve">
-    <value>Lehetővé teszi a WSL-nek a Windows HTTP-proxyadatainak használatát.</value>
+    <value>Lehetővé teszi a LSW-nek a Windows HTTP-proxyadatainak használatát.</value>
   </data>
   <data name="Settings_BestEffortDNS.Header" xml:space="preserve">
     <value>A lehető legjobb DNS-elemzést használja</value>
   </data>
   <data name="Settings_BestEffortDNS.Description" xml:space="preserve">
-    <value>Csak akkor alkalmazható, ha a wsl2.dnsTunneling értéke true. Ha igaz értékre van állítva, a Windows kinyeri a kérdést a DNS-kérelemből, és megkísérli a megoldását, figyelmen kívül hagyva az ismeretlen rekordokat.</value>
-    <comment>{Locked="wsl2.dnsTunneling"}.wslconfig property key names should not be translated</comment>
+    <value>Csak akkor alkalmazható, ha a lsw2.dnsTunneling értéke true. Ha igaz értékre van állítva, a Windows kinyeri a kérdést a DNS-kérelemből, és megkísérli a megoldását, figyelmen kívül hagyva az ismeretlen rekordokat.</value>
+    <comment>{Locked="lsw2.dnsTunneling"}.lswconfig property key names should not be translated</comment>
   </data>
   <data name="Settings_BestEffortDNSToggleSwitch.AutomationProperties.Name" xml:space="preserve">
     <value>A lehető legjobb DNS-elemzést használja.</value>
   </data>
   <data name="Settings_BestEffortDNSToggleSwitch.AutomationProperties.HelpText" xml:space="preserve">
-    <value>Csak akkor alkalmazható, ha a wsl2.dnsTunneling értéke true. Ha igaz értékre van állítva, a Windows kinyeri a kérdést a DNS-kérelemből, és megkísérli a megoldását, figyelmen kívül hagyva az ismeretlen rekordokat.</value>
+    <value>Csak akkor alkalmazható, ha a lsw2.dnsTunneling értéke true. Ha igaz értékre van állítva, a Windows kinyeri a kérdést a DNS-kérelemből, és megkísérli a megoldását, figyelmen kívül hagyva az ismeretlen rekordokat.</value>
   </data>
   <data name="Settings_CustomKernelPath.Header" xml:space="preserve">
     <value>Egyéni kernel</value>
@@ -1211,36 +1211,36 @@ Helyreállítási utasítások megtekintése a következőn: https://aka.ms/wsld
     <value>Böngészés a disztribúciók között</value>
   </data>
   <data name="Settings_CustomSystemDistroPathDescription.Text" xml:space="preserve">
-    <value>Adja meg egy olyan VHD elérési útját, amely egyéni rendszer-disztribúcióként lesz betöltve, amelyet elsősorban a WSL grafikus felhasználói felületi alkalmazásaihoz használnak. [További információ a rendszer disztribúcióiról itt].</value>
+    <value>Adja meg egy olyan VHD elérési útját, amely egyéni rendszer-disztribúcióként lesz betöltve, amelyet elsősorban a LSW grafikus felhasználói felületi alkalmazásaihoz használnak. [További információ a rendszer disztribúcióiról itt].</value>
     <comment>{Locked="["}{Locked="]"}The text in between the delimiters [ ] is made into an hyperlink in code, and the delimiters are removed</comment>
   </data>
   <data name="Settings_CustomSystemDistroPathDescription.NavigateUri" xml:space="preserve">
-    <value>https://aka.ms/wslgsystemdistro</value>
-    <comment>{Locked}Uri to the Microsoft WSLg architecture devblog</comment>
+    <value>https://aka.ms/lswgsystemdistro</value>
+    <comment>{Locked}Uri to the Microsoft LSWg architecture devblog</comment>
   </data>
   <data name="Settings_CustomSystemDistroPathTextBox.AutomationProperties.Name" xml:space="preserve">
     <value>Egyéni rendszer disztribúciója</value>
   </data>
   <data name="Settings_CustomSystemDistroPathTextBox.AutomationProperties.HelpText" xml:space="preserve">
-    <value>Adja meg egy olyan VHD elérési útját, amely egyéni rendszer-disztribúcióként lesz betöltve, amelyet elsősorban a WSL grafikus felhasználói felületi alkalmazásaihoz használnak.</value>
+    <value>Adja meg egy olyan VHD elérési útját, amely egyéni rendszer-disztribúcióként lesz betöltve, amelyet elsősorban a LSW grafikus felhasználói felületi alkalmazásaihoz használnak.</value>
   </data>
   <data name="Settings_DebugConsole.Header" xml:space="preserve">
     <value>Hibakeresési konzol engedélyezése</value>
   </data>
   <data name="Settings_DebugConsole.Description" xml:space="preserve">
-    <value>Logikai érték egy kimeneti konzolablak bekapcsolásához, amely megjeleníti a dmesg tartalmát egy WSL 2 disztribúciós példány indításakor.</value>
+    <value>Logikai érték egy kimeneti konzolablak bekapcsolásához, amely megjeleníti a dmesg tartalmát egy LSW 2 disztribúciós példány indításakor.</value>
   </data>
   <data name="Settings_DebugConsoleToggleSwitch.AutomationProperties.Name" xml:space="preserve">
     <value>Hibakeresési konzol engedélyezése.</value>
   </data>
   <data name="Settings_DebugConsoleToggleSwitch.AutomationProperties.HelpText" xml:space="preserve">
-    <value>Logikai érték egy kimeneti konzolablak bekapcsolásához, amely megjeleníti a diagnosztikai üzenetek tartalmát egy WSL 2 disztribúciós példány indításakor.</value>
+    <value>Logikai érték egy kimeneti konzolablak bekapcsolásához, amely megjeleníti a diagnosztikai üzenetek tartalmát egy LSW 2 disztribúciós példány indításakor.</value>
   </data>
   <data name="Settings_DefaultVHDSize.Header" xml:space="preserve">
     <value>Alapértelmezett VHD-méret</value>
   </data>
   <data name="Settings_DefaultVHDSize.Description" xml:space="preserve">
-    <value>A bővíthető WSL virtuális merevlemez (VHD) alapértelmezett maximális mérete csak az újonnan létrehozott disztribúciókhoz.</value>
+    <value>A bővíthető LSW virtuális merevlemez (VHD) alapértelmezett maximális mérete csak az újonnan létrehozott disztribúciókhoz.</value>
   </data>
   <data name="Settings_DefaultVHDSizeResetButton.Content" xml:space="preserve">
     <value>Méret visszaállítása</value>
@@ -1249,7 +1249,7 @@ Helyreállítási utasítások megtekintése a következőn: https://aka.ms/wsld
     <value>Alapértelmezett VHD-méret</value>
   </data>
   <data name="Settings_DefaultVHDSizeTextBox.AutomationProperties.HelpText" xml:space="preserve">
-    <value>A bővíthető WSL virtuális merevlemez (VHD) alapértelmezett megabájtban mért maximális mérete csak az újonnan létrehozott disztribúciókhoz.</value>
+    <value>A bővíthető LSW virtuális merevlemez (VHD) alapértelmezett megabájtban mért maximális mérete csak az újonnan létrehozott disztribúciókhoz.</value>
   </data>
   <data name="Settings_DeveloperPageTitle.Text" xml:space="preserve">
     <value>Fejlesztő</value>
@@ -1258,39 +1258,39 @@ Helyreállítási utasítások megtekintése a következőn: https://aka.ms/wsld
     <value>Dokumentáció</value>
   </data>
   <data name="Settings_DocumentationLink.NavigateUri" xml:space="preserve">
-    <value>https://aka.ms/wsldocs</value>
-    <comment>{Locked}Uri to Microsoft WSL documentation</comment>
+    <value>https://aka.ms/lswdocs</value>
+    <comment>{Locked}Uri to Microsoft LSW documentation</comment>
   </data>
   <data name="Settings_DrvFSMode.Header" xml:space="preserve">
     <value>DrvFS mód módosítása</value>
   </data>
   <data name="Settings_DrvFSMode.Description" xml:space="preserve">
-    <value>Az operációs rendszerek közötti fájlhozzáférés implementálásának módosítása a WSL-ben.</value>
+    <value>Az operációs rendszerek közötti fájlhozzáférés implementálásának módosítása a LSW-ben.</value>
   </data>
   <data name="Settings_DNSProxy.Header" xml:space="preserve">
     <value>DNS proxy engedélyezve</value>
   </data>
   <data name="Settings_DNSProxy.Description" xml:space="preserve">
-    <value>Csak akkor alkalmazható, ha a wsl2.networkingMode NAT értékre van beállítva. Logikai érték, amely tájékoztatja a WSL-t, hogy konfigurálja a DNS-kiszolgálót Linux rendszeren a gazdagép NAT-jára. A false értékre állítás a DNS-kiszolgálókat Windowsról Linuxra tükrözi.</value>
-    <comment>{Locked="wsl2.networkingMode"}.wslconfig property key names should not be translated</comment>
+    <value>Csak akkor alkalmazható, ha a lsw2.networkingMode NAT értékre van beállítva. Logikai érték, amely tájékoztatja a LSW-t, hogy konfigurálja a DNS-kiszolgálót Linux rendszeren a gazdagép NAT-jára. A false értékre állítás a DNS-kiszolgálókat Windowsról Linuxra tükrözi.</value>
+    <comment>{Locked="lsw2.networkingMode"}.lswconfig property key names should not be translated</comment>
   </data>
   <data name="Settings_DNSProxyToggleSwitch.AutomationProperties.Name" xml:space="preserve">
     <value>DNS proxy engedélyezve.</value>
   </data>
   <data name="Settings_DNSProxyToggleSwitch.AutomationProperties.HelpText" xml:space="preserve">
-    <value>Csak akkor alkalmazható, ha a wsl2.networkingMode NAT értékre van beállítva. Logikai érték, amely tájékoztatja a WSL-t, hogy konfigurálja a DNS-kiszolgálót Linux rendszeren a gazdagép NAT-jára. A false értékre állítás a DNS-kiszolgálókat Windowsról Linuxra tükrözi.</value>
+    <value>Csak akkor alkalmazható, ha a lsw2.networkingMode NAT értékre van beállítva. Logikai érték, amely tájékoztatja a LSW-t, hogy konfigurálja a DNS-kiszolgálót Linux rendszeren a gazdagép NAT-jára. A false értékre állítás a DNS-kiszolgálókat Windowsról Linuxra tükrözi.</value>
   </data>
   <data name="Settings_DNSTunneling.Header" xml:space="preserve">
     <value>DNS-alagútkezelés engedélyezve</value>
   </data>
   <data name="Settings_DNSTunneling.Description" xml:space="preserve">
-    <value>A DNS-kérések WSL-ről Windowsra történő proxyzása szerint változik.</value>
+    <value>A DNS-kérések LSW-ről Windowsra történő proxyzása szerint változik.</value>
   </data>
   <data name="Settings_DNSTunnelingToggleSwitch.AutomationProperties.Name" xml:space="preserve">
     <value>DNS-alagútkezelés engedélyezve.</value>
   </data>
   <data name="Settings_DNSTunnelingToggleSwitch.AutomationProperties.HelpText" xml:space="preserve">
-    <value>A DNS-kérések WSL-ről Windowsra történő proxyzása szerint változik.</value>
+    <value>A DNS-kérések LSW-ről Windowsra történő proxyzása szerint változik.</value>
   </data>
   <data name="Settings_FileSystemPageTitle.Text" xml:space="preserve">
     <value>Fájlrendszer</value>
@@ -1299,17 +1299,17 @@ Helyreállítási utasítások megtekintése a következőn: https://aka.ms/wsld
     <value>Grafikus felhasználói felületű alkalmazások engedélyezése</value>
   </data>
   <data name="Settings_GUIApplicationsDescription.Text" xml:space="preserve">
-    <value>Logikai érték a grafikus felhasználói felületi alkalmazások ([WSLg]) WSL-ben való támogatásának be- vagy kikapcsolásához.</value>
+    <value>Logikai érték a grafikus felhasználói felületi alkalmazások ([LSWg]) LSW-ben való támogatásának be- vagy kikapcsolásához.</value>
   </data>
   <data name="Settings_GUIApplicationsDescription.NavigateUri" xml:space="preserve">
-    <value>https://aka.ms/wslgproject</value>
-    <comment>{Locked}Uri to the Microsoft GitHub WSLg project</comment>
+    <value>https://aka.ms/lswgproject</value>
+    <comment>{Locked}Uri to the Microsoft GitHub LSWg project</comment>
   </data>
   <data name="Settings_GUIApplicationsToggleSwitch.AutomationProperties.Name" xml:space="preserve">
     <value>Grafikus felhasználói felületű alkalmazások engedélyezése.</value>
   </data>
   <data name="Settings_GUIApplicationsToggleSwitch.AutomationProperties.HelpText" xml:space="preserve">
-    <value>Logikai érték a grafikus felhasználói felületi alkalmazások (más néven WSL g) WSL-ben való támogatásának be- vagy kikapcsolásához.</value>
+    <value>Logikai érték a grafikus felhasználói felületi alkalmazások (más néven LSW g) LSW-ben való támogatásának be- vagy kikapcsolásához.</value>
   </data>
   <data name="Settings_HWPerfCounters.Header" xml:space="preserve">
     <value>Hardverteljesítmény-számlálók engedélyezése</value>
@@ -1327,33 +1327,33 @@ Helyreállítási utasítások megtekintése a következőn: https://aka.ms/wsld
     <value>Hyper-V tűzfal engedélyezve</value>
   </data>
   <data name="Settings_HyperVFirewall.Description" xml:space="preserve">
-    <value>Engedélyezi a Hyper-V tűzfalat, amely lehetővé teszi a Windows tűzfal szabályait, valamint a Hyper-V-forgalomra vonatkozó szabályokat a WSL hálózati forgalom szűréséhez.</value>
+    <value>Engedélyezi a Hyper-V tűzfalat, amely lehetővé teszi a Windows tűzfal szabályait, valamint a Hyper-V-forgalomra vonatkozó szabályokat a LSW hálózati forgalom szűréséhez.</value>
   </data>
   <data name="Settings_HyperVFirewallToggleSwitch.AutomationProperties.Name" xml:space="preserve">
     <value>Hyper-V tűzfal engedélyezve.</value>
   </data>
   <data name="Settings_HyperVFirewallToggleSwitch.AutomationProperties.HelpText" xml:space="preserve">
-    <value>Engedélyezi a Hyper-V tűzfalat, amely lehetővé teszi a Windows tűzfal szabályait, valamint a Hyper-V-forgalomra vonatkozó szabályokat a WSL hálózati forgalom szűréséhez.</value>
+    <value>Engedélyezi a Hyper-V tűzfalat, amely lehetővé teszi a Windows tűzfal szabályait, valamint a Hyper-V-forgalomra vonatkozó szabályokat a LSW hálózati forgalom szűréséhez.</value>
   </data>
   <data name="Settings_HostAddressLoopback.Header" xml:space="preserve">
     <value>Állomáscím visszacsatolása</value>
   </data>
   <data name="Settings_HostAddressLoopback.Description" xml:space="preserve">
-    <value>Csak akkor alkalmazható, ha wsl2.networkingMode tükrözöttre van beállítva. Ha Igaz értékre van állítva, a tároló egy, a gazdagéphez rendelt IP-cím használatával csatlakozhat a gazdagéphez, vagy a gazdagép csatlakozhat a tárolóhoz. Vegye figyelembe, hogy a 127.0.0.1 visszacsatolási cím mindig használható – ez a beállítás lehetővé teszi az összes további hozzárendelt helyi IP-cím használatát is.</value>
-    <comment>{Locked="wsl2.networkingMode"}.wslconfig property key names should not be translated</comment>
+    <value>Csak akkor alkalmazható, ha lsw2.networkingMode tükrözöttre van beállítva. Ha Igaz értékre van állítva, a tároló egy, a gazdagéphez rendelt IP-cím használatával csatlakozhat a gazdagéphez, vagy a gazdagép csatlakozhat a tárolóhoz. Vegye figyelembe, hogy a 127.0.0.1 visszacsatolási cím mindig használható – ez a beállítás lehetővé teszi az összes további hozzárendelt helyi IP-cím használatát is.</value>
+    <comment>{Locked="lsw2.networkingMode"}.lswconfig property key names should not be translated</comment>
   </data>
   <data name="Settings_HostAddressLoopbackToggleSwitch.AutomationProperties.Name" xml:space="preserve">
     <value>Állomáscím visszacsatolása.</value>
   </data>
   <data name="Settings_HostAddressLoopbackToggleSwitch.AutomationProperties.HelpText" xml:space="preserve">
-    <value>Csak akkor alkalmazható, ha a wsl2.networkingMode tükrözött értékre van állítva. Ha Igaz értékre van állítva, a tároló egy, a gazdagéphez rendelt IP-cím használatával csatlakozhat a gazdagéphez, vagy a gazdagép csatlakozhat a tárolóhoz. Vegye figyelembe, hogy a 127.0.0.1 visszacsatolási cím mindig használható – ez a beállítás lehetővé teszi az összes további hozzárendelt helyi IP-cím használatát is.</value>
+    <value>Csak akkor alkalmazható, ha a lsw2.networkingMode tükrözött értékre van állítva. Ha Igaz értékre van állítva, a tároló egy, a gazdagéphez rendelt IP-cím használatával csatlakozhat a gazdagéphez, vagy a gazdagép csatlakozhat a tárolóhoz. Vegye figyelembe, hogy a 127.0.0.1 visszacsatolási cím mindig használható – ez a beállítás lehetővé teszi az összes további hozzárendelt helyi IP-cím használatát is.</value>
   </data>
   <data name="Settings_IgnoredPorts.Header" xml:space="preserve">
     <value>Figyelmen kívül hagyott portok</value>
   </data>
   <data name="Settings_IgnoredPorts.Description" xml:space="preserve">
-    <value>Csak akkor alkalmazható, ha a wsl2.networkingMode mirrored értékre van beállítva. Megadja, hogy mely portokhoz kapcsolódhatnak a Linux-alkalmazások, amelyek nem lesznek automatikusan továbbítva vagy figyelembe véve a Windowsban. Vesszővel tagolt listában kell formázni, például 3000,9000,9090.</value>
-    <comment>{Locked="wsl2.networkingMode"}.wslconfig property key names should not be translated</comment>
+    <value>Csak akkor alkalmazható, ha a lsw2.networkingMode mirrored értékre van beállítva. Megadja, hogy mely portokhoz kapcsolódhatnak a Linux-alkalmazások, amelyek nem lesznek automatikusan továbbítva vagy figyelembe véve a Windowsban. Vesszővel tagolt listában kell formázni, például 3000,9000,9090.</value>
+    <comment>{Locked="lsw2.networkingMode"}.lswconfig property key names should not be translated</comment>
   </data>
   <data name="Settings_IgnoredPortsResetButton.Content" xml:space="preserve">
     <value>Portok alaphelyzetbe állítása</value>
@@ -1362,14 +1362,14 @@ Helyreállítási utasítások megtekintése a következőn: https://aka.ms/wsld
     <value>Figyelmen kívül hagyott portok</value>
   </data>
   <data name="Settings_IgnoredPortsTextBox.AutomationProperties.HelpText" xml:space="preserve">
-    <value>Csak akkor alkalmazható, ha a wsl2.networkingMode mirrored értékre van beállítva. Megadja, hogy mely portokhoz kapcsolódhatnak a Linux-alkalmazások, amelyek nem lesznek automatikusan továbbítva vagy figyelembe véve a Windowsban. Vesszővel tagolt listában kell formázni, például 3000, 9000, 9090.</value>
+    <value>Csak akkor alkalmazható, ha a lsw2.networkingMode mirrored értékre van beállítva. Megadja, hogy mely portokhoz kapcsolódhatnak a Linux-alkalmazások, amelyek nem lesznek automatikusan továbbítva vagy figyelembe véve a Windowsban. Vesszővel tagolt listában kell formázni, például 3000, 9000, 9090.</value>
   </data>
   <data name="Settings_InitialAutoProxyTimeout.Header" xml:space="preserve">
     <value>Kezdeti automatikus proxy időtúllépése</value>
   </data>
   <data name="Settings_InitialAutoProxyTimeout.Description" xml:space="preserve">
-    <value>Csak akkor alkalmazható, ha a wsl2.autoProxy igaz értékre van állítva. Konfigurálja, hogy a WSL mennyi ideig (ezredmásodpercben) várja meg a HTTP-proxyadatok lekérését a WSL-tároló indításakor. Ha ezt követően feloldja a proxybeállításokat, a WSL-példányt újra kell indítani a lekért proxybeállítások használatához.</value>
-    <comment>{Locked="wsl2.autoProxy"}.wslconfig property key names should not be translated</comment>
+    <value>Csak akkor alkalmazható, ha a lsw2.autoProxy igaz értékre van állítva. Konfigurálja, hogy a LSW mennyi ideig (ezredmásodpercben) várja meg a HTTP-proxyadatok lekérését a LSW-tároló indításakor. Ha ezt követően feloldja a proxybeállításokat, a LSW-példányt újra kell indítani a lekért proxybeállítások használatához.</value>
+    <comment>{Locked="lsw2.autoProxy"}.lswconfig property key names should not be translated</comment>
   </data>
   <data name="Settings_InitialAutoProxyTimeoutResetButton.Content" xml:space="preserve">
     <value>Időtúllépés alaphelyzetbe állítása</value>
@@ -1378,7 +1378,7 @@ Helyreállítási utasítások megtekintése a következőn: https://aka.ms/wsld
     <value>Kezdeti automatikus proxy időtúllépése</value>
   </data>
   <data name="Settings_InitialAutoProxyTimeoutTextBox.AutomationProperties.HelpText" xml:space="preserve">
-    <value>Csak akkor alkalmazható, ha a wsl2.autoProxy igaz értékre van állítva. Konfigurálja, hogy a WSL mennyi ideig (ezredmásodpercben) várja meg a HTTP-proxyadatok lekérését a WSL-tároló indításakor. Ha ezt követően feloldja a proxybeállításokat, a WSL-példányt újra kell indítani a lekért proxybeállítások használatához.</value>
+    <value>Csak akkor alkalmazható, ha a lsw2.autoProxy igaz értékre van állítva. Konfigurálja, hogy a LSW mennyi ideig (ezredmásodpercben) várja meg a HTTP-proxyadatok lekérését a LSW-tároló indításakor. Ha ezt követően feloldja a proxybeállításokat, a LSW-példányt újra kell indítani a lekért proxybeállítások használatához.</value>
   </data>
   <data name="Settings_KernelCommandLine.Header" xml:space="preserve">
     <value>Kernel parancssora</value>
@@ -1390,13 +1390,13 @@ Helyreállítási utasítások megtekintése a következőn: https://aka.ms/wsld
     <value>Localhost-továbbítás engedélyezése</value>
   </data>
   <data name="Settings_LocalhostForwarding.Description" xml:space="preserve">
-    <value>Logikai érték, amely azt határozza meg, hogy a WSL 2 virtuális gép helyettesítő karaktereihez vagy localhost eleméhez kötött portok csatlakoztathatók legyenek-e a gazdagépről a localhost:port használatával.</value>
+    <value>Logikai érték, amely azt határozza meg, hogy a LSW 2 virtuális gép helyettesítő karaktereihez vagy localhost eleméhez kötött portok csatlakoztathatók legyenek-e a gazdagépről a localhost:port használatával.</value>
   </data>
   <data name="Settings_LocalhostForwardingToggleSwitch.AutomationProperties.Name" xml:space="preserve">
     <value>Localhost-továbbítás engedélyezése.</value>
   </data>
   <data name="Settings_LocalhostForwardingToggleSwitch.AutomationProperties.HelpText" xml:space="preserve">
-    <value>Logikai érték, amely azt határozza meg, hogy a WSL 2 virtuális gép helyettesítő karaktereihez vagy localhost eleméhez kötött portok csatlakoztathatók legyenek-e a gazdagépről a localhost, kettőspont, port használatával.</value>
+    <value>Logikai érték, amely azt határozza meg, hogy a LSW 2 virtuális gép helyettesítő karaktereihez vagy localhost eleméhez kötött portok csatlakoztathatók legyenek-e a gazdagépről a localhost, kettőspont, port használatával.</value>
   </data>
   <data name="Settings_MegabyteStringFormat" xml:space="preserve">
     <value>{0} MB</value>
@@ -1408,7 +1408,7 @@ Helyreállítási utasítások megtekintése a következőn: https://aka.ms/wsld
     <value>Memóriaméret</value>
   </data>
   <data name="Settings_MemorySize.Description" xml:space="preserve">
-    <value>A WSL 2 virtuális géphez hozzárendelendő memória mennyisége.</value>
+    <value>A LSW 2 virtuális géphez hozzárendelendő memória mennyisége.</value>
   </data>
   <data name="Settings_MemorySizeResetButton.Content" xml:space="preserve">
     <value>Méret visszaállítása</value>
@@ -1417,7 +1417,7 @@ Helyreállítási utasítások megtekintése a következőn: https://aka.ms/wsld
     <value>Memóriaméret</value>
   </data>
   <data name="Settings_MemorySizeTextBox.AutomationProperties.HelpText" xml:space="preserve">
-    <value>A WSL 2 virtuális géphez rendelendő, megabájtban megadott memóriamennyiség.</value>
+    <value>A LSW 2 virtuális géphez rendelendő, megabájtban megadott memóriamennyiség.</value>
   </data>
   <data name="Settings_MillisecondsStringFormat" xml:space="preserve">
     <value>{0} ezredmásodperc</value>
@@ -1426,25 +1426,25 @@ Helyreállítási utasítások megtekintése a következőn: https://aka.ms/wsld
     <value>Beágyazott virtualizálás engedélyezése</value>
   </data>
   <data name="Settings_NestedVirtualization.Description" xml:space="preserve">
-    <value>Logikai érték a beágyazott virtualizálás be- vagy kikapcsolásához, ami lehetővé teszi más beágyazott virtuális gépek futtatását a WSL 2-ben.</value>
+    <value>Logikai érték a beágyazott virtualizálás be- vagy kikapcsolásához, ami lehetővé teszi más beágyazott virtuális gépek futtatását a LSW 2-ben.</value>
   </data>
   <data name="Settings_NestedVirtualizationToggleSwitch.AutomationProperties.Name" xml:space="preserve">
     <value>Beágyazott virtualizálás engedélyezése.</value>
   </data>
   <data name="Settings_NestedVirtualizationToggleSwitch.AutomationProperties.HelpText" xml:space="preserve">
-    <value>Logikai érték a beágyazott virtualizálás be- vagy kikapcsolásához, ami lehetővé teszi más beágyazott virtuális gépek futtatását a WSL 2-ben.</value>
+    <value>Logikai érték a beágyazott virtualizálás be- vagy kikapcsolásához, ami lehetővé teszi más beágyazott virtuális gépek futtatását a LSW 2-ben.</value>
   </data>
   <data name="Settings_NetworkingMode.Header" xml:space="preserve">
     <value>Hálózati mód</value>
   </data>
   <data name="Settings_NetworkingMode.Description" xml:space="preserve">
-    <value>Megadja a WSL hálózati módját.</value>
+    <value>Megadja a LSW hálózati módját.</value>
   </data>
   <data name="Settings_NetworkingModeComboBox.AutomationProperties.Name" xml:space="preserve">
     <value>Hálózati mód.</value>
   </data>
   <data name="Settings_NetworkingModeComboBox.AutomationProperties.HelpText" xml:space="preserve">
-    <value>Megadja a WSL hálózati módját.</value>
+    <value>Megadja a LSW hálózati módját.</value>
   </data>
   <data name="Settings_NetworkingPageTitle.Text" xml:space="preserve">
     <value>Hálózatkezelés</value>
@@ -1467,14 +1467,14 @@ Helyreállítási utasítások megtekintése a következőn: https://aka.ms/wsld
     <value>A Linux-fájlok elérése a Fájlkezelőben</value>
   </data>
   <data name="Settings_OOBECrossOSFileAccess_LinuxFromFileExplorerSample.Text" xml:space="preserve">
-    <value>A Linux-fájlokat a Fájlkezelőben a '\\wsl.localhost\' mappában vagy a Linux ikonra kattintva tekintheti meg.</value>
-    <comment>{Locked="\\wsl.localhost\"}Url addresses should not be translated.</comment>
+    <value>A Linux-fájlokat a Fájlkezelőben a '\\lsw.localhost\' mappában vagy a Linux ikonra kattintva tekintheti meg.</value>
+    <comment>{Locked="\\lsw.localhost\"}Url addresses should not be translated.</comment>
   </data>
-  <data name="Settings_OOBECrossOSFileAccess_LaunchWindowsFromWSLTitle.Text" xml:space="preserve">
-    <value>Windows-fájlok és -programok indítása WSL-ből</value>
+  <data name="Settings_OOBECrossOSFileAccess_LaunchWindowsFromLSWTitle.Text" xml:space="preserve">
+    <value>Windows-fájlok és -programok indítása LSW-ből</value>
   </data>
-  <data name="Settings_OOBECrossOSFileAccess_LaunchWindowsFromWSLSample.Text" xml:space="preserve">
-    <value>A WSL használata közben is közvetlenül a Bash-ből futtathatja a Windows végrehajtható fájljait. Próbálja futtatni
+  <data name="Settings_OOBECrossOSFileAccess_LaunchWindowsFromLSWSample.Text" xml:space="preserve">
+    <value>A LSW használata közben is közvetlenül a Bash-ből futtathatja a Windows végrehajtható fájljait. Próbálja futtatni
 a 'powershell.exe /c start .' parancsot a Fájlkezelő megnyitásához az aktuális mappában.</value>
     <comment>{Locked="/c start ."}Command line arguments and file names should not be translated</comment>
   </data>
@@ -1493,106 +1493,106 @@ a 'powershell.exe /c start .' parancsot a Fájlkezelő megnyitásához az aktuá
     <value>Tükrözött módú hálózat</value>
   </data>
   <data name="Settings_OOBECrossOSFileAccess_MirroredModeNetworkingSample.Text" xml:space="preserve">
-    <value>A WSL egy új, tükrözött módot is tartalmaz, amely fejlett funkciókat biztosít, például IPv6-támogatást, valamint hozzáférést a hálózati alkalmazásokhoz a helyi hálózaton.</value>
+    <value>A LSW egy új, tükrözött módot is tartalmaz, amely fejlett funkciókat biztosít, például IPv6-támogatást, valamint hozzáférést a hálózati alkalmazásokhoz a helyi hálózaton.</value>
   </data>
   <data name="Settings_OOBECrossOSFileAccessLink.Content" xml:space="preserve">
     <value>További információ az operációs rendszerek közötti fájlhozzáférésről</value>
   </data>
   <data name="Settings_OOBECrossOSFileAccessLink.NavigateUri" xml:space="preserve">
-    <value>https://aka.ms/wslfilesystems</value>
+    <value>https://aka.ms/lswfilesystems</value>
     <comment>{Locked}Uri to the Working across Windows and Linux file systems documentation</comment>
   </data>
   <data name="Settings_OOBEDisplayName" xml:space="preserve">
     <value>Üdvözli a Linuxos Windows-alrendszer</value>
   </data>
   <data name="Settings_OOBEDistroManagement.Description" xml:space="preserve">
-   <value>A WSL kiváló módja a különböző Linux-disztribúciók kipróbálásának.</value>
+   <value>A LSW kiváló módja a különböző Linux-disztribúciók kipróbálásának.</value>
   </data>
   <data name="Settings_OOBEDistroManagement.Title" xml:space="preserve">
     <value>Disztribúciókezelés</value>
   </data>
-  <data name="Settings_OOBEDistroManagementBasicWSLCommandsLink.Content" xml:space="preserve">
-    <value>További információ az alapszintű WSL-parancsokról</value>
+  <data name="Settings_OOBEDistroManagementBasicLSWCommandsLink.Content" xml:space="preserve">
+    <value>További információ az alapszintű LSW-parancsokról</value>
   </data>
-  <data name="Settings_OOBEDistroManagementBasicWSLCommandsLink.NavigateUri" xml:space="preserve">
-    <value>https://aka.ms/wslcommands</value>
-    <comment>{Locked}Uri to the basic WSL commands documentation</comment>
+  <data name="Settings_OOBEDistroManagementBasicLSWCommandsLink.NavigateUri" xml:space="preserve">
+    <value>https://aka.ms/lswcommands</value>
+    <comment>{Locked}Uri to the basic LSW commands documentation</comment>
   </data>
   <data name="Settings_OOBEDistroManagementImportCustomDistroLink.Content" xml:space="preserve">
     <value>További információ a linuxos disztribúciók importálásáról</value>
   </data>
   <data name="Settings_OOBEDistroManagementImportCustomDistroLink.NavigateUri" xml:space="preserve">
-    <value>https://aka.ms/wslcustomdistro</value>
-    <comment>{Locked}Uri to the import any linux distribution to use with WSL documentation</comment>
+    <value>https://aka.ms/lswcustomdistro</value>
+    <comment>{Locked}Uri to the import any linux distribution to use with LSW documentation</comment>
   </data>
   <data name="Settings_OOBEDistroManagement_InstallableDistrosTitle.Text" xml:space="preserve">
-    <value>Telepíthető WSL-disztribúciók listázása parancs</value>
+    <value>Telepíthető LSW-disztribúciók listázása parancs</value>
   </data>
   <data name="Settings_OOBEDistroManagement_InstallableDistrosSample.Text" xml:space="preserve">
-    <value>'wsl.exe -l -o'</value>
+    <value>'lsw.exe -l -o'</value>
     <comment>{Locked="-l -o"}Command line arguments and file names should not be translated</comment>
   </data>
   <data name="Settings_OOBEDistroManagement_InstallNamedDistrosTitle.Text" xml:space="preserve">
-    <value>Nevesített WSL-disztribúció telepítése parancs</value>
+    <value>Nevesített LSW-disztribúció telepítése parancs</value>
   </data>
   <data name="Settings_OOBEDistroManagement_InstallNamedDistrosSample.Text" xml:space="preserve">
-    <value>'wsl.exe --install &lt;DistroName&gt;'</value>
+    <value>'lsw.exe --install &lt;DistroName&gt;'</value>
     <comment>{Locked="--install "}Command line arguments, file names and string inserts should not be translated</comment>
   </data>
   <data name="Settings_OOBEDistroManagement_AvailableDistrosTitle.Text" xml:space="preserve">
-    <value>Elérhető WSL-disztribúciók listázása parancs</value>
+    <value>Elérhető LSW-disztribúciók listázása parancs</value>
   </data>
   <data name="Settings_OOBEDistroManagement_AvailableDistrosSample.Text" xml:space="preserve">
-    <value>'wsl.exe -l'</value>
+    <value>'lsw.exe -l'</value>
     <comment>{Locked="-l"}Command line arguments and file names should not be translated</comment>
   </data>
   <data name="Settings_OOBEDockerDesktopIntegration.Description" xml:space="preserve">
-    <value>A Docker Desktop nagyszerűen működik együtt a WSL-lel, hogy segítsen a Linux-tárolókkal való fejlesztésben.
+    <value>A Docker Desktop nagyszerűen működik együtt a LSW-lel, hogy segítsen a Linux-tárolókkal való fejlesztésben.
 
-A Docker Desktop WSL-lel való használatának néhány előnye:
+A Docker Desktop LSW-lel való használatának néhány előnye:
 
-• Docker-parancsokat futtathat WSL-ben vagy Windowsban, ugyanazzal a Docker-démonnal és lemezképekkel.
-• A windowsos meghajtók WSL-beli automatikus csatlakoztatásával zökkenőmentesen oszthat meg fájlokat és mappákat Windows és Linux között.
-• A WSL együttműködési képességének köszönhetően a kívánt Windows-eszközökkel és -szerkesztőkkel dolgozhat Linux-kódon és -fájlokon, vagy fordítva.</value>
+• Docker-parancsokat futtathat LSW-ben vagy Windowsban, ugyanazzal a Docker-démonnal és lemezképekkel.
+• A windowsos meghajtók LSW-beli automatikus csatlakoztatásával zökkenőmentesen oszthat meg fájlokat és mappákat Windows és Linux között.
+• A LSW együttműködési képességének köszönhetően a kívánt Windows-eszközökkel és -szerkesztőkkel dolgozhat Linux-kódon és -fájlokon, vagy fordítva.</value>
  </data>
   <data name="Settings_OOBEDockerDesktopIntegration.Title" xml:space="preserve">
     <value>Docker Desktop-integráció</value>
   </data>
   <data name="Settings_OOBEDockerDesktopIntegrationLink.Content" xml:space="preserve">
-    <value>További információ a WSL használatáról Dockerrel</value>
+    <value>További információ a LSW használatáról Dockerrel</value>
   </data>
   <data name="Settings_OOBEDockerDesktopIntegrationLink.NavigateUri" xml:space="preserve">
-    <value>https://aka.ms/wsldocker</value>
-    <comment>{Locked}Uri to the Docker remote containers on WSL 2 documentation</comment>
+    <value>https://aka.ms/lswdocker</value>
+    <comment>{Locked}Uri to the Docker remote containers on LSW 2 documentation</comment>
   </data>
   <data name="Settings_OOBEGeneral.Description" xml:space="preserve">
-    <value>A Linuxos Windows-alrendszer (WSL) segítségével közvetlenül a Windowson futtathatja kedvenc Linux-eszközeit, segédprogramjait, alkalmazásait és munkafolyamatait.
+    <value>A Linuxos Windows-alrendszer (LSW) segítségével közvetlenül a Windowson futtathatja kedvenc Linux-eszközeit, segédprogramjait, alkalmazásait és munkafolyamatait.
 
 Szánjon egy kis időt a közösség néhány kedvenc funkciójának előzetes megtekintésére, vagy tekintse meg átfogó dokumentációnkat.</value>
   </data>
   <data name="Settings_OOBEGeneral.Title" xml:space="preserve">
-    <value>Üdvözli a WSL</value>
+    <value>Üdvözli a LSW</value>
   </data>
   <data name="Settings_OOBEGeneral_BestPracticesSetupLink.Content" xml:space="preserve">
     <value>Ajánlott eljárások a beállításhoz</value>
   </data>
   <data name="Settings_OOBEGeneral_BestPracticesSetupLink.NavigateUri" xml:space="preserve">
-    <value>https://aka.ms/wslsetup</value>
+    <value>https://aka.ms/lswsetup</value>
     <comment>{Locked}Uri to the Best Practices for Setup Documentation</comment>
   </data>
   <data name="Settings_OOBEGeneral_GettingStartedLinuxLink.Content" xml:space="preserve">
     <value>Első lépések Linuxszal</value>
   </data>
   <data name="Settings_OOBEGeneral_GettingStartedLinuxLink.NavigateUri" xml:space="preserve">
-    <value>https://aka.ms/wslgettingstarted</value>
+    <value>https://aka.ms/lswgettingstarted</value>
     <comment>{Locked}Uri to the Getting Started with Linux Documentation</comment>
   </data>
-  <data name="Settings_OOBEGeneral_WSLDocumentationLink.Content" xml:space="preserve">
-    <value>A linuxos Windows-alrendszer (WSL) dokumentációja</value>
+  <data name="Settings_OOBEGeneral_LSWDocumentationLink.Content" xml:space="preserve">
+    <value>A linuxos Windows-alrendszer (LSW) dokumentációja</value>
   </data>
-  <data name="Settings_OOBEGeneral_WSLDocumentationLink.NavigateUri" xml:space="preserve">
-    <value>https://aka.ms/wsldocs</value>
-    <comment>{Locked}Uri to the Microsoft WSL Documentation</comment>
+  <data name="Settings_OOBEGeneral_LSWDocumentationLink.NavigateUri" xml:space="preserve">
+    <value>https://aka.ms/lswdocs</value>
+    <comment>{Locked}Uri to the Microsoft LSW Documentation</comment>
   </data>
   <data name="Settings_OOBEGUIApps.Description" xml:space="preserve">
     <value>Grafikus linuxos alkalmazásokat használhat natív Windows-interakciókkal, például alt-tab billentyűkombinációval, start menü indítása, tálca kitűzése, valamint a kivágás és beillesztés támogatása.</value>
@@ -1601,9 +1601,9 @@ Szánjon egy kis időt a közösség néhány kedvenc funkciójának előzetes m
     <value>Grafikus felhasználói felületű alkalmazások</value>
   </data>
   <data name="Settings_OOBEGPUAcceleration.Description" xml:space="preserve">
-    <value>A WSL képes kihasználni a Windows GPU-t gépi tanulási munkafolyamatokhoz
+    <value>A LSW képes kihasználni a Windows GPU-t gépi tanulási munkafolyamatokhoz
 
-A WSL-ben futó Linux bináris fájlok automatikusan használhatják a GPU-t a Windowsban a teljesítményük gyorsításához. Ezeket a munkafolyamatokat ugyanúgy kell telepítenie és futtatnia, mint egy normál linuxos gépen. Számos különböző módon kezdheti meg a CUDA futtatását egy Docker-tárolóban, ha NVIDIA grafikus kártyával rendelkezik, a PyTorch vagy a TensorFlow DirectML-vel való futtatásához AMD- vagy Intel- vagy NVIDIA-videokártyán. További információért tekintse meg az alábbi kezdő útmutatót.</value>
+A LSW-ben futó Linux bináris fájlok automatikusan használhatják a GPU-t a Windowsban a teljesítményük gyorsításához. Ezeket a munkafolyamatokat ugyanúgy kell telepítenie és futtatnia, mint egy normál linuxos gépen. Számos különböző módon kezdheti meg a CUDA futtatását egy Docker-tárolóban, ha NVIDIA grafikus kártyával rendelkezik, a PyTorch vagy a TensorFlow DirectML-vel való futtatásához AMD- vagy Intel- vagy NVIDIA-videokártyán. További információért tekintse meg az alábbi kezdő útmutatót.</value>
   </data>
   <data name="Settings_OOBEGPUAcceleration.Title" xml:space="preserve">
     <value>GPU-gyorsítás</value>
@@ -1612,15 +1612,15 @@ A WSL-ben futó Linux bináris fájlok automatikusan használhatják a GPU-t a W
     <value>További információ a GPU-gyorsításról</value>
   </data>
   <data name="Settings_OOBEGPUAccelerationLink.NavigateUri" xml:space="preserve">
-    <value>https://aka.ms/wslgpu</value>
-    <comment>{Locked}Uri to the GPU acceleration for ML in WSL documentation</comment>
+    <value>https://aka.ms/lswgpu</value>
+    <comment>{Locked}Uri to the GPU acceleration for ML in LSW documentation</comment>
   </data>
   <data name="Settings_OOBEGUIAppsLink.Content" xml:space="preserve">
-    <value>További információ a WSL GUI-alkalmazásokról</value>
+    <value>További információ a LSW GUI-alkalmazásokról</value>
   </data>
   <data name="Settings_OOBEGUIAppsLink.NavigateUri" xml:space="preserve">
-    <value>https://aka.ms/wslguiapps</value>
-    <comment>{Locked}Uri to the Run GUI apps on the WSL documentation</comment>
+    <value>https://aka.ms/lswguiapps</value>
+    <comment>{Locked}Uri to the Run GUI apps on the LSW documentation</comment>
   </data>
   <data name="Settings_OOBEGUIApps_AppsListDescription.Text" xml:space="preserve">
     <value>Íme a kipróbálandó alkalmazások listája (az összes alkalmazást telepítheti Ubuntuban a 'sudo apt install &lt;Az alkalmazás neve&gt;' beírásával)
@@ -1642,44 +1642,44 @@ A WSL-ben futó Linux bináris fájlok automatikusan használhatják a GPU-t a W
     <value>További információ a hálózati alkalmazásokról</value>
   </data>
   <data name="Settings_OOBENetworkingIntegrationLinuxNetworkingAppsLink.NavigateUri" xml:space="preserve">
-    <value>https://aka.ms/wslnetworking</value>
-    <comment>{Locked}Uri to the Accessing network applications with WSL documentation</comment>
+    <value>https://aka.ms/lswnetworking</value>
+    <comment>{Locked}Uri to the Accessing network applications with LSW documentation</comment>
   </data>
   <data name="Settings_OOBENetworkingIntegrationMirroredModeLink.Content" xml:space="preserve">
     <value>További információ a tükrözött módú hálózatkezelésről</value>
   </data>
   <data name="Settings_OOBENetworkingIntegrationMirroredModeLink.NavigateUri" xml:space="preserve">
-    <value>https://aka.ms/wslmirroredmode</value>
-    <comment>{Locked}Uri to the WSL Mirrored Mode networking documentation</comment>
+    <value>https://aka.ms/lswmirroredmode</value>
+    <comment>{Locked}Uri to the LSW Mirrored Mode networking documentation</comment>
   </data>
   <data name="Settings_OOBEVSCodeIntegration.Description" xml:space="preserve">
-   <value>A WSL-t közvetlenül a VS Code-ból teljes munkaidős fejlesztési környezetként is használhatja.</value>
+   <value>A LSW-t közvetlenül a VS Code-ból teljes munkaidős fejlesztési környezetként is használhatja.</value>
   </data>
   <data name="Settings_OOBEVSCodeIntegration.Title" xml:space="preserve">
     <value>VS Code-integráció</value>
   </data>
   <data name="Settings_OOBEVSCodeIntegrationLink.Content" xml:space="preserve">
-    <value>További információ a WSL használatáról VS Code-dal</value>
+    <value>További információ a LSW használatáról VS Code-dal</value>
   </data>
   <data name="Settings_OOBEVSCodeIntegrationLink.NavigateUri" xml:space="preserve">
-    <value>https://aka.ms/wslvscode</value>
-    <comment>{Locked}Uri to the using Visual Studio Code with WSL documentation</comment>
+    <value>https://aka.ms/lswvscode</value>
+    <comment>{Locked}Uri to the using Visual Studio Code with LSW documentation</comment>
   </data>
   <data name="Settings_OOBEVSCodeIntegration_VSCodeInstallTitle.Text" xml:space="preserve">
     <value>A telepítés módja</value>
   </data>
   <data name="Settings_OOBEVSCodeIntegration_VSCodeInstallSample.Text" xml:space="preserve">
-    <value>A VS Code telepítése után telepítheti a távoli WSL-bővítményt a Windows terminálból:
+    <value>A VS Code telepítése után telepítheti a távoli LSW-bővítményt a Windows terminálból:
 
-'code –install-extension ms-vscode-remote.remote-wsl'</value>
+'code –install-extension ms-vscode-remote.remote-lsw'</value>
   </data>
   <data name="Settings_OOBEVSCodeIntegration_VSCodeOpenProjectTitle.Text" xml:space="preserve">
-    <value>WSL-projekt megnyitása Visual Studio Code-ban</value>
+    <value>LSW-projekt megnyitása Visual Studio Code-ban</value>
   </data>
   <data name="Settings_OOBEVSCodeIntegration_VSCodeOpenProjectSample.Text" xml:space="preserve">
-    <value>Ha a WSL-disztribúcióból szeretne megnyitni egy projektet a VS Code-ban, nyissa meg a terjesztési parancssort, és futtassa a 'code .' parancsot egy projektfájl megnyitásához.
+    <value>Ha a LSW-disztribúcióból szeretne megnyitni egy projektet a VS Code-ban, nyissa meg a terjesztési parancssort, és futtassa a 'code .' parancsot egy projektfájl megnyitásához.
 
-A VS Code-ban található parancskatalógusban további VS Code Remote beállításokat is elérhet. A „SHIFT+CTRL+P” billentyűkombinációval nyissa meg a parancspalettát, és írja be a "Remote-WSL" parancsot a rendelkezésre álló VS Code Remote-beállítások listájának megtekintéséhez, lehetővé téve a mappa újbóli megnyitását egy távoli munkamenetben, adja meg a megnyitni kívánt disztribúciót és egyebeket.</value>
+A VS Code-ban található parancskatalógusban további VS Code Remote beállításokat is elérhet. A „SHIFT+CTRL+P” billentyűkombinációval nyissa meg a parancspalettát, és írja be a "Remote-LSW" parancsot a rendelkezésre álló VS Code Remote-beállítások listájának megtekintéséhez, lehetővé téve a mappa újbóli megnyitását egy távoli munkamenetben, adja meg a megnyitni kívánt disztribúciót és egyebeket.</value>
   </data>
   <data name="Settings_OOBE_HowToUse.Text" xml:space="preserve">
     <value>Használati útmutató</value>
@@ -1691,7 +1691,7 @@ A VS Code-ban található parancskatalógusban további VS Code Remote beállít
     <value>Lapjelentés engedélyezése</value>
   </data>
   <data name="Settings_PageReporting.Description" xml:space="preserve">
-    <value>Az alapértelmezett igaz beállítás lehetővé teszi, hogy a Windows visszanyerje a WSL 2 virtuális gép számára lefoglalt nem használt memóriát.</value>
+    <value>Az alapértelmezett igaz beállítás lehetővé teszi, hogy a Windows visszanyerje a LSW 2 virtuális gép számára lefoglalt nem használt memóriát.</value>
   </data>
   <data name="Settings_PrivacyPolicyLink.Content" xml:space="preserve">
     <value>Adatvédelmi nyilatkozat</value>
@@ -1704,7 +1704,7 @@ A VS Code-ban található parancskatalógusban további VS Code Remote beállít
     <value>Processzorok száma</value>
   </data>
   <data name="Settings_ProcCount.Description" xml:space="preserve">
-    <value>A WSL 2 virtuális géphez hozzárendelni kívánt logikai processzorok száma.</value>
+    <value>A LSW 2 virtuális géphez hozzárendelni kívánt logikai processzorok száma.</value>
   </data>
   <data name="Settings_ProcCountResetButton.Content" xml:space="preserve">
     <value>Szám alaphelyzetbe állítása</value>
@@ -1713,7 +1713,7 @@ A VS Code-ban található parancskatalógusban további VS Code Remote beállít
     <value>Processzorok száma</value>
   </data>
   <data name="Settings_ProcCountTextBox.AutomationProperties.HelpText" xml:space="preserve">
-    <value>A WSL 2 virtuális géphez hozzárendelni kívánt logikai processzorok száma.</value>
+    <value>A LSW 2 virtuális géphez hozzárendelni kívánt logikai processzorok száma.</value>
   </data>
   <data name="Settings_RelatedLinks.Text" xml:space="preserve">
     <value>Kapcsolódó hivatkozások</value>
@@ -1722,20 +1722,20 @@ A VS Code-ban található parancskatalógusban további VS Code Remote beállít
     <value>Kibocsátási megjegyzések</value>
   </data>
   <data name="Settings_ReleaseNotesLink.NavigateUri" xml:space="preserve">
-    <value>https://aka.ms/wslreleases</value>
-    <comment>{Locked}Uri to Microsoft WSL release notes</comment>
+    <value>https://aka.ms/lswreleases</value>
+    <comment>{Locked}Uri to Microsoft LSW release notes</comment>
   </data>
   <data name="Settings_SafeMode.Header" xml:space="preserve">
     <value>Csökkentett mód engedélyezése</value>
   </data>
   <data name="Settings_SafeMode.Description" xml:space="preserve">
-    <value>Futtatja a WSL-t csökkentett módban, amely számos funkciót letilt, és a rossz állapotú disztribúciók helyreállítására szolgál.</value>
+    <value>Futtatja a LSW-t csökkentett módban, amely számos funkciót letilt, és a rossz állapotú disztribúciók helyreállítására szolgál.</value>
   </data>
   <data name="Settings_SafeModeToggleSwitch.AutomationProperties.Name" xml:space="preserve">
     <value>Csökkentett mód engedélyezése.</value>
   </data>
   <data name="Settings_SafeModeToggleSwitch.AutomationProperties.HelpText" xml:space="preserve">
-    <value>Futtatja a WSL-t csökkentett módban, amely számos funkciót letilt, és a rossz állapotú disztribúciók helyreállítására szolgál.</value>
+    <value>Futtatja a LSW-t csökkentett módban, amely számos funkciót letilt, és a rossz állapotú disztribúciók helyreállítására szolgál.</value>
   </data>
   <data name="Settings_Shell_About.Content" xml:space="preserve">
     <value>Névjegy</value>
@@ -1761,7 +1761,7 @@ A VS Code-ban található parancskatalógusban további VS Code Remote beállít
   <data name="Settings_Shell_GUIApps.Content" xml:space="preserve">
     <value>Grafikus felhasználói felületű alkalmazások</value>
   </data>
-  <data name="Settings_Shell_LaunchWSL.Content" xml:space="preserve">
+  <data name="Settings_Shell_LaunchLSW.Content" xml:space="preserve">
     <value>Wsl.exe indítása</value>
   </data>
   <data name="Settings_Shell_MemAndProc.Content" xml:space="preserve">
@@ -1774,7 +1774,7 @@ A VS Code-ban található parancskatalógusban további VS Code Remote beállít
     <value>Hálózati integráció</value>
   </data>
   <data name="Settings_Shell_OOBE.Content" xml:space="preserve">
-    <value>Üdvözli a WSL</value>
+    <value>Üdvözli a LSW</value>
   </data>
   <data name="Settings_Shell_OptionalFeatures.Content" xml:space="preserve">
     <value>Választható funkciók</value>
@@ -1795,8 +1795,8 @@ A VS Code-ban található parancskatalógusban további VS Code Remote beállít
     <value>Problémák</value>
   </data>
   <data name="Settings_IssuesLink.NavigateUri" xml:space="preserve">
-    <value>https://aka.ms/wslproject</value>
-    <comment>{Locked}Uri to Microsoft WSL issues</comment>
+    <value>https://aka.ms/lswproject</value>
+    <comment>{Locked}Uri to Microsoft LSW issues</comment>
   </data>
   <data name="Settings_SparseVHD.Header" xml:space="preserve">
     <value>Ritka VHD engedélyezése alapértelmezés szerint</value>
@@ -1829,7 +1829,7 @@ A VS Code-ban található parancskatalógusban további VS Code Remote beállít
     <value>Felcserélési méret</value>
   </data>
   <data name="Settings_SwapSize.Description" xml:space="preserve">
-    <value>Mennyi lapozóterületet kell hozzáadni a WSL 2 virtuális géphez, 0-t a felcserélés nélküli fájlhoz. A felcserélési tároló lemezalapú RAM, amit akkor használ a rendszer ha a memóriaigény meghaladja a hardvereszközökre vonatkozó korlátot.</value>
+    <value>Mennyi lapozóterületet kell hozzáadni a LSW 2 virtuális géphez, 0-t a felcserélés nélküli fájlhoz. A felcserélési tároló lemezalapú RAM, amit akkor használ a rendszer ha a memóriaigény meghaladja a hardvereszközökre vonatkozó korlátot.</value>
   </data>
   <data name="Settings_SwapSizeResetButton.Content" xml:space="preserve">
     <value>Méret visszaállítása</value>
@@ -1838,7 +1838,7 @@ A VS Code-ban található parancskatalógusban további VS Code Remote beállít
     <value>Felcserélési méret</value>
   </data>
   <data name="Settings_SwapSizeTextBox.AutomationProperties.HelpText" xml:space="preserve">
-    <value>A WSL 2 virtuális géphez hozzáadandó lapozótár megabájtban megadva. 0 a felcserélés nélküli fájlhoz. A felcserélési tároló lemezalapú RAM, amit akkor használ a rendszer ha a memóriaigény meghaladja a hardvereszközökre vonatkozó korlátot.</value>
+    <value>A LSW 2 virtuális géphez hozzáadandó lapozótár megabájtban megadva. 0 a felcserélés nélküli fájlhoz. A felcserélési tároló lemezalapú RAM, amit akkor használ a rendszer ha a memóriaigény meghaladja a hardvereszközökre vonatkozó korlátot.</value>
   </data>
   <data name="Settings_Virtio.Header" xml:space="preserve">
     <value>VirtIO engedélyezése</value>

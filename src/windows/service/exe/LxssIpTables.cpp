@@ -329,9 +329,9 @@ unique_mi_session LxssManagementInterface::NewSession()
 
 // LxssNetworkingFirewall class functions
 
-const wil::unique_bstr LxssNetworkingFirewall::s_DefaultRuleDescription(wil::make_bstr_failfast(L"WSL iptables entry"));
+const wil::unique_bstr LxssNetworkingFirewall::s_DefaultRuleDescription(wil::make_bstr_failfast(L"LSW iptables entry"));
 
-const std::wstring LxssNetworkingFirewall::s_FriendlyNamePrefix(L"WSLRULE_17774471984f_");
+const std::wstring LxssNetworkingFirewall::s_FriendlyNamePrefix(L"LSWRULE_17774471984f_");
 
 LxssNetworkingFirewall::LxssNetworkingFirewall()
 {
@@ -429,7 +429,7 @@ void LxssNetworkingFirewall::CleanupRemnants()
     THROW_IF_FAILED(rules->get__NewEnum(enumInterface.GetAddressOf()));
     Microsoft::WRL::ComPtr<IEnumVARIANT> rulesEnum;
     THROW_IF_FAILED(enumInterface.As(&rulesEnum));
-    // Find any rules with the unique WSL prefix and destroy them.
+    // Find any rules with the unique LSW prefix and destroy them.
     for (;;)
     {
         wil::unique_variant next;
@@ -444,7 +444,7 @@ void LxssNetworkingFirewall::CleanupRemnants()
         THROW_IF_FAILED(next.pdispVal->QueryInterface(IID_PPV_ARGS(&nextRule)));
         wil::unique_bstr nextRuleName;
         THROW_IF_FAILED(nextRule->get_Name(nextRuleName.addressof()));
-        if (wsl::shared::string::StartsWith(nextRuleName.get(), s_FriendlyNamePrefix.c_str(), true))
+        if (lsw::shared::string::StartsWith(nextRuleName.get(), s_FriendlyNamePrefix.c_str(), true))
         {
             // The firewall port rule will be destroyed when it goes out of
             // scope.
@@ -536,7 +536,7 @@ void LxssNetworkingFirewall::RemoveExcludedAdapter(const std::wstring& AdapterNa
 
         THROW_HR_IF(E_UNEXPECTED, (nextAdapter.vt != VT_BSTR));
         // Case-insensitive name comparison
-        if (wsl::shared::string::IsEqual(AdapterName, nextAdapter.bstrVal, true))
+        if (lsw::shared::string::IsEqual(AdapterName, nextAdapter.bstrVal, true))
         {
             break;
         }
@@ -594,7 +594,7 @@ LxssNetworkingFirewallPort::~LxssNetworkingFirewallPort()
 // LxssNetworkingNat class functions
 
 // N.B. The name is internally limited by NAT to 39 characters.
-const std::wstring LxssNetworkingNat::s_FriendlyNamePrefix(L"WSLNAT_17774471984f_");
+const std::wstring LxssNetworkingNat::s_FriendlyNamePrefix(L"LSWNAT_17774471984f_");
 
 const std::wstring LxssNetworkingNat::s_WmiNatInstanceId(L"InstanceID");
 const std::wstring LxssNetworkingNat::s_WmiNatInternalIpAddress(L"InternalIPInterfaceAddressPrefix");
@@ -675,7 +675,7 @@ LxssNetworkingNat::~LxssNetworkingNat()
 void LxssNetworkingNat::CleanupRemnants()
 {
     // Search through all NATs in the system looking for those that match the
-    // WSL naming convention: WSL_<IP address>
+    // LSW naming convention: LSW_<IP address>
     const auto session = LxssManagementInterface::NewSession();
     unique_mi_operation operation;
     MI_Session_EnumerateInstances(
@@ -729,7 +729,7 @@ void LxssNetworkingNat::CleanupRemnants()
             continue;
         }
 
-        if (wsl::shared::string::StartsWith(miValue.string, s_FriendlyNamePrefix, true))
+        if (lsw::shared::string::StartsWith(miValue.string, s_FriendlyNamePrefix, true))
         {
             // Create a temporary NAT instance, to be immediately deleted when
             // it goes out of scope.

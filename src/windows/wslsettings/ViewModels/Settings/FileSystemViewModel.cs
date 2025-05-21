@@ -22,10 +22,10 @@ public partial class FileSystemViewModel : WslConfigSettingViewModel
 
     override protected void InitializeConfigSettings()
     {
-        var wslConfigService = App.GetService<IWslConfigService>();
-        _defaultVHDSize = wslConfigService.GetWslConfigSetting(WslConfigEntry.VhdSizeBytes);
+        var lswConfigService = App.GetService<IWslConfigService>();
+        _defaultVHDSize = lswConfigService.GetWslConfigSetting(WslConfigEntry.VhdSizeBytes);
 
-        _defaultDefaultVHDSizeBytes = wslConfigService.GetWslConfigSetting(WslConfigEntry.VhdSizeBytes, true).UInt64Value;
+        _defaultDefaultVHDSizeBytes = lswConfigService.GetWslConfigSetting(WslConfigEntry.VhdSizeBytes, true).UInt64Value;
     }
 
     public string DefaultVHDSize

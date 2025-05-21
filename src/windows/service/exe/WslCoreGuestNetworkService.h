@@ -12,7 +12,7 @@
 
 #include <wil/resource.h>
 
-namespace wsl::core::networking {
+namespace lsw::core::networking {
 class GuestNetworkService
 {
 public:
@@ -36,7 +36,7 @@ public:
         HCN_NOTIFICATION_CALLBACK Callback,
         void* CallbackContext);
 
-    void SetGuestNetworkServiceState(_In_ wsl::shared::hns::GuestNetworkServiceState State) const;
+    void SetGuestNetworkServiceState(_In_ lsw::shared::hns::GuestNetworkServiceState State) const;
 
     std::pair<uint16_t, uint16_t> AllocateEphemeralPortRange();
 
@@ -63,12 +63,12 @@ private:
     static std::optional<LxssDynamicFunction<decltype(HcnReserveGuestNetworkServicePort)>> m_allocatePort;
     static std::optional<LxssDynamicFunction<decltype(HcnReleaseGuestNetworkServicePortReservationHandle)>> m_releasePort;
 
-    wsl::windows::common::hcs::unique_hcn_guest_network_service m_service;
-    wsl::windows::common::hcs::unique_hcn_guest_network_service_callback m_guestNetworkServiceCallback;
+    lsw::windows::common::hcs::unique_hcn_guest_network_service m_service;
+    lsw::windows::common::hcs::unique_hcn_guest_network_service_callback m_guestNetworkServiceCallback;
     GUID m_id{};
     wil::srwlock m_dataLock;
     _Guarded_by_(m_dataLock) std::set<uint16_t> m_ignoredPorts;
     _Guarded_by_(m_dataLock) std::map<std::pair<HCN_PORT_PROTOCOL, USHORT>, HcnPortReservation> m_reservedPorts;
     _Guarded_by_(m_dataLock) HCN_PORT_RANGE_RESERVATION m_reservedPortRange {};
 };
-} // namespace wsl::core::networking
+} // namespace lsw::core::networking

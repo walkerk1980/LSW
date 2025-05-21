@@ -4,7 +4,7 @@ namespace WslSettings.Contracts.Services;
 
 public interface IWslConfigService
 {
-    IWslConfigSetting GetWslConfigSetting(WslConfigEntry wslConfigEntry, bool defaultSetting = false);
+    IWslConfigSetting GetWslConfigSetting(WslConfigEntry lswConfigEntry, bool defaultSetting = false);
     uint SetWslConfigSetting(IWslConfigSetting setting);
     public delegate void WslConfigChangedEventHandler();
     event WslConfigChangedEventHandler WslConfigChanged;

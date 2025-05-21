@@ -8,7 +8,7 @@ Module Name:
 
 Abstract:
 
-    This file contains WSL Core filesystem helper function declarations.
+    This file contains LSW Core filesystem helper function declarations.
 
 --*/
 
@@ -17,12 +17,12 @@ Abstract:
 
 #define MAX_VHD_COUNT 254
 
-// Each virtiofs device uses the DAX cache, which is controlled by wslcore's caller, plus a couple
+// Each virtiofs device uses the DAX cache, which is controlled by lswcore's caller, plus a couple
 // of extra pages for configuration. MMIO space needs to be large page aligned (2MB), so request an
 // additional 2MB to cover the couple of extra pages needed.
 #define EXTRA_MMIO_SIZE_PER_VIRTIOFS_DEVICE_IN_MB 2
 
-namespace wsl::core::filesystem {
+namespace lsw::core::filesystem {
 
 /// <summary>
 /// Create a file owned by the specified user.
@@ -41,4 +41,4 @@ void ResizeExistingVhd(_In_ HANDLE diskHandle, _In_ ULONGLONG maximumSize, _In_ 
 
 ULONGLONG GetDiskSize(_In_ HANDLE diskHandle);
 
-} // namespace wsl::core::filesystem
+} // namespace lsw::core::filesystem

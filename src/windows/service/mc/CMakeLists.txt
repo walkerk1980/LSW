@@ -1,2 +1,2 @@
-add_mc(wslservicemc wsleventschema.mc)
-set_target_properties(wslservicemc PROPERTIES FOLDER windows)
+add_mc(lswservicemc lsweventschema.mc)
+set_target_properties(lswservicemc PROPERTIES FOLDER windows)

@@ -12,7 +12,7 @@
 #include <p9tracelogging.h>
 #include <optional>
 
-#include "wslpath.h"
+#include "lswpath.h"
 
 #include "util.h"
 #include "SocketChannel.h"
@@ -58,7 +58,7 @@ wil::unique_fd CreateUnixServerSocket(const char* path)
         // It won't, so split the parent path and child name.
         auto index = pathView.find_last_of('/');
 
-        // This really shouldn't happen unless the WSL service has a bug.
+        // This really shouldn't happen unless the LSW service has a bug.
         THROW_ERRNO_IF(EINVAL, index == std::string_view::npos);
 
         const std::string parent{pathView.substr(0, index)};
@@ -148,7 +148,7 @@ catch (...)
     return true;
 }
 
-void RunPlan9ControlFile(p9fs::IPlan9FileSystem& fileSystem, wsl::shared::SocketChannel& channel)
+void RunPlan9ControlFile(p9fs::IPlan9FileSystem& fileSystem, lsw::shared::SocketChannel& channel)
 try
 {
     std::vector<gsl::byte> Buffer;
@@ -200,7 +200,7 @@ void RunPlan9Server(const char* socketPath, const char* logFile, int logLevel, b
         // Close the pipe to signal the parent process that the plan9 server is started.
         pipeFd.reset();
 
-        wsl::shared::SocketChannel channel({controlSocket}, "Plan9Control");
+        lsw::shared::SocketChannel channel({controlSocket}, "Plan9Control");
         RunPlan9ControlFile(*fileSystem, channel);
     }
 
@@ -212,7 +212,7 @@ void RunPlan9Server(const char* socketPath, const char* logFile, int logLevel, b
 }
 
 // Start listening for Plan 9 file server clients.
-std::pair<unsigned int, wsl::shared::SocketChannel> StartPlan9Server(const char* socketWindowsPath, const wsl::linux::WslDistributionConfig& Config)
+std::pair<unsigned int, lsw::shared::SocketChannel> StartPlan9Server(const char* socketWindowsPath, const lsw::linux::WslDistributionConfig& Config)
 try
 {
     unsigned int result = LX_INIT_UTILITY_VM_INVALID_PORT;
@@ -222,7 +222,7 @@ try
     // N.B. VM mode does not use a socket path.
     if (!UtilIsUtilityVm() && strlen(socketWindowsPath) == 0)
     {
-        return {LX_INIT_UTILITY_VM_INVALID_PORT, wsl::shared::SocketChannel{}};
+        return {LX_INIT_UTILITY_VM_INVALID_PORT, lsw::shared::SocketChannel{}};
     }
 
     int sockets[] = {-1, -1};
@@ -315,10 +315,10 @@ try
     char readBuf = 0;
     THROW_LAST_ERROR_IF(read(pipe.read().get(), &readBuf, 1) != 0);
 
-    return {result, wsl::shared::SocketChannel{std::move(parentSocket), "Plan9Control"}};
+    return {result, lsw::shared::SocketChannel{std::move(parentSocket), "Plan9Control"}};
 }
 catch (...)
 {
     LOG_CAUGHT_EXCEPTION_MSG("Could not start file system server.")
-    return {LX_INIT_UTILITY_VM_INVALID_PORT, wsl::shared::SocketChannel{}};
+    return {LX_INIT_UTILITY_VM_INVALID_PORT, lsw::shared::SocketChannel{}};
 }

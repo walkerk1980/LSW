@@ -5,10 +5,10 @@
 #include "Stringify.h"
 #include "stringshared.h"
 
-using namespace wsl::core::networking;
-using namespace wsl::shared;
-using namespace wsl::windows::common::stringify;
-using wsl::core::VirtioNetworking;
+using namespace lsw::core::networking;
+using namespace lsw::shared;
+using namespace lsw::windows::common::stringify;
+using lsw::core::VirtioNetworking;
 
 static constexpr auto c_loopbackDeviceName = TEXT(LX_INIT_LOOPBACK_DEVICE_NAME);
 
@@ -99,7 +99,7 @@ try
     // Send the default route to gns
     if (!default_route.empty())
     {
-        wsl::shared::hns::Route route;
+        lsw::shared::hns::Route route;
         route.NextHop = default_route;
         route.DestinationPrefix = LX_INIT_DEFAULT_ROUTE_PREFIX;
         route.Family = AF_INET;
@@ -257,7 +257,7 @@ void VirtioNetworking::UpdateMtu()
         notification.Settings.NlMtu = m_networkMtu;
         notification.Settings.Connected = true;
 
-        WSL_LOG("VirtioNetworking::UpdateMtu", TraceLoggingValue(m_networkMtu, "VirtioMtu"));
+        LSW_LOG("VirtioNetworking::UpdateMtu", TraceLoggingValue(m_networkMtu, "VirtioMtu"));
 
         // TODO: Why was this commented ?
         // m_gnsChannel.SendHnsNotification(ToJsonW(notification).c_str(), m_endpointId);
@@ -268,7 +268,7 @@ void VirtioNetworking::TraceLoggingRundown() noexcept
 {
     auto lock = m_lock.lock_exclusive();
 
-    WSL_LOG("VirtioNetworking::TraceLoggingRundown", TRACE_NETWORKSETTINGS_OBJECT(m_networkSettings));
+    LSW_LOG("VirtioNetworking::TraceLoggingRundown", TRACE_NETWORKSETTINGS_OBJECT(m_networkSettings));
 }
 
 void VirtioNetworking::FillInitialConfiguration(LX_MINI_INIT_NETWORKING_CONFIGURATION& message)
@@ -298,11 +298,11 @@ std::optional<ULONGLONG> VirtioNetworking::FindVirtioInterfaceLuid(const SOCKADD
                 break;
             }
 
-            WSL_LOG(
+            LSW_LOG(
                 "VirtioNetworking::FindVirtioInterfaceLuid [IP Address comparison mismatch]",
-                TraceLoggingValue(wsl::windows::common::string::SockAddrInetToString(VirtioAddress).c_str(), "VirtioAddress"),
+                TraceLoggingValue(lsw::windows::common::string::SockAddrInetToString(VirtioAddress).c_str(), "VirtioAddress"),
                 TraceLoggingValue(
-                    wsl::windows::common::string::SockAddrInetToString(address.Address).c_str(), "enumeratedAddress"));
+                    lsw::windows::common::string::SockAddrInetToString(address.Address).c_str(), "enumeratedAddress"));
         }
 
         if (VirtioLuid.Value != 0)
@@ -322,24 +322,24 @@ std::optional<ULONGLONG> VirtioNetworking::FindVirtioInterfaceLuid(const SOCKADD
         GetNetworkConnectivityHint(&latestConnectivityHint);
         if (latestConnectivityHint != currentConnectivityHint)
         {
-            WSL_LOG("VirtioNetworking::FindVirtioInterfaceLuid [connectivity changed while waiting for the Virtio interface]");
+            LSW_LOG("VirtioNetworking::FindVirtioInterfaceLuid [connectivity changed while waiting for the Virtio interface]");
             THROW_WIN32_MSG(ERROR_RETRY, "connectivity changed while waiting for the Virtio interface");
         }
     }
 
     if (VirtioLuid.Value == 0)
     {
-        WSL_LOG(
+        LSW_LOG(
             "VirtioNetworking::FindVirtioInterfaceLuid [IP address not found]",
             TraceLoggingValue(VirtioLuid.Value, "VirtioInterfaceLuid"),
-            TraceLoggingValue(wsl::windows::common::string::SockAddrInetToString(VirtioAddress).c_str(), "VirtioIPAddress"));
+            TraceLoggingValue(lsw::windows::common::string::SockAddrInetToString(VirtioAddress).c_str(), "VirtioIPAddress"));
         return {};
     }
 
-    WSL_LOG(
+    LSW_LOG(
         "VirtioNetworking::FindVirtioInterfaceLuid [waiting for Virtio interface to be connected]",
         TraceLoggingValue(VirtioLuid.Value, "VirtioInterfaceLuid"),
-        TraceLoggingValue(wsl::windows::common::string::SockAddrInetToString(VirtioAddress).c_str(), "VirtioIPAddress"));
+        TraceLoggingValue(lsw::windows::common::string::SockAddrInetToString(VirtioAddress).c_str(), "VirtioIPAddress"));
 
     bool ipv4Connected = false;
     for (;;)
@@ -373,7 +373,7 @@ std::optional<ULONGLONG> VirtioNetworking::FindVirtioInterfaceLuid(const SOCKADD
         GetNetworkConnectivityHint(&latestConnectivityHint);
         if (latestConnectivityHint != currentConnectivityHint)
         {
-            WSL_LOG("VirtioNetworking::FindVirtioInterfaceLuid [connectivity changed while waiting for the Virtio interface]");
+            LSW_LOG("VirtioNetworking::FindVirtioInterfaceLuid [connectivity changed while waiting for the Virtio interface]");
             THROW_WIN32_MSG(ERROR_RETRY, "connectivity changed while waiting for the Virtio interface");
         }
     }

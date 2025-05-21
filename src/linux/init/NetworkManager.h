@@ -17,7 +17,7 @@ public:
 
     Interface CreateProxyWifiAdapter(Interface& baseAdapter, const std::string& wifiName);
 
-    void SetAdapterConfiguration(Interface& adapter, const wsl::shared::hns::HNSEndpoint& configuration);
+    void SetAdapterConfiguration(Interface& adapter, const lsw::shared::hns::HNSEndpoint& configuration);
 
     enum class InterfaceState
     {
@@ -77,7 +77,7 @@ public:
 
     void EnableIpv4ArpFilter();
 
-    wsl::shared::conncheck::ConnCheckResult SendConnectRequest(const char* remoteAddress);
+    lsw::shared::conncheck::ConnCheckResult SendConnectRequest(const char* remoteAddress);
 
 private:
     void InitializeLoopbackConfigurationImpl(Interface& gelnic, int addressFamily);

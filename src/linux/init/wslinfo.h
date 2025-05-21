@@ -4,23 +4,23 @@ Copyright (c) Microsoft. All rights reserved.
 
 Module Name:
 
-    wslinfo.h
+    lswinfo.h
 
 Abstract:
 
-    This file contains wslinfo function declarations.
+    This file contains lswinfo function declarations.
 
 --*/
 
 #pragma once
 
-#define WSLINFO_NAME "wslinfo"
+#define LSWINFO_NAME "lswinfo"
 
-#define WSLINFO_MSAL_PROXY_PATH "--msal-proxy-path"
-#define WSLINFO_NETWORKING_MODE "--networking-mode"
-#define WSLINFO_WSL_VERSION "--version"
-#define WSLINFO_WSL_VERSION_LEGACY "--wsl-version"
-#define WSLINFO_WSL_HELP "--help"
-#define WSLINFO_NO_NEWLINE 'n'
+#define LSWINFO_MSAL_PROXY_PATH "--msal-proxy-path"
+#define LSWINFO_NETWORKING_MODE "--networking-mode"
+#define LSWINFO_LSW_VERSION "--version"
+#define LSWINFO_LSW_VERSION_LEGACY "--lsw-version"
+#define LSWINFO_LSW_HELP "--help"
+#define LSWINFO_NO_NEWLINE 'n'
 
 int WslInfoEntry(int Argc, char* Argv[]);

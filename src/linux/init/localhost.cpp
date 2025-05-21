@@ -223,7 +223,7 @@ std::vector<sockaddr_storage> ParseTcpFile(int family, FILE* file)
     return sockets;
 }
 
-int SendRelayListenerSocket(wsl::shared::SocketChannel& channel, int hvSocketPort)
+int SendRelayListenerSocket(lsw::shared::SocketChannel& channel, int hvSocketPort)
 try
 {
     LX_GNS_SET_PORT_LISTENER message{};
@@ -257,7 +257,7 @@ LX_GNS_PORT_LISTENER_RELAY SockToRelayMessage(const sockaddr_storage& sock)
     return message;
 }
 
-int StartHostListener(wsl::shared::SocketChannel& channel, const sockaddr_storage& sock)
+int StartHostListener(lsw::shared::SocketChannel& channel, const sockaddr_storage& sock)
 try
 {
     auto message = SockToRelayMessage(sock);
@@ -268,7 +268,7 @@ try
 }
 CATCH_RETURN_ERRNO();
 
-int StopHostListener(wsl::shared::SocketChannel& channel, const sockaddr_storage& sock)
+int StopHostListener(lsw::shared::SocketChannel& channel, const sockaddr_storage& sock)
 try
 {
     auto message = SockToRelayMessage(sock);
@@ -317,7 +317,7 @@ bool IsSameSockAddr(const sockaddr_storage& left, const sockaddr_storage& right)
 }
 
 // Start looking for ports bound to localhost or wildcard.
-int ScanProcNetTCP(wsl::shared::SocketChannel& channel)
+int ScanProcNetTCP(lsw::shared::SocketChannel& channel)
 {
     // Peridocally scan procfs for listening TCP sockets.
     std::vector<sockaddr_storage> relays{};
@@ -396,7 +396,7 @@ int ScanProcNetTCP(wsl::shared::SocketChannel& channel)
 } // namespace
 
 // Create a thread to monitor for connections to relay.
-int StartLocalhostRelay(wsl::shared::SocketChannel& channel, int GuestRelayFd, bool ScanForPorts)
+int StartLocalhostRelay(lsw::shared::SocketChannel& channel, int GuestRelayFd, bool ScanForPorts)
 try
 {
     // If the other end of a socket is reset, write will result in EPIPE. Ignore
@@ -445,7 +445,7 @@ catch (...)
 
 int RunPortTracker(int Argc, char** Argv)
 {
-    using namespace wsl::shared;
+    using namespace lsw::shared;
 
     constexpr auto* Usage = "Usage: localhost " INIT_PORT_TRACKER_FD_ARG
                             " fd"
@@ -487,7 +487,7 @@ int RunPortTracker(int Argc, char** Argv)
 
     const bool synchronousMode = BpfFd != -1 && NetlinkSocketFd != -1;
     const bool localhostRelay = GuestRelayFd != -1;
-    auto hvSocketChannel = std::make_shared<wsl::shared::SocketChannel>(wil::unique_fd{PortTrackerFd}, "localhost");
+    auto hvSocketChannel = std::make_shared<lsw::shared::SocketChannel>(wil::unique_fd{PortTrackerFd}, "localhost");
 
     if (localhostRelay)
     {

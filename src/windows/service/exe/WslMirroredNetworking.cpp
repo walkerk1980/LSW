@@ -8,7 +8,7 @@ Module Name:
 
 Abstract:
 
-    This file contains WSL mirrored networking function definitions.
+    This file contains LSW mirrored networking function definitions.
 
 --*/
 
@@ -24,10 +24,10 @@ Abstract:
 static constexpr auto c_loopbackDeviceName = TEXT(LX_INIT_LOOPBACK_DEVICE_NAME);
 static constexpr auto c_initialMirroredGoalStateWaitTimeoutMs = 5 * 1000;
 
-using namespace wsl::windows::common;
-using namespace wsl::shared;
-using wsl::core::networking::EndpointIpAddress;
-using wsl::core::networking::EndpointRoute;
+using namespace lsw::windows::common;
+using namespace lsw::shared;
+using lsw::core::networking::EndpointIpAddress;
+using lsw::core::networking::EndpointRoute;
 
 namespace {
 inline const auto HnsModifyRequestTypeToString(const hns::ModifyRequestType requestType)
@@ -37,9 +37,9 @@ inline const auto HnsModifyRequestTypeToString(const hns::ModifyRequestType requ
 } // namespace
 
 _Requires_lock_held_(m_networkLock)
-void wsl::core::networking::WslMirroredNetworkManager::ProcessConnectivityChange()
+void lsw::core::networking::WslMirroredNetworkManager::ProcessConnectivityChange()
 {
-    const std::set<GUID, wsl::windows::common::helpers::GuidLess> initialConnectedInterfaces{std::move(m_hostConnectedInterfaces)};
+    const std::set<GUID, lsw::windows::common::helpers::GuidLess> initialConnectedInterfaces{std::move(m_hostConnectedInterfaces)};
     m_hostConnectedInterfaces.clear();
 
     const auto coInit = wil::CoInitializeEx();
@@ -66,7 +66,7 @@ void wsl::core::networking::WslMirroredNetworkManager::ProcessConnectivityChange
         hr = networkInstance->GetNetworkConnections(&enumNetworkConnections);
         if (FAILED(hr))
         {
-            WSL_LOG(
+            LSW_LOG(
                 "WslMirroredNetworkManager::ProcessConnectivityChange - ignoring interface after processing "
                 "INetworkConnection::GetAdapterId",
                 TraceLoggingValue(hr, "hr"));
@@ -87,7 +87,7 @@ void wsl::core::networking::WslMirroredNetworkManager::ProcessConnectivityChange
             hr = networkConnection->GetAdapterId(&interfaceGuid);
             if (FAILED(hr))
             {
-                WSL_LOG(
+                LSW_LOG(
                     "WslMirroredNetworkManager::ProcessConnectivityChange - ignoring interface INetworkConnection::GetAdapterId "
                     "failed",
                     TraceLoggingValue(hr, "hr"));
@@ -98,10 +98,10 @@ void wsl::core::networking::WslMirroredNetworkManager::ProcessConnectivityChange
             hr = networkConnection->GetConnectivity(&connectivity);
             if (FAILED(hr) || connectivity == NLM_CONNECTIVITY_DISCONNECTED)
             {
-                WSL_LOG(
+                LSW_LOG(
                     "WslMirroredNetworkManager::ProcessConnectivityChange - ignoring interface after processing "
                     "INetworkConnection::GetConnectivity",
-                    TraceLoggingValue(wsl::shared::string::GuidToString<wchar_t>(interfaceGuid).c_str(), "interfaceGuid"),
+                    TraceLoggingValue(lsw::shared::string::GuidToString<wchar_t>(interfaceGuid).c_str(), "interfaceGuid"),
                     TraceLoggingValue(connectivity == NLM_CONNECTIVITY_DISCONNECTED, "is_NLM_CONNECTIVITY_DISCONNECTED"),
                     TraceLoggingValue(hr, "hr"));
                 continue;
@@ -113,7 +113,7 @@ void wsl::core::networking::WslMirroredNetworkManager::ProcessConnectivityChange
 
     if (initialConnectedInterfaces != m_hostConnectedInterfaces)
     {
-        WSL_LOG(
+        LSW_LOG(
             "WslMirroredNetworkManager::ProcessConnectivityChange - reset goal state",
             TraceLoggingValue(initialConnectedInterfaces.size(), "previous_interfaces_size"),
             TraceLoggingValue(m_hostConnectedInterfaces.size(), "updated_interfaces_size"));
@@ -124,29 +124,29 @@ void wsl::core::networking::WslMirroredNetworkManager::ProcessConnectivityChange
         std::wstring guids;
         for (const auto& connectedInterface : initialConnectedInterfaces)
         {
-            guids.append(wsl::shared::string::GuidToString<wchar_t>(connectedInterface) + L",");
+            guids.append(lsw::shared::string::GuidToString<wchar_t>(connectedInterface) + L",");
         }
 
-        WSL_LOG(
+        LSW_LOG(
             "WslMirroredNetworkManager::ProcessConnectivityChange [previous]",
             TraceLoggingValue(guids.c_str(), "connectedInterfaces"));
 
         guids.clear();
         for (const auto& connectedInterface : m_hostConnectedInterfaces)
         {
-            guids.append(wsl::shared::string::GuidToString<wchar_t>(connectedInterface) + L",");
+            guids.append(lsw::shared::string::GuidToString<wchar_t>(connectedInterface) + L",");
         }
 
-        WSL_LOG(
+        LSW_LOG(
             "WslMirroredNetworkManager::ProcessConnectivityChange [updated]",
             TraceLoggingValue(guids.c_str(), "connectedInterfaces"));
     }
 }
 
 _Requires_lock_held_(m_networkLock)
-void wsl::core::networking::WslMirroredNetworkManager::ProcessIpAddressChange()
+void lsw::core::networking::WslMirroredNetworkManager::ProcessIpAddressChange()
 {
-    wsl::core::networking::unique_address_table addressTable{};
+    lsw::core::networking::unique_address_table addressTable{};
     THROW_IF_WIN32_ERROR(GetUnicastIpAddressTable(AF_UNSPEC, &addressTable));
 
     for (auto& endpoint : m_networkEndpoints)
@@ -176,7 +176,7 @@ void wsl::core::networking::WslMirroredNetworkManager::ProcessIpAddressChange()
 
         if (initialAddresses != endpoint.Network->IpAddresses)
         {
-            WSL_LOG(
+            LSW_LOG(
                 "WslMirroredNetworkManager::ProcessIpAddressChange - reset goal state",
                 TraceLoggingValue(endpoint.EndpointId, "endpointId"),
                 TraceLoggingValue(endpoint.InterfaceGuid, "interfaceGuid"),
@@ -188,7 +188,7 @@ void wsl::core::networking::WslMirroredNetworkManager::ProcessIpAddressChange()
 
             for (const auto& address : initialAddresses)
             {
-                WSL_LOG(
+                LSW_LOG(
                     "WslMirroredNetworkManager::ProcessIpAddressChange [previous]",
                     TraceLoggingValue(endpoint.EndpointId, "endpointId"),
                     TraceLoggingValue(endpoint.InterfaceGuid, "interfaceGuid"),
@@ -197,7 +197,7 @@ void wsl::core::networking::WslMirroredNetworkManager::ProcessIpAddressChange()
             }
             for (const auto& address : endpoint.Network->IpAddresses)
             {
-                WSL_LOG(
+                LSW_LOG(
                     "WslMirroredNetworkManager::ProcessIpAddressChange [updated]",
                     TraceLoggingValue(endpoint.EndpointId, "endpointId"),
                     TraceLoggingValue(endpoint.InterfaceGuid, "interfaceGuid"),
@@ -209,10 +209,10 @@ void wsl::core::networking::WslMirroredNetworkManager::ProcessIpAddressChange()
 }
 
 _Requires_lock_held_(m_networkLock)
-void wsl::core::networking::WslMirroredNetworkManager::ProcessRouteChange()
+void lsw::core::networking::WslMirroredNetworkManager::ProcessRouteChange()
 {
-    wsl::core::networking::unique_address_table addressTable{};
-    wsl::core::networking::unique_forward_table routeTable{};
+    lsw::core::networking::unique_address_table addressTable{};
+    lsw::core::networking::unique_forward_table routeTable{};
     THROW_IF_WIN32_ERROR(GetIpForwardTable2(AF_UNSPEC, &routeTable));
 
     for (auto& endpoint : m_networkEndpoints)
@@ -386,7 +386,7 @@ void wsl::core::networking::WslMirroredNetworkManager::ProcessRouteChange()
 
         if (initialRoutes != endpoint.Network->Routes)
         {
-            WSL_LOG(
+            LSW_LOG(
                 "WslMirroredNetworkManager::ProcessRouteChange - reset goal state",
                 TraceLoggingValue(endpoint.EndpointId, "endpointId"),
                 TraceLoggingValue(endpoint.InterfaceGuid, "interfaceGuid"),
@@ -398,7 +398,7 @@ void wsl::core::networking::WslMirroredNetworkManager::ProcessRouteChange()
 
             for (const auto& route : initialRoutes)
             {
-                WSL_LOG(
+                LSW_LOG(
                     "WslMirroredNetworkManager::ProcessRouteChange [previous]",
                     TraceLoggingValue(endpoint.EndpointId, "endpointId"),
                     TraceLoggingValue(endpoint.InterfaceGuid, "interfaceGuid"),
@@ -409,7 +409,7 @@ void wsl::core::networking::WslMirroredNetworkManager::ProcessRouteChange()
             }
             for (const auto& route : endpoint.Network->Routes)
             {
-                WSL_LOG(
+                LSW_LOG(
                     "WslMirroredNetworkManager::ProcessRouteChange [updated]",
                     TraceLoggingValue(endpoint.EndpointId, "endpointId"),
                     TraceLoggingValue(endpoint.InterfaceGuid, "interfaceGuid"),
@@ -423,44 +423,44 @@ void wsl::core::networking::WslMirroredNetworkManager::ProcessRouteChange()
 }
 
 _Requires_lock_held_(m_networkLock)
-void wsl::core::networking::WslMirroredNetworkManager::ProcessDNSChange()
+void lsw::core::networking::WslMirroredNetworkManager::ProcessDNSChange()
 {
     const auto initialDnsInfo = m_dnsInfo;
 
     if (m_vmConfig.EnableDnsTunneling)
     {
-        m_dnsInfo = wsl::core::networking::HostDnsInfo::GetDnsTunnelingSettings(m_dnsTunnelingIpAddress);
+        m_dnsInfo = lsw::core::networking::HostDnsInfo::GetDnsTunnelingSettings(m_dnsTunnelingIpAddress);
     }
     else
     {
         m_hostDnsInfo.UpdateNetworkInformation();
         m_dnsInfo = m_hostDnsInfo.GetDnsSettings(
-            wsl::core::networking::DnsSettingsFlags::IncludeVpn | wsl::core::networking::DnsSettingsFlags::IncludeIpv6Servers |
-            wsl::core::networking::DnsSettingsFlags::IncludeAllSuffixes);
+            lsw::core::networking::DnsSettingsFlags::IncludeVpn | lsw::core::networking::DnsSettingsFlags::IncludeIpv6Servers |
+            lsw::core::networking::DnsSettingsFlags::IncludeAllSuffixes);
     }
 
     if (initialDnsInfo != m_dnsInfo)
     {
-        WSL_LOG("WslMirroredNetworkManager::ProcessDNSChange - reset goal state");
+        LSW_LOG("WslMirroredNetworkManager::ProcessDNSChange - reset goal state");
         m_inMirroredGoalState.ResetEvent();
         m_connectivityTelemetry.UpdateTimer();
 
-        WSL_LOG(
+        LSW_LOG(
             "WslMirroredNetworkManager::ProcessDNSChange [previous]",
-            TraceLoggingValue(wsl::shared::string::Join(initialDnsInfo.Domains, ',').c_str(), "domainList"),
-            TraceLoggingValue(wsl::shared::string::Join(initialDnsInfo.Servers, ',').c_str(), "dnsServerList"));
+            TraceLoggingValue(lsw::shared::string::Join(initialDnsInfo.Domains, ',').c_str(), "domainList"),
+            TraceLoggingValue(lsw::shared::string::Join(initialDnsInfo.Servers, ',').c_str(), "dnsServerList"));
 
-        WSL_LOG(
+        LSW_LOG(
             "WslMirroredNetworkManager::ProcessDNSChange [updated]",
-            TraceLoggingValue(wsl::shared::string::Join(m_dnsInfo.Domains, ',').c_str(), "domainList"),
-            TraceLoggingValue(wsl::shared::string::Join(m_dnsInfo.Servers, ',').c_str(), "dnsServerList"));
+            TraceLoggingValue(lsw::shared::string::Join(m_dnsInfo.Domains, ',').c_str(), "domainList"),
+            TraceLoggingValue(lsw::shared::string::Join(m_dnsInfo.Servers, ',').c_str(), "dnsServerList"));
     }
 }
 
 _Requires_lock_held_(m_networkLock)
-void wsl::core::networking::WslMirroredNetworkManager::ProcessInterfaceChange()
+void lsw::core::networking::WslMirroredNetworkManager::ProcessInterfaceChange()
 {
-    wsl::core::networking::unique_interface_table interfaceTable{};
+    lsw::core::networking::unique_interface_table interfaceTable{};
     THROW_IF_WIN32_ERROR(::GetIpInterfaceTable(AF_UNSPEC, &interfaceTable));
 
     for (auto& endpoint : m_networkEndpoints)
@@ -523,12 +523,12 @@ void wsl::core::networking::WslMirroredNetworkManager::ProcessInterfaceChange()
             // but we do want to trace when disableDefaultRoutes get updated - to greatly help debugging
             if (connectedStateUpdated || mtuUpdated || metricUpdate)
             {
-                WSL_LOG("WslMirroredNetworkManager::ProcessInterfaceChange - reset goal state");
+                LSW_LOG("WslMirroredNetworkManager::ProcessInterfaceChange - reset goal state");
                 m_inMirroredGoalState.ResetEvent();
                 m_connectivityTelemetry.UpdateTimer();
             }
 
-            WSL_LOG(
+            LSW_LOG(
                 "WslMirroredNetworkManager::ProcessInterfaceChange [previous]",
                 TraceLoggingValue(endpoint.EndpointId, "endpointId"),
                 TraceLoggingValue(endpoint.InterfaceGuid, "interfaceGuid"),
@@ -538,7 +538,7 @@ void wsl::core::networking::WslMirroredNetworkManager::ProcessInterfaceChange()
                 TraceLoggingValue(originalIPv4DisableDefaultRoutes, "disableIpv4DefaultRoutes"),
                 TraceLoggingValue(originalIPv6DisableDefaultRoutes, "disableIpv6DefaultRoutes"));
 
-            WSL_LOG(
+            LSW_LOG(
                 "WslMirroredNetworkManager::ProcessInterfaceChange [updated]",
                 TraceLoggingValue(endpoint.EndpointId, "endpointId"),
                 TraceLoggingValue(endpoint.InterfaceGuid, "interfaceGuid"),
@@ -553,7 +553,7 @@ void wsl::core::networking::WslMirroredNetworkManager::ProcessInterfaceChange()
     }
 }
 
-wsl::core::networking::WslMirroredNetworkManager::WslMirroredNetworkManager(
+lsw::core::networking::WslMirroredNetworkManager::WslMirroredNetworkManager(
     HCS_SYSTEM hcsSystem,
     const Config& config,
     GnsMessageCallbackWithCallbackResult&& GnsMessageCallbackWithCallbackResult,
@@ -628,18 +628,18 @@ wsl::core::networking::WslMirroredNetworkManager::WslMirroredNetworkManager(
 
     if (config.DnsTunnelingIpAddress.has_value())
     {
-        m_dnsTunnelingIpAddress = wsl::windows::common::string::IntegerIpv4ToWstring(config.DnsTunnelingIpAddress.value());
+        m_dnsTunnelingIpAddress = lsw::windows::common::string::IntegerIpv4ToWstring(config.DnsTunnelingIpAddress.value());
     }
 
     m_state = State::Started;
 }
 
-wsl::core::networking::WslMirroredNetworkManager::~WslMirroredNetworkManager() noexcept
+lsw::core::networking::WslMirroredNetworkManager::~WslMirroredNetworkManager() noexcept
 {
     Stop();
 }
 
-wsl::core::networking::WslMirroredNetworkManager::HnsStatus wsl::core::networking::WslMirroredNetworkManager::Stop() noexcept
+lsw::core::networking::WslMirroredNetworkManager::HnsStatus lsw::core::networking::WslMirroredNetworkManager::Stop() noexcept
 {
     HnsStatus returnStatus{};
     try
@@ -684,7 +684,7 @@ wsl::core::networking::WslMirroredNetworkManager::HnsStatus wsl::core::networkin
     return returnStatus;
 }
 
-void wsl::core::networking::WslMirroredNetworkManager::DebounceUpdateAllEndpointsDefaultTimerFired(
+void lsw::core::networking::WslMirroredNetworkManager::DebounceUpdateAllEndpointsDefaultTimerFired(
     _Inout_ PTP_CALLBACK_INSTANCE, _Inout_opt_ PVOID Context, _Inout_ PTP_TIMER)
 try
 {
@@ -701,7 +701,7 @@ try
 }
 CATCH_LOG()
 
-void wsl::core::networking::WslMirroredNetworkManager::DebounceCreateEndpointFailureTimerFired(
+void lsw::core::networking::WslMirroredNetworkManager::DebounceCreateEndpointFailureTimerFired(
     _Inout_ PTP_CALLBACK_INSTANCE, _Inout_opt_ PVOID Context, _Inout_ PTP_TIMER)
 try
 {
@@ -728,7 +728,7 @@ try
 CATCH_LOG()
 
 _Requires_lock_held_(m_networkLock)
-std::vector<GUID> wsl::core::networking::WslMirroredNetworkManager::EnumerateMirroredNetworks() const noexcept
+std::vector<GUID> lsw::core::networking::WslMirroredNetworkManager::EnumerateMirroredNetworks() const noexcept
 try
 {
     WI_ASSERT(m_state == State::Started || m_state == State::Starting);
@@ -742,10 +742,10 @@ catch (...)
 }
 
 _Requires_lock_held_(m_networkLock)
-_Check_return_ HRESULT wsl::core::networking::WslMirroredNetworkManager::AddNetwork(const GUID& networkId) noexcept
+_Check_return_ HRESULT lsw::core::networking::WslMirroredNetworkManager::AddNetwork(const GUID& networkId) noexcept
 try
 {
-    WSL_LOG("WslMirroredNetworkManager::AddNetwork", TraceLoggingValue(networkId, "networkId"));
+    LSW_LOG("WslMirroredNetworkManager::AddNetwork", TraceLoggingValue(networkId, "networkId"));
 
     // Inform the parent class to create a new endpoint object which we can then connect into the container
     m_hnsQueue.submit([this, networkId] { m_addNetworkEndpointCallback(networkId); });
@@ -755,16 +755,16 @@ try
 CATCH_RETURN()
 
 _Requires_lock_held_(m_networkLock)
-_Check_return_ HRESULT wsl::core::networking::WslMirroredNetworkManager::RemoveNetwork(const GUID& networkId) noexcept
+_Check_return_ HRESULT lsw::core::networking::WslMirroredNetworkManager::RemoveNetwork(const GUID& networkId) noexcept
 try
 {
-    WSL_LOG("WslMirroredNetworkManager::RemoveNetwork", TraceLoggingValue(networkId, "networkId"));
+    LSW_LOG("WslMirroredNetworkManager::RemoveNetwork", TraceLoggingValue(networkId, "networkId"));
 
     const auto foundEndpoint =
         std::ranges::find_if(m_networkEndpoints, [&](const auto& endpoint) { return endpoint.NetworkId == networkId; });
     if (foundEndpoint == std::end(m_networkEndpoints))
     {
-        WSL_LOG("WslMirroredNetworkManager::RemoveNetwork - Network not found", TraceLoggingValue(networkId, "networkId"));
+        LSW_LOG("WslMirroredNetworkManager::RemoveNetwork - Network not found", TraceLoggingValue(networkId, "networkId"));
         return HRESULT_FROM_WIN32(ERROR_NOT_FOUND);
     }
 
@@ -773,7 +773,7 @@ try
 }
 CATCH_RETURN()
 
-void __stdcall wsl::core::networking::WslMirroredNetworkManager::RetryLinuxIpStateSyncTimerCallback(
+void __stdcall lsw::core::networking::WslMirroredNetworkManager::RetryLinuxIpStateSyncTimerCallback(
     _Inout_ PTP_CALLBACK_INSTANCE, _Inout_opt_ PVOID Context, _Inout_ PTP_TIMER) noexcept
 {
     auto* const manager = static_cast<WslMirroredNetworkManager*>(Context);
@@ -787,17 +787,17 @@ void __stdcall wsl::core::networking::WslMirroredNetworkManager::RetryLinuxIpSta
 }
 
 _Requires_lock_held_(m_networkLock)
-_Check_return_ HRESULT wsl::core::networking::WslMirroredNetworkManager::SendAddressRequestToGns(
+_Check_return_ HRESULT lsw::core::networking::WslMirroredNetworkManager::SendAddressRequestToGns(
     const NetworkEndpoint& endpoint, const TrackedIpAddress& address, hns::ModifyRequestType requestType) noexcept
 try
 {
     hns::ModifyGuestEndpointSettingRequest<hns::IPAddress> modifyRequest;
     modifyRequest.ResourceType = hns::GuestEndpointResourceType::IPAddress;
     modifyRequest.RequestType = requestType;
-    modifyRequest.targetDeviceName = wsl::shared::string::GuidToString<wchar_t>(endpoint.InterfaceGuid);
+    modifyRequest.targetDeviceName = lsw::shared::string::GuidToString<wchar_t>(endpoint.InterfaceGuid);
     modifyRequest.Settings = address.ConvertToHnsSettingsMsg();
 
-    WSL_LOG(
+    LSW_LOG(
         "WslMirroredNetworkManager::SendAddressRequestToGns",
         TraceLoggingValue("ModifyGuestDeviceSettingRequest - set address [queued]", "GnsMessage"),
         TraceLoggingValue(HnsModifyRequestTypeToString(requestType).c_str(), "requestType"),
@@ -812,7 +812,7 @@ try
         return m_callbackForGnsMessage(LxGnsMessageDeviceSettingRequest, ToJsonW(modifyRequest), GnsCallbackFlags::Wait, &linuxResultCode);
     });
 
-    WSL_LOG(
+    LSW_LOG(
         "WslMirroredNetworkManager::SendAddressRequestToGns",
         TraceLoggingValue("ModifyGuestDeviceSettingRequest - set address [completed]", "GnsMessage"),
         TraceLoggingHResult(hr, "hr"),
@@ -824,17 +824,17 @@ try
 CATCH_RETURN()
 
 _Requires_lock_held_(m_networkLock)
-_Check_return_ HRESULT wsl::core::networking::WslMirroredNetworkManager::SendRouteRequestToGns(
+_Check_return_ HRESULT lsw::core::networking::WslMirroredNetworkManager::SendRouteRequestToGns(
     const NetworkEndpoint& endpoint, const TrackedRoute& route, hns::ModifyRequestType requestType) noexcept
 try
 {
     hns::ModifyGuestEndpointSettingRequest<hns::Route> modifyRequest;
     modifyRequest.ResourceType = hns::GuestEndpointResourceType::Route;
     modifyRequest.RequestType = requestType;
-    modifyRequest.targetDeviceName = wsl::shared::string::GuidToString<wchar_t>(endpoint.InterfaceGuid);
+    modifyRequest.targetDeviceName = lsw::shared::string::GuidToString<wchar_t>(endpoint.InterfaceGuid);
     modifyRequest.Settings = route.ConvertToHnsSettingsMsg();
 
-    WSL_LOG(
+    LSW_LOG(
         "WslMirroredNetworkManager::SendRouteRequestToGns",
         TraceLoggingValue("ModifyGuestDeviceSettingRequest : set route [queued]", "GnsMessage"),
         TraceLoggingValue(HnsModifyRequestTypeToString(requestType).c_str(), "requestType"),
@@ -850,7 +850,7 @@ try
         return m_callbackForGnsMessage(LxGnsMessageDeviceSettingRequest, ToJsonW(modifyRequest), GnsCallbackFlags::Wait, &linuxResultCode);
     });
 
-    WSL_LOG(
+    LSW_LOG(
         "WslMirroredNetworkManager::SendRouteRequestToGns",
         TraceLoggingValue("ModifyGuestDeviceSettingRequest : set route [completed]", "GnsMessage"),
         TraceLoggingHResult(hr, "hr"),
@@ -862,17 +862,17 @@ try
 CATCH_RETURN()
 
 _Requires_lock_held_(m_networkLock)
-_Check_return_ HRESULT wsl::core::networking::WslMirroredNetworkManager::SendLoopbackRequestToGns(
+_Check_return_ HRESULT lsw::core::networking::WslMirroredNetworkManager::SendLoopbackRequestToGns(
     const NetworkEndpoint& endpoint, const TrackedIpAddress& address, hns::OperationType operation) noexcept
 try
 {
     hns::LoopbackRoutesRequest loopbackRequest;
     loopbackRequest.operation = operation;
-    loopbackRequest.targetDeviceName = wsl::shared::string::GuidToString<wchar_t>(endpoint.InterfaceGuid);
+    loopbackRequest.targetDeviceName = lsw::shared::string::GuidToString<wchar_t>(endpoint.InterfaceGuid);
     loopbackRequest.family = address.Address.Address.si_family;
     loopbackRequest.ipAddress = address.Address.AddressString;
 
-    WSL_LOG(
+    LSW_LOG(
         "WslMirroredNetworkManager::SendLoopbackRequestToGns",
         TraceLoggingValue("LoopbackRoutesRequest [queued]", "GnsMessage"),
         TraceLoggingValue(JsonEnumToString(operation).c_str(), "requestType"),
@@ -885,7 +885,7 @@ try
         return m_callbackForGnsMessage(LxGnsMessageLoopbackRoutesRequest, ToJsonW(loopbackRequest), GnsCallbackFlags::Wait, &linuxResultCode);
     });
 
-    WSL_LOG(
+    LSW_LOG(
         "WslMirroredNetworkManager::SendLoopbackRequestToGns",
         TraceLoggingValue("LoopbackRoutesRequest [completed]", "GnsMessage"),
         TraceLoggingHResult(hr, "hr"),
@@ -895,36 +895,36 @@ try
 }
 CATCH_RETURN()
 
-static hns::DNS ConvertDnsInfoToHnsSettingsMsg(const wsl::core::networking::DnsInfo& dnsInfo)
+static hns::DNS ConvertDnsInfoToHnsSettingsMsg(const lsw::core::networking::DnsInfo& dnsInfo)
 {
     hns::DNS dnsSettings{};
     dnsSettings.Options = LX_INIT_RESOLVCONF_FULL_HEADER;
 
-    dnsSettings.ServerList = wsl::shared::string::MultiByteToWide(wsl::shared::string::Join(dnsInfo.Servers, ','));
-    dnsSettings.Search = wsl::shared::string::MultiByteToWide(wsl::shared::string::Join(dnsInfo.Domains, ','));
+    dnsSettings.ServerList = lsw::shared::string::MultiByteToWide(lsw::shared::string::Join(dnsInfo.Servers, ','));
+    dnsSettings.Search = lsw::shared::string::MultiByteToWide(lsw::shared::string::Join(dnsInfo.Domains, ','));
 
     return dnsSettings;
 }
 
 _Requires_lock_held_(m_networkLock)
-_Check_return_ HRESULT wsl::core::networking::WslMirroredNetworkManager::SendDnsRequestToGns(
+_Check_return_ HRESULT lsw::core::networking::WslMirroredNetworkManager::SendDnsRequestToGns(
     const NetworkEndpoint& endpoint, const DnsInfo& dnsInfo, hns::ModifyRequestType requestType) noexcept
 try
 {
     hns::ModifyGuestEndpointSettingRequest<hns::DNS> modifyRequest;
     modifyRequest.ResourceType = hns::GuestEndpointResourceType::DNS;
     modifyRequest.RequestType = requestType;
-    modifyRequest.targetDeviceName = wsl::shared::string::GuidToString<wchar_t>(endpoint.InterfaceGuid);
+    modifyRequest.targetDeviceName = lsw::shared::string::GuidToString<wchar_t>(endpoint.InterfaceGuid);
     modifyRequest.Settings = ConvertDnsInfoToHnsSettingsMsg(dnsInfo);
 
-    WSL_LOG(
+    LSW_LOG(
         "WslMirroredNetworkManager::SendDnsRequestToGns",
         TraceLoggingValue("ModifyGuestDeviceSettingRequest : set DNS [queued]", "GnsMessage"),
         TraceLoggingValue(HnsModifyRequestTypeToString(requestType).c_str(), "requestType"),
         TraceLoggingValue(endpoint.InterfaceGuid, "InterfaceGuid"),
         TraceLoggingValue(m_vmConfig.EnableDnsTunneling, "m_vmConfig.EnableDnsTunneling"),
-        TraceLoggingValue(wsl::shared::string::Join(dnsInfo.Servers, ',').c_str(), "server list"),
-        TraceLoggingValue(wsl::shared::string::Join(dnsInfo.Domains, ',').c_str(), "suffix list"));
+        TraceLoggingValue(lsw::shared::string::Join(dnsInfo.Servers, ',').c_str(), "server list"),
+        TraceLoggingValue(lsw::shared::string::Join(dnsInfo.Domains, ',').c_str(), "suffix list"));
 
     int linuxResultCode{};
     // can safely capture by ref since we are waiting
@@ -932,7 +932,7 @@ try
         return m_callbackForGnsMessage(LxGnsMessageDeviceSettingRequest, ToJsonW(modifyRequest), GnsCallbackFlags::Wait, &linuxResultCode);
     });
 
-    WSL_LOG(
+    LSW_LOG(
         "WslMirroredNetworkManager::SendDnsRequestToGns",
         TraceLoggingValue("ModifyGuestDeviceSettingRequest : set DNS [completed]", "GnsMessage"),
         TraceLoggingHResult(hr, "hr"),
@@ -943,7 +943,7 @@ try
 CATCH_RETURN()
 
 _Requires_lock_held_(m_networkLock)
-_Check_return_ HRESULT wsl::core::networking::WslMirroredNetworkManager::SendInterfaceRequestToGns(const NetworkEndpoint& endpoint) noexcept
+_Check_return_ HRESULT lsw::core::networking::WslMirroredNetworkManager::SendInterfaceRequestToGns(const NetworkEndpoint& endpoint) noexcept
 try
 {
     const auto interfaceConnected = endpoint.Network->IsConnected;
@@ -955,9 +955,9 @@ try
     modifyRequest.Settings.NlMtu = interfaceMtu;
     modifyRequest.Settings.Metric = interfaceMetric;
     modifyRequest.ResourceType = hns::GuestEndpointResourceType::Interface;
-    modifyRequest.targetDeviceName = wsl::shared::string::GuidToString<wchar_t>(endpoint.InterfaceGuid);
+    modifyRequest.targetDeviceName = lsw::shared::string::GuidToString<wchar_t>(endpoint.InterfaceGuid);
 
-    WSL_LOG(
+    LSW_LOG(
         "WslMirroredNetworkManager::SendInterfaceRequestToGns",
         TraceLoggingValue("ModifyGuestDeviceSettingRequest : update interface properties [queued]", "GnsMessage"),
         TraceLoggingValue(endpoint.InterfaceGuid, "InterfaceGuid"),
@@ -971,7 +971,7 @@ try
         return m_callbackForGnsMessage(LxGnsMessageModifyGuestDeviceSettingRequest, ToJsonW(modifyRequest), GnsCallbackFlags::Wait, &linuxResultCode);
     });
 
-    WSL_LOG(
+    LSW_LOG(
         "WslMirroredNetworkManager::SendInterfaceRequestToGns",
         TraceLoggingValue("ModifyGuestDeviceSettingRequest : update interface properties [completed]", "GnsMessage"),
         TraceLoggingHResult(hr, "hr"),
@@ -982,7 +982,7 @@ try
 CATCH_RETURN()
 
 _Requires_lock_held_(m_networkLock)
-_Check_return_ bool wsl::core::networking::WslMirroredNetworkManager::SyncIpStateWithLinux(NetworkEndpoint& endpoint)
+_Check_return_ bool lsw::core::networking::WslMirroredNetworkManager::SyncIpStateWithLinux(NetworkEndpoint& endpoint)
 {
     using hns::GuestEndpointResourceType;
     using hns::IPAddress;
@@ -998,13 +998,13 @@ _Check_return_ bool wsl::core::networking::WslMirroredNetworkManager::SyncIpStat
     {
         // Tell GNS that we're ready to start pushing addresses and routes to Linux on this interface.
         hns::InitialIpConfigurationNotification notification{};
-        notification.targetDeviceName = wsl::shared::string::GuidToString<wchar_t>(endpoint.InterfaceGuid);
+        notification.targetDeviceName = lsw::shared::string::GuidToString<wchar_t>(endpoint.InterfaceGuid);
         WI_SetAllFlags(
             notification.flags,
             (hns::InitialIpConfigurationNotificationFlags::SkipPrimaryRoutingTableUpdate |
              hns::InitialIpConfigurationNotificationFlags::SkipLoopbackRouteReset));
 
-        WSL_LOG(
+        LSW_LOG(
             "WslMirroredNetworkManager::SyncIpStateWithLinux",
             TraceLoggingValue("InitialIpConfigurationNotification [queued]", "GnsMessage"),
             TraceLoggingValue(endpoint.InterfaceGuid, "InterfaceGuid"));
@@ -1016,7 +1016,7 @@ _Check_return_ bool wsl::core::networking::WslMirroredNetworkManager::SyncIpStat
                 LxGnsMessageInitialIpConfigurationNotification, ToJsonW(notification), GnsCallbackFlags::Wait, &linuxResultCode);
         });
 
-        WSL_LOG(
+        LSW_LOG(
             "WslMirroredNetworkManager::SyncIpStateWithLinux",
             TraceLoggingValue("InitialIpConfigurationNotification [completed]", "GnsMessage"),
             TraceLoggingHResult(hr, "hr"),
@@ -1041,7 +1041,7 @@ _Check_return_ bool wsl::core::networking::WslMirroredNetworkManager::SyncIpStat
 
         if (FAILED(SendInterfaceRequestToGns(endpoint)))
         {
-            WSL_LOG(
+            LSW_LOG(
                 "WslMirroredNetworkManager::SyncIpStateWithLinux",
                 TraceLoggingValue("Failed to update Interface properties", "message"),
                 TraceLoggingValue(endpoint.Network->IsConnected, "connected"),
@@ -1110,7 +1110,7 @@ _Check_return_ bool wsl::core::networking::WslMirroredNetworkManager::SyncIpStat
         {
             if (FAILED(SendLoopbackRequestToGns(endpoint, *address, hns::OperationType::Remove)))
             {
-                WSL_LOG(
+                LSW_LOG(
                     "WslMirroredNetworkManager::SyncIpStateWithLinux",
                     TraceLoggingValue("Failed to remove loopback routes for local address", "message"),
                     TraceLoggingValue(endpoint.InterfaceGuid, "InterfaceGuid"),
@@ -1124,7 +1124,7 @@ _Check_return_ bool wsl::core::networking::WslMirroredNetworkManager::SyncIpStat
         {
             if (address->SyncRetryCount == 0)
             {
-                WSL_LOG(
+                LSW_LOG(
                     "WslMirroredNetworkManager::SyncIpStateWithLinux",
                     TraceLoggingValue(
                         "Reached maximum retries to remove an address - we will no longer schedule the retry timer", "message"),
@@ -1140,7 +1140,7 @@ _Check_return_ bool wsl::core::networking::WslMirroredNetworkManager::SyncIpStat
         }
         else
         {
-            WSL_LOG(
+            LSW_LOG(
                 "WslMirroredNetworkManager::SyncIpStateWithLinux",
                 TraceLoggingValue("Address synced (removed)", "message"),
                 TraceLoggingValue(endpoint.InterfaceGuid, "InterfaceGuid"),
@@ -1196,7 +1196,7 @@ _Check_return_ bool wsl::core::networking::WslMirroredNetworkManager::SyncIpStat
         {
             if (route->SyncRetryCount == 0)
             {
-                WSL_LOG(
+                LSW_LOG(
                     "WslMirroredNetworkManager::SyncIpStateWithLinux",
                     TraceLoggingValue(
                         "Reached maximum retries to remove a route - we will no longer schedule the retry timer", "message"),
@@ -1214,7 +1214,7 @@ _Check_return_ bool wsl::core::networking::WslMirroredNetworkManager::SyncIpStat
         }
         else
         {
-            WSL_LOG(
+            LSW_LOG(
                 "WslMirroredNetworkManager::SyncIpStateWithLinux",
                 TraceLoggingValue("Route synced (removed) succeeded", "message"),
                 TraceLoggingValue(endpoint.InterfaceGuid, "InterfaceGuid"),
@@ -1261,10 +1261,10 @@ _Check_return_ bool wsl::core::networking::WslMirroredNetworkManager::SyncIpStat
                     hr = SendLoopbackRequestToGns(endpoint, trackedAddress, hns::OperationType::Create);
                     if (FAILED(hr.value()))
                     {
-                        WSL_LOG(
+                        LSW_LOG(
                             "WslMirroredNetworkManager::SyncIpStateWithLinux",
                             TraceLoggingValue("Failed to create loopback routes for local address", "message"),
-                            TraceLoggingValue(wsl::core::networking::ToString(trackedAddress.SyncStatus), "AddressSyncStatus"),
+                            TraceLoggingValue(lsw::core::networking::ToString(trackedAddress.SyncStatus), "AddressSyncStatus"),
                             TraceLoggingValue(endpoint.InterfaceGuid, "InterfaceGuid"),
                             TraceLoggingValue(endpoint.Network->IsConnected, "isConnected"),
                             TraceLoggingValue(trackedAddress.Address.AddressString.c_str(), "address"),
@@ -1315,10 +1315,10 @@ _Check_return_ bool wsl::core::networking::WslMirroredNetworkManager::SyncIpStat
                     hr = SendLoopbackRequestToGns(endpoint, trackedAddress, hns::OperationType::Create);
                     if (FAILED(hr.value()))
                     {
-                        WSL_LOG(
+                        LSW_LOG(
                             "WslMirroredNetworkManager::SyncIpStateWithLinux",
                             TraceLoggingValue("Failed to create loopback routes for local address", "message"),
-                            TraceLoggingValue(wsl::core::networking::ToString(trackedAddress.SyncStatus), "AddressSyncStatus"),
+                            TraceLoggingValue(lsw::core::networking::ToString(trackedAddress.SyncStatus), "AddressSyncStatus"),
                             TraceLoggingValue(endpoint.InterfaceGuid, "InterfaceGuid"),
                             TraceLoggingValue(endpoint.Network->IsConnected, "isConnected"),
                             TraceLoggingValue(trackedAddress.Address.AddressString.c_str(), "address"),
@@ -1342,7 +1342,7 @@ _Check_return_ bool wsl::core::networking::WslMirroredNetworkManager::SyncIpStat
             if (SUCCEEDED(hr.value_or(E_FAIL)))
             {
                 trackedAddress.SyncStatus = Synced;
-                WSL_LOG(
+                LSW_LOG(
                     "WslMirroredNetworkManager::SyncIpStateWithLinux",
                     TraceLoggingValue("Address synced", "message"),
                     TraceLoggingValue(endpoint.InterfaceGuid, "InterfaceGuid"),
@@ -1353,7 +1353,7 @@ _Check_return_ bool wsl::core::networking::WslMirroredNetworkManager::SyncIpStat
 
             if (trackedAddress.SyncRetryCount == 0)
             {
-                WSL_LOG(
+                LSW_LOG(
                     "WslMirroredNetworkManager::SyncIpStateWithLinux",
                     TraceLoggingValue(
                         "Reached maximum retries to sync an address - we will no longer schedule the retry timer", "message"),
@@ -1368,7 +1368,7 @@ _Check_return_ bool wsl::core::networking::WslMirroredNetworkManager::SyncIpStat
     }
     else
     {
-        WSL_LOG(
+        LSW_LOG(
             "WslMirroredNetworkManager::SyncIpStateWithLinux",
             TraceLoggingValue("Not adding addresses for hidden or disconnected interface", "message"),
             TraceLoggingValue(endpoint.InterfaceGuid, "InterfaceGuid"),
@@ -1390,7 +1390,7 @@ _Check_return_ bool wsl::core::networking::WslMirroredNetworkManager::SyncIpStat
 
         if (refreshAllRoutes)
         {
-            WSL_LOG("WslMirroredNetworkManager::SyncIpStateWithLinux", TraceLoggingValue("Refreshing all routes", "message"));
+            LSW_LOG("WslMirroredNetworkManager::SyncIpStateWithLinux", TraceLoggingValue("Refreshing all routes", "message"));
         }
 
         for (auto& trackedRoute : endpoint.StateTracking->Routes)
@@ -1445,7 +1445,7 @@ _Check_return_ bool wsl::core::networking::WslMirroredNetworkManager::SyncIpStat
             if (SUCCEEDED(hr.value_or(E_FAIL)))
             {
                 trackedRoute.SyncStatus = Synced;
-                WSL_LOG(
+                LSW_LOG(
                     "WslMirroredNetworkManager::SyncIpStateWithLinux",
                     TraceLoggingValue("Route synced", "message"),
                     TraceLoggingValue(endpoint.InterfaceGuid, "InterfaceGuid"),
@@ -1458,7 +1458,7 @@ _Check_return_ bool wsl::core::networking::WslMirroredNetworkManager::SyncIpStat
 
             if (trackedRoute.SyncRetryCount == 0)
             {
-                WSL_LOG(
+                LSW_LOG(
                     "WslMirroredNetworkManager::SyncIpStateWithLinux",
                     TraceLoggingValue(
                         "Reached maximum amount of retries to sync a route. This can happen if the route's next hop is not "
@@ -1478,7 +1478,7 @@ _Check_return_ bool wsl::core::networking::WslMirroredNetworkManager::SyncIpStat
     }
     else
     {
-        WSL_LOG(
+        LSW_LOG(
             "WslMirroredNetworkManager::SyncIpStateWithLinux",
             TraceLoggingValue("Not adding routes for hidden or disconnected interface", "message"),
             TraceLoggingValue(endpoint.InterfaceGuid, "InterfaceGuid"),
@@ -1501,7 +1501,7 @@ _Check_return_ bool wsl::core::networking::WslMirroredNetworkManager::SyncIpStat
 
     endpoint.StateTracking->InitialSyncComplete = true;
 
-    WSL_LOG(
+    LSW_LOG(
         "WslMirroredNetworkManager::SyncIpStateWithLinux",
         TraceLoggingValue(endpoint.InterfaceGuid, "InterfaceGuid"),
         TraceLoggingValue(syncSuccessful, "syncSuccessful"));
@@ -1510,7 +1510,7 @@ _Check_return_ bool wsl::core::networking::WslMirroredNetworkManager::SyncIpStat
 
 // We must determine what IP changes to push to Linux
 _Requires_lock_held_(m_networkLock)
-void wsl::core::networking::WslMirroredNetworkManager::UpdateAllEndpointsImpl(UpdateEndpointFlag updateFlag, _In_ PCSTR callingSource) noexcept
+void lsw::core::networking::WslMirroredNetworkManager::UpdateAllEndpointsImpl(UpdateEndpointFlag updateFlag, _In_ PCSTR callingSource) noexcept
 try
 {
     static long s_updateAllEndpointsCounter = 0;
@@ -1518,7 +1518,7 @@ try
 
     if (updateFlag == UpdateEndpointFlag::None)
     {
-        WSL_LOG(
+        LSW_LOG(
             "WslMirroredNetworkManager::UpdateAllEndpointsImpl",
             TraceLoggingValue(instanceCounter, "instanceCounter"),
             TraceLoggingValue(callingSource, "callingSource"),
@@ -1534,11 +1534,11 @@ try
         if (timeFromLastUpdate >= m_debounceUpdateAllEndpointsTimerMs)
         {
             // It's been >= m_debounceUpdateAllEndpointsTimerMs since we last attempted an update, so go ahead and process it.
-            WSL_LOG(
+            LSW_LOG(
                 "WslMirroredNetworkManager::UpdateAllEndpointsImpl",
                 TraceLoggingValue(instanceCounter, "instanceCounter"),
                 TraceLoggingValue(callingSource, "callingSource"),
-                TraceLoggingValue(wsl::core::networking::ToString(updateFlag), "updateFlag"),
+                TraceLoggingValue(lsw::core::networking::ToString(updateFlag), "updateFlag"),
                 TraceLoggingValue("Debounce time reset - continuing update", "state"),
                 TraceLoggingValue(timeFromLastUpdate, "timeFromLastUpdate"),
                 TraceLoggingValue(m_debounceUpdateAllEndpointsTimerMs, "m_debounceUpdateAllEndpointsTimerMs"));
@@ -1547,11 +1547,11 @@ try
         else if (!m_IsDebounceUpdateAllEndpointsDefaultTimerSet)
         {
             // The debounce timer is not already scheduled, so schedule it.
-            WSL_LOG(
+            LSW_LOG(
                 "WslMirroredNetworkManager::UpdateAllEndpointsImpl",
                 TraceLoggingValue(instanceCounter, "instanceCounter"),
                 TraceLoggingValue(callingSource, "callingSource"),
-                TraceLoggingValue(wsl::core::networking::ToString(updateFlag), "updateFlag"),
+                TraceLoggingValue(lsw::core::networking::ToString(updateFlag), "updateFlag"),
                 TraceLoggingValue("Debouncing Notification - setting timer", "state"),
                 TraceLoggingValue(timeFromLastUpdate, "timeFromLastUpdate"),
                 TraceLoggingValue(m_debounceUpdateAllEndpointsTimerMs, "m_debounceUpdateAllEndpointsTimerMs"));
@@ -1566,11 +1566,11 @@ try
         else
         {
             // The debounce timer is already scheduled, so ignore this update.
-            WSL_LOG(
+            LSW_LOG(
                 "WslMirroredNetworkManager::UpdateAllEndpointsImpl",
                 TraceLoggingValue(instanceCounter, "instanceCounter"),
                 TraceLoggingValue(callingSource, "callingSource"),
-                TraceLoggingValue(wsl::core::networking::ToString(updateFlag), "updateFlag"),
+                TraceLoggingValue(lsw::core::networking::ToString(updateFlag), "updateFlag"),
                 TraceLoggingValue("Debouncing Notification - timer already set", "state"),
                 TraceLoggingValue(timeFromLastUpdate, "timeFromLastUpdate"),
                 TraceLoggingValue(m_debounceUpdateAllEndpointsTimerMs, "m_debounceUpdateAllEndpointsTimerMs"));
@@ -1579,11 +1579,11 @@ try
     }
     else
     {
-        WSL_LOG(
+        LSW_LOG(
             "WslMirroredNetworkManager::UpdateAllEndpointsImpl",
             TraceLoggingValue(instanceCounter, "instanceCounter"),
             TraceLoggingValue(callingSource, "callingSource"),
-            TraceLoggingValue(wsl::core::networking::ToString(updateFlag), "updateFlag"));
+            TraceLoggingValue(lsw::core::networking::ToString(updateFlag), "updateFlag"));
     }
 
     m_latestHnsStatus = HnsStatus::NetworkConnectedWithHnsNotification;
@@ -1599,7 +1599,7 @@ try
 
     // Push IP state to Linux
     bool syncSuccessful = true;
-    std::set<GUID, wsl::windows::common::helpers::GuidLess> mirroredConnectedInterfaces;
+    std::set<GUID, lsw::windows::common::helpers::GuidLess> mirroredConnectedInterfaces;
     for (auto& endpoint : m_networkEndpoints)
     {
         if (IsInterfaceIndexOfGelnic(endpoint.Network->InterfaceIndex))
@@ -1614,7 +1614,7 @@ try
         {
             if (endpoint.Network->IsHidden)
             {
-                WSL_LOG(
+                LSW_LOG(
                     "WslMirroredNetworkManager::UpdateAllEndpointsImpl",
                     TraceLoggingValue(instanceCounter, "instanceCounter"),
                     TraceLoggingValue(endpoint.InterfaceGuid, "interfaceGuid"),
@@ -1631,7 +1631,7 @@ try
             // if the host has hidden the interface that was mirrored by HNS
             // ensure the interface is not connected in Linux
             // we are deliberately overriding the endpoint state in this case
-            WSL_LOG(
+            LSW_LOG(
                 "WslMirroredNetworkManager::UpdateAllEndpointsImpl",
                 TraceLoggingValue(instanceCounter, "instanceCounter"),
                 TraceLoggingValue(endpoint.InterfaceGuid, "interfaceGuid"),
@@ -1646,7 +1646,7 @@ try
         if (!SyncIpStateWithLinux(endpoint))
         {
             // We failed to sync some bit of state.  Let's schedule a timer to try again in a bit.
-            WSL_LOG(
+            LSW_LOG(
                 "WslMirroredNetworkManager::UpdateAllEndpointsImpl",
                 TraceLoggingValue(instanceCounter, "instanceCounter"),
                 TraceLoggingValue(endpoint.InterfaceGuid, "interfaceGuid"),
@@ -1709,7 +1709,7 @@ try
 
                 if (!interfaceMatched)
                 {
-                    WSL_LOG(
+                    LSW_LOG(
                         "WslMirroredNetworkManager::UpdateAllEndpointsImpl",
                         TraceLoggingValue(instanceCounter, "instanceCounter"),
                         TraceLoggingValue("HNS has not yet mirrored a host connected Interface", "message"),
@@ -1721,7 +1721,7 @@ try
 
         if (hnsMirroredInSyncWithHost && !m_inMirroredGoalState.is_signaled())
         {
-            WSL_LOG(
+            LSW_LOG(
                 "WslMirroredNetworkManager::UpdateAllEndpointsImpl",
                 TraceLoggingValue(instanceCounter, "instanceCounter"),
                 TraceLoggingValue("Reached goal state", "message"));
@@ -1734,7 +1734,7 @@ try
                 m_initialMirroredGoalStateEndTime = std::chrono::steady_clock::now();
 
                 const auto waitTime = m_initialMirroredGoalStateEndTime - m_objectCreationTime;
-                WSL_LOG(
+                LSW_LOG(
                     "WslMirroringInitialGoalStateWait",
                     TraceLoggingValue((std::chrono::duration_cast<std::chrono::milliseconds>(waitTime)).count(), "waitTimeMs"),
                     TraceLoggingValue(m_vmConfig.EnableDnsTunneling, "DnsTunnelingEnabled"),
@@ -1746,7 +1746,7 @@ try
 }
 CATCH_LOG()
 
-_Check_return_ HRESULT wsl::core::networking::WslMirroredNetworkManager::EnumerateNetworks(_Out_ std::vector<GUID>& NetworkIds) const noexcept
+_Check_return_ HRESULT lsw::core::networking::WslMirroredNetworkManager::EnumerateNetworks(_Out_ std::vector<GUID>& NetworkIds) const noexcept
 try
 {
     auto lock = m_networkLock.lock_shared();
@@ -1761,7 +1761,7 @@ try
 }
 CATCH_RETURN()
 
-void wsl::core::networking::WslMirroredNetworkManager::AddEndpoint(NetworkEndpoint&& newEndpoint, hns::HNSEndpoint&& endpointProperties) noexcept
+void lsw::core::networking::WslMirroredNetworkManager::AddEndpoint(NetworkEndpoint&& newEndpoint, hns::HNSEndpoint&& endpointProperties) noexcept
 {
     const auto lock = m_networkLock.lock_exclusive();
     if (m_state == State::Stopped)
@@ -1774,7 +1774,7 @@ void wsl::core::networking::WslMirroredNetworkManager::AddEndpoint(NetworkEndpoi
 }
 
 _Requires_lock_held_(m_networkLock)
-void wsl::core::networking::WslMirroredNetworkManager::AddEndpointImpl(EndpointTracking&& endpointTrackingObject) noexcept
+void lsw::core::networking::WslMirroredNetworkManager::AddEndpointImpl(EndpointTracking&& endpointTrackingObject) noexcept
 {
     PCSTR executionStep = "";
     try
@@ -1782,20 +1782,20 @@ void wsl::core::networking::WslMirroredNetworkManager::AddEndpointImpl(EndpointT
         // Hot-add the network endpoint to the utility VM.
         hcs::NetworkAdapter networkEndpoint{};
 
-        networkEndpoint.MacAddress = wsl::shared::string::ParseMacAddress(endpointTrackingObject.m_hnsEndpoint.MacAddress);
+        networkEndpoint.MacAddress = lsw::shared::string::ParseMacAddress(endpointTrackingObject.m_hnsEndpoint.MacAddress);
 
         // Set the instance id to the mirrored interfaceGuid so HNS -> netvsc can optimally use the same vmNIC constructs when the InterfaceGuid is the same
         hcs::ModifySettingRequest<hcs::NetworkAdapter> addEndpointRequest{};
         addEndpointRequest.ResourcePath =
-            c_networkAdapterPrefix + wsl::shared::string::GuidToString<wchar_t>(endpointTrackingObject.m_networkEndpoint.InterfaceGuid);
+            c_networkAdapterPrefix + lsw::shared::string::GuidToString<wchar_t>(endpointTrackingObject.m_networkEndpoint.InterfaceGuid);
         addEndpointRequest.RequestType = hcs::ModifyRequestType::Add;
         addEndpointRequest.Settings.EndpointId = endpointTrackingObject.m_hnsEndpoint.ID;
         addEndpointRequest.Settings.InstanceId = endpointTrackingObject.m_networkEndpoint.InterfaceGuid;
 
-        addEndpointRequest.Settings.MacAddress = wsl::shared::string::ParseMacAddress(endpointTrackingObject.m_hnsEndpoint.MacAddress);
-        auto addEndpointRequestString = wsl::shared::ToJsonW(addEndpointRequest);
+        addEndpointRequest.Settings.MacAddress = lsw::shared::string::ParseMacAddress(endpointTrackingObject.m_hnsEndpoint.MacAddress);
+        auto addEndpointRequestString = lsw::shared::ToJsonW(addEndpointRequest);
 
-        WSL_LOG(
+        LSW_LOG(
             "WslMirroredNetworkManager::AddEndpoint [Creating HCS endpoint]",
             TraceLoggingValue(addEndpointRequestString.c_str(), "networkRequestString"));
 
@@ -1803,12 +1803,12 @@ void wsl::core::networking::WslMirroredNetworkManager::AddEndpointImpl(EndpointT
         auto hr = m_hnsQueue.submit_and_wait([&] {
             // RetryWithTimeout throws if fails every attempt - which is caught and returned by m_gnsMessageQueue
             auto retryCount = 0ul;
-            return wsl::shared::retry::RetryWithTimeout<HRESULT>(
+            return lsw::shared::retry::RetryWithTimeout<HRESULT>(
                 [&] {
                     const auto retryHr = wil::ResultFromException(
-                        [&] { wsl::windows::common::hcs::ModifyComputeSystem(m_hcsSystem, addEndpointRequestString.c_str()); });
+                        [&] { lsw::windows::common::hcs::ModifyComputeSystem(m_hcsSystem, addEndpointRequestString.c_str()); });
 
-                    WSL_LOG(
+                    LSW_LOG(
                         "WslMirroredNetworkManager::AddEndpoint [ModifyComputeSystem(ModifyRequestType::Add)]",
                         TraceLoggingValue(endpointTrackingObject.m_hnsEndpoint.ID, "endpointId"),
                         TraceLoggingValue(endpointTrackingObject.m_networkEndpoint.InterfaceGuid, "instanceId"),
@@ -1818,14 +1818,14 @@ void wsl::core::networking::WslMirroredNetworkManager::AddEndpointImpl(EndpointT
                     ++retryCount;
                     return THROW_IF_FAILED(retryHr);
                 },
-                wsl::core::networking::AddEndpointRetryPeriod,
-                wsl::core::networking::AddEndpointRetryTimeout,
-                wsl::core::networking::AddEndpointRetryPredicate);
+                lsw::core::networking::AddEndpointRetryPeriod,
+                lsw::core::networking::AddEndpointRetryTimeout,
+                lsw::core::networking::AddEndpointRetryPredicate);
         });
 
         if (hr == HCN_E_ENDPOINT_ALREADY_ATTACHED)
         {
-            WSL_LOG(
+            LSW_LOG(
                 "WslMirroredNetworkManager::AddEndpoint [Adding the endpoint returned HCN_E_ENDPOINT_ALREADY_ATTACHED - "
                 "continuing]",
                 TraceLoggingValue(endpointTrackingObject.m_hnsEndpoint.ID, "endpointId"));
@@ -1842,19 +1842,19 @@ void wsl::core::networking::WslMirroredNetworkManager::AddEndpointImpl(EndpointT
             // Set the instance id to the mirrored interfaceGuid so HNS -> netvsc can optimally use the same vmNIC constructs when the InterfaceGuid is the same
             hcs::ModifySettingRequest<hcs::NetworkAdapter> networkRequest{};
             networkRequest.ResourcePath =
-                c_networkAdapterPrefix + wsl::shared::string::GuidToString<wchar_t>(endpointTrackingObject.m_networkEndpoint.InterfaceGuid);
+                c_networkAdapterPrefix + lsw::shared::string::GuidToString<wchar_t>(endpointTrackingObject.m_networkEndpoint.InterfaceGuid);
             networkRequest.RequestType = hcs::ModifyRequestType::Remove;
             networkRequest.Settings.EndpointId = endpointTrackingObject.m_hnsEndpoint.ID;
             networkRequest.Settings.InstanceId = endpointTrackingObject.m_networkEndpoint.InterfaceGuid;
 
-            const auto networkRequestString = wsl::shared::ToJsonW(std::move(networkRequest));
+            const auto networkRequestString = lsw::shared::ToJsonW(std::move(networkRequest));
 
             // capturing by ref because we wait for the workitem to complete
             const auto modifyResult = m_hnsQueue.submit_and_wait([&] {
                 windows::common::hcs::ModifyComputeSystem(m_hcsSystem, networkRequestString.c_str());
                 return S_OK; // ModifyComputeSystem throws errors, caught by m_gnsMessageQueue
             });
-            WSL_LOG(
+            LSW_LOG(
                 "WslMirroredNetworkManager::AddEndpoint [Removing the HCS mirrored endpoint after failure to Add]",
                 TraceLoggingHResult(modifyResult, "hr"),
                 TraceLoggingValue(endpointTrackingObject.m_hnsEndpoint.ID, "endpointId"),
@@ -1862,7 +1862,7 @@ void wsl::core::networking::WslMirroredNetworkManager::AddEndpointImpl(EndpointT
 
             if (FAILED(modifyResult))
             {
-                WSL_LOG(
+                LSW_LOG(
                     "AddMirroredEndpointFailed",
                     TraceLoggingHResult(modifyResult, "result"),
                     TraceLoggingValue(endpointTrackingObject.m_networkEndpoint.InterfaceGuid, "InterfaceGuid"),
@@ -1887,7 +1887,7 @@ void wsl::core::networking::WslMirroredNetworkManager::AddEndpointImpl(EndpointT
         refreshRequest.ResourceType = hns::GuestEndpointResourceType::Port;
 
         const auto refreshEndpointRequestString = ToJsonW(refreshRequest);
-        WSL_LOG(
+        LSW_LOG(
             "WslMirroredNetworkManager::AddEndpoint [Synchronizing HNS state]",
             TraceLoggingValue(endpointTrackingObject.m_hnsEndpoint.ID, "endpointId"),
             TraceLoggingValue(endpointTrackingObject.m_networkEndpoint.InterfaceGuid, "instanceId"));
@@ -1898,13 +1898,13 @@ void wsl::core::networking::WslMirroredNetworkManager::AddEndpointImpl(EndpointT
             constexpr auto retryPredicate = [] { return wil::ResultFromCaughtException() != HCN_E_ENDPOINT_NOT_FOUND; };
             auto retryCount = 0ul;
             // RetryWithTimeout throws if fails every attempt - which is caught and returned by m_hnsQueue
-            return wsl::shared::retry::RetryWithTimeout<HRESULT>(
+            return lsw::shared::retry::RetryWithTimeout<HRESULT>(
                 [&] {
                     wil::unique_cotaskmem_string error;
                     const auto retryHr = HcnModifyEndpoint(
                         endpointTrackingObject.m_networkEndpoint.Endpoint.get(), refreshEndpointRequestString.c_str(), &error);
 
-                    WSL_LOG(
+                    LSW_LOG(
                         "WslMirroredNetworkManager::AddEndpoint [HcnModifyEndpoint(ModifyRequestType::Refresh)]",
                         TraceLoggingValue(endpointTrackingObject.m_networkEndpoint.EndpointId, "endpointId"),
                         TraceLoggingValue(endpointTrackingObject.m_networkEndpoint.InterfaceGuid, "instanceId"),
@@ -1916,8 +1916,8 @@ void wsl::core::networking::WslMirroredNetworkManager::AddEndpointImpl(EndpointT
                     ++retryCount;
                     return THROW_IF_FAILED(retryHr);
                 },
-                wsl::core::networking::AddEndpointRetryPeriod,
-                wsl::core::networking::AddEndpointRetryTimeout,
+                lsw::core::networking::AddEndpointRetryPeriod,
+                lsw::core::networking::AddEndpointRetryTimeout,
                 retryPredicate);
         }));
 
@@ -1928,7 +1928,7 @@ void wsl::core::networking::WslMirroredNetworkManager::AddEndpointImpl(EndpointT
 
         constexpr auto type = GnsMessageType(newAdapterNotification);
         const auto jsonString = ToJsonW(newAdapterNotification);
-        WSL_LOG(
+        LSW_LOG(
             "WslMirroredNetworkManager::AddEndpoint",
             TraceLoggingValue("VmNicCreatedNotification [queued]", "GnsMessage"),
             TraceLoggingValue(endpointTrackingObject.m_networkEndpoint.InterfaceGuid, "adapterId"),
@@ -1943,7 +1943,7 @@ void wsl::core::networking::WslMirroredNetworkManager::AddEndpointImpl(EndpointT
         // can safely capture by ref since we are waiting
         hr = m_gnsCallbackQueue.submit_and_wait(
             [&] { return m_callbackForGnsMessage(type, jsonString, GnsCallbackFlags::Wait, &linuxResultCode); });
-        WSL_LOG(
+        LSW_LOG(
             "WslMirroredNetworkManager::AddEndpoint",
             TraceLoggingValue("VmNicCreatedNotification [completed]", "GnsMessage"),
             TraceLoggingHResult(hr, "hr"),
@@ -1972,7 +1972,7 @@ void wsl::core::networking::WslMirroredNetworkManager::AddEndpointImpl(EndpointT
         // restore the Endpoint ID GUID and PortFriendlyName
         endpointTrackingObject.m_hnsEndpoint.ID = originalEndpointId;
         endpointTrackingObject.m_hnsEndpoint.PortFriendlyName = originalPortFriendlyName;
-        WSL_LOG(
+        LSW_LOG(
             "WslMirroredNetworkManager::AddEndpoint [Update link status]",
             TraceLoggingHResult(hr, "hr"),
             TraceLoggingValue(linuxResultCode, "linuxResultCode"),
@@ -1993,7 +1993,7 @@ void wsl::core::networking::WslMirroredNetworkManager::AddEndpointImpl(EndpointT
             // Set the lowerEdgeAdapterId == the InstanceId of the Endpoint == the mirrored interfaceGuid
             createLoopbackDevice.lowerEdgeAdapterId = endpointTrackingObject.m_networkEndpoint.InterfaceGuid;
 
-            WSL_LOG(
+            LSW_LOG(
                 "WslMirroredNetworkManager::AddEndpoint",
                 TraceLoggingValue("CreateDeviceRequest - loopback [queued]", "GnsMessage"),
                 TraceLoggingValue(c_loopbackDeviceName, "deviceName"),
@@ -2007,7 +2007,7 @@ void wsl::core::networking::WslMirroredNetworkManager::AddEndpointImpl(EndpointT
             hr = m_gnsCallbackQueue.submit_and_wait([&] {
                 return m_callbackForGnsMessage(gnsMessageType, ToJsonW(createLoopbackDevice), GnsCallbackFlags::Wait, &linuxResultCode);
             });
-            WSL_LOG(
+            LSW_LOG(
                 "WslMirroredNetworkManager::AddEndpoint",
                 TraceLoggingValue("CreateDeviceRequest - loopback [completed]", "GnsMessage"),
                 TraceLoggingHResult(hr, "hr"),
@@ -2018,7 +2018,7 @@ void wsl::core::networking::WslMirroredNetworkManager::AddEndpointImpl(EndpointT
             // Perform per-interface configuration of net filter rules.
             hns::InterfaceNetFilterRequest interfaceNetFilterRequest;
             interfaceNetFilterRequest.targetDeviceName =
-                wsl::shared::string::GuidToString<wchar_t>(endpointTrackingObject.m_networkEndpoint.InterfaceGuid);
+                lsw::shared::string::GuidToString<wchar_t>(endpointTrackingObject.m_networkEndpoint.InterfaceGuid);
             interfaceNetFilterRequest.operation = hns::OperationType::Create;
             interfaceNetFilterRequest.ephemeralPortRangeStart = m_ephemeralPortRange.first;
             interfaceNetFilterRequest.ephemeralPortRangeEnd = m_ephemeralPortRange.second;
@@ -2030,7 +2030,7 @@ void wsl::core::networking::WslMirroredNetworkManager::AddEndpointImpl(EndpointT
                     LxGnsMessageInterfaceNetFilter, ToJsonW(interfaceNetFilterRequest), GnsCallbackFlags::Wait, &linuxResultCode);
             });
             LOG_IF_FAILED(hr);
-            WSL_LOG(
+            LSW_LOG(
                 "WslMirroredNetworkManager::AddEndpoint [InterfaceNetFilterRequest]",
                 TraceLoggingHResult(hr, "hr"),
                 TraceLoggingValue(linuxResultCode, "linuxResultCode"),
@@ -2040,7 +2040,7 @@ void wsl::core::networking::WslMirroredNetworkManager::AddEndpointImpl(EndpointT
                 TraceLoggingValue(m_ephemeralPortRange.second, "ephemeralPortRangeEnd"));
         }
 
-        // WSL will track state for every endpoint (interface)
+        // LSW will track state for every endpoint (interface)
         endpointTrackingObject.m_networkEndpoint.StateTracking.emplace(m_vmConfig.FirewallConfig.VmCreatorId);
         endpointTrackingObject.m_networkEndpoint.StateTracking->SeedInitialState(*endpointTrackingObject.m_networkEndpoint.Network);
 
@@ -2052,7 +2052,7 @@ void wsl::core::networking::WslMirroredNetworkManager::AddEndpointImpl(EndpointT
         // after added, we must determine what is the preferred interface to indicate to bond to connect
         UpdateAllEndpointsImpl(UpdateEndpointFlag::Default, "AddEndpoint");
 
-        WSL_LOG(
+        LSW_LOG(
             "CreateMirroredEndpointEnd",
             TraceLoggingHResult(S_OK, "result"),
             TraceLoggingValue(endpointTrackingObject.m_networkEndpoint.InterfaceGuid, "InterfaceGuid"),
@@ -2068,7 +2068,7 @@ void wsl::core::networking::WslMirroredNetworkManager::AddEndpointImpl(EndpointT
     {
         const auto hr = wil::ResultFromCaughtException();
 
-        WSL_LOG(
+        LSW_LOG(
             "AddMirroredEndpointFailed",
             TraceLoggingHResult(hr, "result"),
             TraceLoggingValue(endpointTrackingObject.m_networkEndpoint.InterfaceGuid, "InterfaceGuid"),
@@ -2083,7 +2083,7 @@ void wsl::core::networking::WslMirroredNetworkManager::AddEndpointImpl(EndpointT
 
         if (hr == HCN_E_ENDPOINT_NOT_FOUND)
         {
-            WSL_LOG(
+            LSW_LOG(
                 "WslMirroredNetworkManager::AddEndpoint",
                 TraceLoggingValue("HCN/HCS returned HCN_E_ENDPOINT_NOT_FOUND - not retrying", "GnsMessage"),
                 TraceLoggingValue(endpointTrackingObject.m_networkEndpoint.NetworkId, "networkId"),
@@ -2099,7 +2099,7 @@ void wsl::core::networking::WslMirroredNetworkManager::AddEndpointImpl(EndpointT
 
             if (endpointTrackingObject.m_retryCount > m_maxAddEndpointRetryCount)
             {
-                WSL_LOG(
+                LSW_LOG(
                     "BlockedNetworkEndpoint",
                     TraceLoggingValue("WslMirroredNetworkManager::AddEndpoint", "where"),
                     TraceLoggingHResult(hr, "result"),
@@ -2135,7 +2135,7 @@ void wsl::core::networking::WslMirroredNetworkManager::AddEndpointImpl(EndpointT
 }
 
 _Requires_lock_held_(m_networkLock)
-_Check_return_ HRESULT wsl::core::networking::WslMirroredNetworkManager::RemoveEndpoint(const GUID& endpointId) noexcept
+_Check_return_ HRESULT lsw::core::networking::WslMirroredNetworkManager::RemoveEndpoint(const GUID& endpointId) noexcept
 try
 {
     const auto removedFailedEndpointCount = std::erase_if(m_failedEndpointProperties, [&](const auto& endpointTracking) {
@@ -2143,12 +2143,12 @@ try
     });
     if (removedFailedEndpointCount > 0)
     {
-        WSL_LOG(
+        LSW_LOG(
             "WslMirroredNetworkManager::RemoveEndpoint - Endpoint removed from m_failedEndpointProperties",
             TraceLoggingValue(endpointId, "endpointId"));
     }
 
-    WSL_LOG("WslMirroredNetworkManager::RemoveEndpoint", TraceLoggingValue(endpointId, "endpointId"));
+    LSW_LOG("WslMirroredNetworkManager::RemoveEndpoint", TraceLoggingValue(endpointId, "endpointId"));
 
     std::vector<NetworkEndpoint>::const_iterator foundEndpoint;
 
@@ -2160,13 +2160,13 @@ try
 
         if (foundEndpoint == m_networkEndpoints.cend())
         {
-            WSL_LOG("WslMirroredNetworkManager::RemoveEndpoint - Endpoint not found", TraceLoggingValue(endpointId, "endpointId"));
+            LSW_LOG("WslMirroredNetworkManager::RemoveEndpoint - Endpoint not found", TraceLoggingValue(endpointId, "endpointId"));
             return S_OK;
         }
 
         // Perform per-interface configuration of net filter rules.
         hns::InterfaceNetFilterRequest interfaceNetFilterRequest;
-        interfaceNetFilterRequest.targetDeviceName = wsl::shared::string::GuidToString<wchar_t>(foundEndpoint->InterfaceGuid);
+        interfaceNetFilterRequest.targetDeviceName = lsw::shared::string::GuidToString<wchar_t>(foundEndpoint->InterfaceGuid);
         interfaceNetFilterRequest.operation = hns::OperationType::Remove;
 
         int linuxResultCode{};
@@ -2176,7 +2176,7 @@ try
                 LxGnsMessageInterfaceNetFilter, ToJsonW(std::move(interfaceNetFilterRequest)), GnsCallbackFlags::Wait, &linuxResultCode);
         });
         LOG_IF_FAILED(hr);
-        WSL_LOG(
+        LSW_LOG(
             "WslMirroredNetworkManager::RemoveEndpoint [InterfaceNetFilterRequest]",
             TraceLoggingHResult(hr, "hr"),
             TraceLoggingValue(linuxResultCode, "linuxResultCode"),
@@ -2185,14 +2185,14 @@ try
 
         // A race exists between already queued operations for this interface on the GNS queue and HNS endpoint removal.
         // In order to resolve the race, while holding the m_networkLock, flush the GNS queue then delete the endpoint in HCS.
-        WSL_LOG("WslMirroredNetworkManager::RemoveEndpoint", TraceLoggingValue("Flush GNS queue [queued]", "message"));
+        LSW_LOG("WslMirroredNetworkManager::RemoveEndpoint", TraceLoggingValue("Flush GNS queue [queued]", "message"));
 
         linuxResultCode = {};
         // can safely capture by ref since we are waiting
         hr = m_gnsCallbackQueue.submit_and_wait([&] {
             return m_callbackForGnsMessage(LxGnsMessageNoOp, std::wstring(L""), GnsCallbackFlags::Wait, &linuxResultCode);
         });
-        WSL_LOG(
+        LSW_LOG(
             "WslMirroredNetworkManager::RemoveEndpoint",
             TraceLoggingValue("Flush GNS queue [completed]", "message"),
             TraceLoggingHResult(hr, "hr"),
@@ -2202,14 +2202,14 @@ try
         // Set the instance id to the mirrored interfaceGuid so HNS -> netvsc can optimally use the same vmNIC constructs when the InterfaceGuid is the same
 
         hcs::ModifySettingRequest<hcs::NetworkAdapter> networkRequest{};
-        networkRequest.ResourcePath = c_networkAdapterPrefix + wsl::shared::string::GuidToString<wchar_t>(foundEndpoint->InterfaceGuid);
+        networkRequest.ResourcePath = c_networkAdapterPrefix + lsw::shared::string::GuidToString<wchar_t>(foundEndpoint->InterfaceGuid);
         networkRequest.RequestType = hcs::ModifyRequestType::Remove;
         networkRequest.Settings.InstanceId = foundEndpoint->InterfaceGuid;
         networkRequest.Settings.EndpointId = endpointId;
 
-        const auto networkRequestString = wsl::shared::ToJsonW(networkRequest);
+        const auto networkRequestString = lsw::shared::ToJsonW(networkRequest);
 
-        WSL_LOG(
+        LSW_LOG(
             "WslMirroredNetworkManager::RemoveEndpoint : Removing the HCS mirrored endpoint [queued]",
             TraceLoggingValue(networkRequestString.c_str(), "networkRequest"),
             TraceLoggingValue(endpointId, "endpointId"));
@@ -2218,13 +2218,13 @@ try
             windows::common::hcs::ModifyComputeSystem(m_hcsSystem, networkRequestString.c_str());
             return S_OK;
         });
-        WSL_LOG(
+        LSW_LOG(
             "WslMirroredNetworkManager::RemoveEndpoint : Removing the HCS mirrored endpoint [completed]",
             TraceLoggingHResult(hr, "hr"));
 
         if (FAILED(hr))
         {
-            WSL_LOG(
+            LSW_LOG(
                 "RemoveMirroredEndpointFailed",
                 TraceLoggingHResult(hr, "result"),
                 TraceLoggingValue("RemoveHcsEndpoint", "executionStep"),
@@ -2238,7 +2238,7 @@ try
     // Remove the endpoint and its tracked state
     // Linux will delete any addresses and routes associated with the interface
     m_networkEndpoints.erase(foundEndpoint);
-    WSL_LOG(
+    LSW_LOG(
         "WslMirroredNetworkManager::RemoveEndpoint - Endpoint removed from m_networkEndpoints",
         TraceLoggingValue(endpointId, "endpointId"));
 
@@ -2249,9 +2249,9 @@ try
 }
 CATCH_RETURN()
 
-void wsl::core::networking::WslMirroredNetworkManager::SendCreateNotificationsForInitialEndpoints() noexcept
+void lsw::core::networking::WslMirroredNetworkManager::SendCreateNotificationsForInitialEndpoints() noexcept
 {
-    WSL_LOG("WslMirroredNetworkManager::SendCreateNotificationsForInitialEndpoints");
+    LSW_LOG("WslMirroredNetworkManager::SendCreateNotificationsForInitialEndpoints");
     const auto lock = m_networkLock.lock_shared();
     if (m_state == State::Stopped)
     {
@@ -2264,7 +2264,7 @@ void wsl::core::networking::WslMirroredNetworkManager::SendCreateNotificationsFo
     const auto hr = m_gnsCallbackQueue.submit_and_wait([&] {
         return m_callbackForGnsMessage(LxGnsMessageGlobalNetFilter, std::wstring(L""), GnsCallbackFlags::Wait, &linuxResultCode);
     });
-    WSL_LOG(
+    LSW_LOG(
         "WslMirroredNetworkManager::SendCreateNotificationsForInitialEndpoints",
         TraceLoggingValue("Sent message to perform global configuration of net filter rules", "message"),
         TraceLoggingHResult(hr, "hr"),
@@ -2272,14 +2272,14 @@ void wsl::core::networking::WslMirroredNetworkManager::SendCreateNotificationsFo
     LOG_IF_FAILED(hr);
 }
 
-HRESULT wsl::core::networking::WslMirroredNetworkManager::WaitForMirroredGoalState() noexcept
+HRESULT lsw::core::networking::WslMirroredNetworkManager::WaitForMirroredGoalState() noexcept
 {
-    WSL_LOG("WslMirroredNetworkManager::WaitForMirroredGoalState");
+    LSW_LOG("WslMirroredNetworkManager::WaitForMirroredGoalState");
 
     return (m_inMirroredGoalState.wait(c_initialMirroredGoalStateWaitTimeoutMs)) ? S_OK : HRESULT_FROM_WIN32(ERROR_TIMEOUT);
 }
 
-_Check_return_ bool wsl::core::networking::WslMirroredNetworkManager::DoesEndpointExist(GUID networkId) const noexcept
+_Check_return_ bool lsw::core::networking::WslMirroredNetworkManager::DoesEndpointExist(GUID networkId) const noexcept
 try
 {
     const auto lock = m_networkLock.lock_shared();
@@ -2297,7 +2297,7 @@ catch (...)
 }
 
 _Requires_lock_not_held_(m_networkLock)
-void wsl::core::networking::WslMirroredNetworkManager::UpdateAllEndpoints(_In_ PCSTR sourceName) noexcept
+void lsw::core::networking::WslMirroredNetworkManager::UpdateAllEndpoints(_In_ PCSTR sourceName) noexcept
 {
     const auto lock = m_networkLock.lock_exclusive();
     if (m_state == State::Stopped)
@@ -2308,7 +2308,7 @@ void wsl::core::networking::WslMirroredNetworkManager::UpdateAllEndpoints(_In_ P
     UpdateAllEndpointsImpl(UpdateEndpointFlag::Default, sourceName);
 }
 
-void wsl::core::networking::WslMirroredNetworkManager::OnNetworkConnectivityHintChange() noexcept
+void lsw::core::networking::WslMirroredNetworkManager::OnNetworkConnectivityHintChange() noexcept
 {
     const auto lock = m_networkLock.lock_exclusive();
     if (m_state == State::Stopped)
@@ -2323,7 +2323,7 @@ void wsl::core::networking::WslMirroredNetworkManager::OnNetworkConnectivityHint
 // 1) Always consume the data immediately.
 // 2) If UpdateAllEndpointsImpl hasn't run for >= m_debounceUpdateAllEndpointsTimerMs then run it.
 // 3) If UpdateAllEndpointsImpl has run < m_debounceUpdateAllEndpointsTimerMs ago, schedule the timer.
-void wsl::core::networking::WslMirroredNetworkManager::OnNetworkEndpointChange() noexcept
+void lsw::core::networking::WslMirroredNetworkManager::OnNetworkEndpointChange() noexcept
 {
     const auto lock = m_networkLock.lock_exclusive();
     if (m_state == State::Stopped)
@@ -2334,7 +2334,7 @@ void wsl::core::networking::WslMirroredNetworkManager::OnNetworkEndpointChange()
     UpdateAllEndpointsImpl(UpdateEndpointFlag::Default, "OnNetworkEndpointChange");
 }
 
-void wsl::core::networking::WslMirroredNetworkManager::OnDnsSuffixChange() noexcept
+void lsw::core::networking::WslMirroredNetworkManager::OnDnsSuffixChange() noexcept
 try
 {
     const auto lock = m_networkLock.lock_exclusive();
@@ -2347,11 +2347,11 @@ try
 }
 CATCH_LOG();
 
-void wsl::core::networking::WslMirroredNetworkManager::TunAdapterStateChanged(_In_ const std::string& interfaceName, _In_ bool up) noexcept
+void lsw::core::networking::WslMirroredNetworkManager::TunAdapterStateChanged(_In_ const std::string& interfaceName, _In_ bool up) noexcept
 {
 }
 
-void wsl::core::networking::WslMirroredNetworkManager::ReconnectGuestNetwork()
+void lsw::core::networking::WslMirroredNetworkManager::ReconnectGuestNetwork()
 {
     auto lock = m_networkLock.lock_exclusive();
     if (m_state == State::Stopped)
@@ -2359,35 +2359,35 @@ void wsl::core::networking::WslMirroredNetworkManager::ReconnectGuestNetwork()
         return;
     }
 
-    WSL_LOG("WslMirroredNetworkManager::ReconnectGuestNetwork");
+    LSW_LOG("WslMirroredNetworkManager::ReconnectGuestNetwork");
     UpdateAllEndpointsImpl(UpdateEndpointFlag::ForceUpdate, "ReconnectGuestNetwork");
 }
 
 _Requires_lock_held_(m_networkLock)
-wsl::core::networking::NetworkSettings wsl::core::networking::WslMirroredNetworkManager::GetNetworkSettingsOfInterface(DWORD ifIndex) const
+lsw::core::networking::NetworkSettings lsw::core::networking::WslMirroredNetworkManager::GetNetworkSettingsOfInterface(DWORD ifIndex) const
 {
     const auto matchingEndpoint =
         std::ranges::find_if(m_networkEndpoints, [&](const auto& endpoint) { return endpoint.Network->InterfaceIndex == ifIndex; });
     if (matchingEndpoint == std::end(m_networkEndpoints))
     {
-        WSL_LOG("GetNetworkSettingsOfInterface - Network not found", TraceLoggingValue(ifIndex, "ifIndex"));
+        LSW_LOG("GetNetworkSettingsOfInterface - Network not found", TraceLoggingValue(ifIndex, "ifIndex"));
         return {};
     }
     else
     {
-        WSL_LOG("GetNetworkSettingsOfInterface", TRACE_NETWORKSETTINGS_OBJECT(matchingEndpoint->Network.get()));
+        LSW_LOG("GetNetworkSettingsOfInterface", TRACE_NETWORKSETTINGS_OBJECT(matchingEndpoint->Network.get()));
         return *matchingEndpoint->Network;
     }
 }
 
-std::shared_ptr<wsl::core::networking::NetworkSettings> wsl::core::networking::WslMirroredNetworkManager::GetEndpointSettings(
+std::shared_ptr<lsw::core::networking::NetworkSettings> lsw::core::networking::WslMirroredNetworkManager::GetEndpointSettings(
     const hns::HNSEndpoint& endpointProperties) const
 {
-    return wsl::core::networking::GetEndpointSettings(endpointProperties);
+    return lsw::core::networking::GetEndpointSettings(endpointProperties);
 }
 
 _Requires_lock_held_(m_networkLock)
-_Check_return_ HRESULT wsl::core::networking::WslMirroredNetworkManager::UpdateHcnServiceTimer() noexcept
+_Check_return_ HRESULT lsw::core::networking::WslMirroredNetworkManager::UpdateHcnServiceTimer() noexcept
 try
 {
     // These values are chosen so that the connection will be retried 5 times.
@@ -2412,7 +2412,7 @@ try
             m_retryHcnServiceConnectionDurationMs *= 2;
         }
 
-        WSL_LOG(
+        LSW_LOG(
             "WslMirroredNetworkManager::UpdateHcnServiceTimer",
             TraceLoggingValue(m_retryHcnServiceConnectionDurationMs, "m_retryHcnServiceConnectionDurationMs"));
 
@@ -2422,7 +2422,7 @@ try
     }
     else
     {
-        WSL_LOG(
+        LSW_LOG(
             "WslMirroredNetworkManager::UpdateHcnServiceTimer",
             TraceLoggingValue(0, "retryHcnServiceConnectionDurationMs (service is not active)"));
         THROW_WIN32(ERROR_SERVICE_NOT_ACTIVE);
@@ -2433,12 +2433,12 @@ try
 CATCH_RETURN()
 
 _Requires_lock_held_(m_networkLock)
-_Check_return_ HRESULT wsl::core::networking::WslMirroredNetworkManager::ResetHcnServiceSession() noexcept
+_Check_return_ HRESULT lsw::core::networking::WslMirroredNetworkManager::ResetHcnServiceSession() noexcept
 try
 {
     if (!m_hcnCallback)
     {
-        WSL_LOG("WslMirroredNetworkManager::ResetHcnServiceSession - attempting to re-register"); // Attempt to resubscribe to HNS notifications.
+        LSW_LOG("WslMirroredNetworkManager::ResetHcnServiceSession - attempting to re-register"); // Attempt to resubscribe to HNS notifications.
         m_hcnCallback = windows::common::hcs::RegisterServiceCallback(HcnCallback, this);
 
         // if we can reregister, reset the retry timer.
@@ -2455,7 +2455,7 @@ try
         catch (...)
         {
             const auto hr = wil::ResultFromCaughtException();
-            WSL_LOG(
+            LSW_LOG(
                 "ResetHcnServiceSessionFailed",
                 TraceLoggingValue(hr, "result"),
                 TraceLoggingValue("HcnEnumerateNetworks", "executionStep"),
@@ -2472,7 +2472,7 @@ try
         const auto enumEndpointsHr = HcnEnumerateEndpoints(nullptr, &response, &error);
         if (FAILED(enumEndpointsHr))
         {
-            WSL_LOG(
+            LSW_LOG(
                 "ResetHcnServiceSessionFailed",
                 TraceLoggingValue(enumEndpointsHr, "result"),
                 TraceLoggingValue("HcnEnumerateEndpoints", "executionStep"),
@@ -2483,7 +2483,7 @@ try
         }
         else
         {
-            WSL_LOG(
+            LSW_LOG(
                 "WslMirroredNetworkManager::ResetHcnServiceSession - HcnEnumerateEndpoints",
                 TraceLoggingValue(response.get(), "response"));
         }
@@ -2497,17 +2497,17 @@ try
     }
     else
     {
-        WSL_LOG("WslMirroredNetworkManager::ResetHcnServiceSession - already re-registered");
+        LSW_LOG("WslMirroredNetworkManager::ResetHcnServiceSession - already re-registered");
     }
 
     return S_OK;
 }
 CATCH_RETURN()
 
-void wsl::core::networking::WslMirroredNetworkManager::TelemetryConnectionCallback(NLM_CONNECTIVITY hostConnectivity, uint32_t telemetryCounter) noexcept
+void lsw::core::networking::WslMirroredNetworkManager::TelemetryConnectionCallback(NLM_CONNECTIVITY hostConnectivity, uint32_t telemetryCounter) noexcept
 try
 {
-    WSL_LOG("WslMirroredNetworkManager::TelemetryConnectionCallback");
+    LSW_LOG("WslMirroredNetworkManager::TelemetryConnectionCallback");
 
     const auto lock = m_networkLock.lock_exclusive();
     if (m_state == State::Stopped)
@@ -2518,10 +2518,10 @@ try
     // if this is the inital callback for checking container connectivity, push this through as telemetry, so we can observe the time-to-connect
     if ((telemetryCounter > 1) && !(hostConnectivity & NLM_CONNECTIVITY_IPV4_INTERNET) && !(hostConnectivity & NLM_CONNECTIVITY_IPV6_INTERNET))
     {
-        WSL_LOG(
+        LSW_LOG(
             "WslMirroredNetworkManager::TelemetryConnectionCallback - not testing connectivity - host is not connected",
             TraceLoggingValue(telemetryCounter, "telemetryCounter"),
-            TraceLoggingValue(wsl::core::networking::ToString(hostConnectivity).c_str(), "HostConnectivityLevel"));
+            TraceLoggingValue(lsw::core::networking::ToString(hostConnectivity).c_str(), "HostConnectivityLevel"));
         return;
     }
 
@@ -2537,7 +2537,7 @@ try
 
     // make the same connect requests as we just requested from the container
     const auto hostConnectivityCheck =
-        wsl::shared::conncheck::CheckConnection(c_ipv4TestRequestTargetA, c_ipv6TestRequestTargetA, "80");
+        lsw::shared::conncheck::CheckConnection(c_ipv4TestRequestTargetA, c_ipv6TestRequestTargetA, "80");
     const auto WindowsIpv4ConnCheckStatus = static_cast<uint32_t>(hostConnectivityCheck.Ipv4Status);
     const auto WindowsIpv6ConnCheckStatus = static_cast<uint32_t>(hostConnectivityCheck.Ipv6Status);
     const auto WindowsIPv4NlmConnectivityLevel = ConnectivityTelemetry::WindowsIPv4NlmConnectivityLevel(hostConnectivity);
@@ -2548,14 +2548,14 @@ try
     const auto timeFromObjectCreation = std::chrono::steady_clock::now() - m_objectCreationTime;
 
     // Logs when network connectivity changes, used to compare network connectivity in the guest to the host to determine networking health
-    WSL_LOG_TELEMETRY(
+    LSW_LOG_TELEMETRY(
         "TelemetryConnectionCallback",
         PDT_ProductAndServicePerformance,
         TraceLoggingValue("Mirrored", "networkingMode"),
         TraceLoggingValue(telemetryCounter, "telemetryCounter"),
         TraceLoggingValue(
             (std::chrono::duration_cast<std::chrono::milliseconds>(timeFromObjectCreation)).count(), "timeFromObjectCreationMs"),
-        TraceLoggingValue(wsl::core::networking::ToString(hostConnectivity).c_str(), "HostConnectivityLevel"),
+        TraceLoggingValue(lsw::core::networking::ToString(hostConnectivity).c_str(), "HostConnectivityLevel"),
         TraceLoggingValue(WindowsIPv4NlmConnectivityLevel, "WindowsIPv4ConnectivityLevel"),
         TraceLoggingValue(WindowsIPv6NlmConnectivityLevel, "WindowsIPv6ConnectivityLevel"),
         TraceLoggingValue(LinuxIPv4ConnCheckStatus, "LinuxIPv4ConnCheckStatus"),
@@ -2569,10 +2569,10 @@ try
 }
 CATCH_LOG()
 
-void __stdcall wsl::core::networking::WslMirroredNetworkManager::HcnServiceConnectionTimerCallback(
+void __stdcall lsw::core::networking::WslMirroredNetworkManager::HcnServiceConnectionTimerCallback(
     _Inout_ PTP_CALLBACK_INSTANCE, _Inout_opt_ PVOID Context, _Inout_ PTP_TIMER) noexcept
 {
-    WSL_LOG("WslMirroredNetworkManager::HcnServiceConnectionTimerCallback");
+    LSW_LOG("WslMirroredNetworkManager::HcnServiceConnectionTimerCallback");
 
     auto* const manager = static_cast<WslMirroredNetworkManager*>(Context);
 
@@ -2590,7 +2590,7 @@ void __stdcall wsl::core::networking::WslMirroredNetworkManager::HcnServiceConne
     }
 }
 
-void CALLBACK wsl::core::networking::WslMirroredNetworkManager::HcnCallback(
+void CALLBACK lsw::core::networking::WslMirroredNetworkManager::HcnCallback(
     _In_ DWORD NotificationType, _In_opt_ void* Context, _In_ HRESULT, _In_opt_ PCWSTR NotificationData) noexcept
 try
 {
@@ -2609,10 +2609,10 @@ try
         return;
     }
 
-    WSL_LOG(
+    LSW_LOG(
         "WslMirroredNetworkManager::HcnCallback [HcnRegisterServiceCallback]",
         TraceLoggingValue(NotificationType, "notificationType"),
-        TraceLoggingValue(wsl::windows::common::stringify::HcnNotificationsToString(NotificationType), "notificationTypeString"),
+        TraceLoggingValue(lsw::windows::common::stringify::HcnNotificationsToString(NotificationType), "notificationTypeString"),
         TraceLoggingValue(data.ID, "networkId"),
         TraceLoggingValue(data.Flags, "flags"),
         TraceLoggingValue(NotificationData, "notificationData"));
@@ -2624,7 +2624,7 @@ try
         // convert the enum to integer to allow for bitmap comparisons
         if (!WI_IsFlagSet(data.Flags, WI_EnumValue(hns::NetworkFlags::EnableFlowSteering)))
         {
-            WSL_LOG("WslMirroredNetworkManager::HcnCallback [HcnRegisterServiceCallback] - not a mirrored network");
+            LSW_LOG("WslMirroredNetworkManager::HcnCallback [HcnRegisterServiceCallback] - not a mirrored network");
             return;
         }
 
@@ -2658,7 +2658,7 @@ try
 }
 CATCH_LOG()
 
-const char* wsl::core::networking::WslMirroredNetworkManager::StateToString(State state) noexcept
+const char* lsw::core::networking::WslMirroredNetworkManager::StateToString(State state) noexcept
 {
     switch (state)
     {
@@ -2673,11 +2673,11 @@ const char* wsl::core::networking::WslMirroredNetworkManager::StateToString(Stat
     }
 }
 
-void wsl::core::networking::WslMirroredNetworkManager::TraceLoggingRundown() const
+void lsw::core::networking::WslMirroredNetworkManager::TraceLoggingRundown() const
 {
     auto lock = m_networkLock.lock_shared();
 
-    WSL_LOG(
+    LSW_LOG(
         "WslMirroredNetworkManager::TraceLoggingRundown",
         TraceLoggingValue("Global State"),
         TraceLoggingValue(StateToString(m_state), "state"),
@@ -2685,11 +2685,11 @@ void wsl::core::networking::WslMirroredNetworkManager::TraceLoggingRundown() con
 
     for (const auto& network : m_networkEndpoints)
     {
-        WSL_LOG("WslMirroredNetworkManager::TraceLoggingRundown", TRACE_NETWORKSETTINGS_OBJECT(network.Network));
+        LSW_LOG("WslMirroredNetworkManager::TraceLoggingRundown", TRACE_NETWORKSETTINGS_OBJECT(network.Network));
 
         if (network.StateTracking)
         {
-            WSL_LOG(
+            LSW_LOG(
                 "WslMirroredNetworkManager::TraceLoggingRundown",
                 TraceLoggingValue("IpStateTracking Interface Info"),
                 TraceLoggingValue(network.StateTracking->InterfaceGuid, "interfaceGuid"),
@@ -2697,19 +2697,19 @@ void wsl::core::networking::WslMirroredNetworkManager::TraceLoggingRundown() con
 
             for (const auto& address : network.StateTracking->IpAddresses)
             {
-                WSL_LOG(
+                LSW_LOG(
                     "WslMirroredNetworkManager::TraceLoggingRundown",
                     TraceLoggingValue("IpStateTracking::IpAddresses"),
                     TraceLoggingValue(address.Address.AddressString.c_str(), "address"),
                     TraceLoggingValue(address.Address.PrefixLength, "prefixLength"),
-                    TraceLoggingValue(wsl::core::networking::ToString(address.SyncStatus), "syncStatus"),
+                    TraceLoggingValue(lsw::core::networking::ToString(address.SyncStatus), "syncStatus"),
                     TraceLoggingValue(address.SyncRetryCount, "syncRetryCount"),
                     TraceLoggingValue(address.LoopbackSyncRetryCount, "loopbackSyncRetryCount"));
             }
 
             for (const auto& route : network.StateTracking->Routes)
             {
-                WSL_LOG(
+                LSW_LOG(
                     "WslMirroredNetworkManager::TraceLoggingRundown",
                     TraceLoggingValue("IpStateTracking::Routes"),
                     TraceLoggingValue(route.Route.ToString().c_str(), "route"),
@@ -2717,7 +2717,7 @@ void wsl::core::networking::WslMirroredNetworkManager::TraceLoggingRundown() con
                     TraceLoggingValue(
                         !route.CanConflictWithLinuxAutoGenRoute() || route.LinuxConflictRemoved,
                         "linuxConflictRemovedOrDoesntExist"),
-                    TraceLoggingValue(wsl::core::networking::ToString(route.SyncStatus), "syncStatus"),
+                    TraceLoggingValue(lsw::core::networking::ToString(route.SyncStatus), "syncStatus"),
                     TraceLoggingValue(route.SyncRetryCount, "syncRetryCount"));
             }
         }

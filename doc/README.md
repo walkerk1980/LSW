@@ -1,4 +1,4 @@
-# WSL open source documentation
+# LSW open source documentation
 
 Build instructions: 
 

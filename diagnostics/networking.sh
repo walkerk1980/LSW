@@ -6,7 +6,7 @@ lsb_release -a || cat /etc/issue /etc/os-release
 uname -a
 
 echo "Printing per-distro configuration"
-cat /etc/wsl.conf
+cat /etc/lsw.conf
 
 echo "Printing adapter & routing configuration"
 ip a
@@ -22,7 +22,7 @@ if [ -z ${https_proxy+x} ]; then echo "https_proxy is unset"; else echo "https_p
 if [ -z ${HTTPS_PROXY+x} ]; then echo "HTTPS_PROXY is unset"; else echo "HTTPS_PROXY is set"; fi
 if [ -z ${no_proxy+x} ]; then echo "no_proxy is unset"; else echo "no_proxy is set"; fi
 if [ -z ${NO_PROXY+x} ]; then echo "NO_PROXY is unset"; else echo "NO_PROXY is set"; fi
-if [ -z ${WSL_PAC_URL+x} ]; then echo "WSL_PAC_URL is unset"; else echo "WSL_PAC_URL is set"; fi
+if [ -z ${LSW_PAC_URL+x} ]; then echo "LSW_PAC_URL is unset"; else echo "LSW_PAC_URL is set"; fi
 
 echo "Printing DNS configuration"
 cat /etc/resolv.conf

@@ -1,10 +1,10 @@
 # GNS
 
-`gns` is a process created by `mini_init`. Its jobs is to configure networking within the WSL2 virtual machine. 
+`gns` is a process created by `mini_init`. Its jobs is to configure networking within the LSW2 virtual machine. 
 
 ## Networking configuration 
 
-Networking settings are shared by all WSL2 distributions. While WSL2 is running, `gns` maintains an hvsocket channel to [wslservice.exe](wslservice.exe.md), which is used to send various networking related configurations such as:
+Networking settings are shared by all LSW2 distributions. While LSW2 is running, `gns` maintains an hvsocket channel to [lswservice.exe](lswservice.exe.md), which is used to send various networking related configurations such as:
 
 - Interface IP configuration
 - Routing table entries

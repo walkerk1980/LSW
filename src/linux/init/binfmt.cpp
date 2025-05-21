@@ -19,7 +19,7 @@ Abstract:
 #include <signal.h>
 #include "common.h"
 #include "binfmt.h"
-#include "wslpath.h"
+#include "lswpath.h"
 #include <libgen.h>
 #include "util.h"
 #include "SocketChannel.h"
@@ -94,7 +94,7 @@ Return Value:
     g_Locale = newlocale(LC_ALL_MASK, "", NULL);
 
     //
-    // Check if the binary is being run on WSL or in a Utility VM.
+    // Check if the binary is being run on LSW or in a Utility VM.
     //
 
     if (!UtilIsUtilityVm())
@@ -164,7 +164,7 @@ try
     // Establish a connection to the interop server.
     //
 
-    wsl::shared::SocketChannel channel{UtilConnectToInteropServer(), "Interop"};
+    lsw::shared::SocketChannel channel{UtilConnectToInteropServer(), "Interop"};
     if (channel.Socket() < 0)
     {
         return ExitCode;
@@ -277,7 +277,7 @@ try
 
         if (PollDescriptors[3].revents & POLLIN)
         {
-            auto PollMessage = wsl::shared::socket::RecvMessage(PollDescriptors[3].fd, Buffer);
+            auto PollMessage = lsw::shared::socket::RecvMessage(PollDescriptors[3].fd, Buffer);
             if (PollMessage.empty())
             {
                 PollDescriptors[3].fd = -1;
@@ -916,9 +916,9 @@ try
     // Copy filename, cwd, environment into the message buffer.
     //
 
-    Common->FilenameOffset = wsl::shared::string::CopyToSpan(Filename, Message, Offset);
-    Common->CurrentWorkingDirectoryOffset = wsl::shared::string::CopyToSpan(CurrentWorkingDirectory, Message, Offset);
-    Common->EnvironmentOffset = wsl::shared::string::CopyToSpan(std::string_view{Environment.data(), Environment.size()}, Message, Offset);
+    Common->FilenameOffset = lsw::shared::string::CopyToSpan(Filename, Message, Offset);
+    Common->CurrentWorkingDirectoryOffset = lsw::shared::string::CopyToSpan(CurrentWorkingDirectory, Message, Offset);
+    Common->EnvironmentOffset = lsw::shared::string::CopyToSpan(std::string_view{Environment.data(), Environment.size()}, Message, Offset);
 
     //
     // Copy the command line arguments.
@@ -928,7 +928,7 @@ try
     Common->CommandLineCount = gsl::narrow_cast<unsigned short>(Argc - 1);
     for (int Index = 1; Index < Argc; Index += 1)
     {
-        wsl::shared::string::CopyToSpan(Argv[Index], Message, Offset);
+        lsw::shared::string::CopyToSpan(Argv[Index], Message, Offset);
     }
 
     //

@@ -14,7 +14,7 @@
 #include "WslCoreGuestNetworkService.h"
 #include "IMirroredNetworkManager.h"
 
-namespace wsl::core {
+namespace lsw::core {
 
 class MirroredNetworking : public INetworkingEngine
 {
@@ -53,7 +53,7 @@ public:
     /// </summary>
     static bool IsExternalInterfaceConstrained(const HCN_NETWORK network) noexcept;
 
-    static bool IsHyperVFirewallSupported(const wsl::core::Config& vmConfig) noexcept;
+    static bool IsHyperVFirewallSupported(const lsw::core::Config& vmConfig) noexcept;
 
 private:
     void AddNetworkEndpoint(const GUID& NetworkId) noexcept;
@@ -72,7 +72,7 @@ private:
     const Config& m_config;
 
     // holding the MTA for our COM callback
-    wsl::windows::common::helpers::unique_mta_cookie m_mtaCookie{};
+    lsw::windows::common::helpers::unique_mta_cookie m_mtaCookie{};
     std::optional<GnsPortTrackerChannel> m_gnsPortTrackerChannel;
     std::shared_ptr<GnsRpcServer> m_gnsRpcServer;
     // mutable allows m_gnsMessageQueue to submit from const methods
@@ -100,10 +100,10 @@ private:
 
     // track network-id to endpoint-id
     // we can avoid recreating vmNICs by reusing the same endpoint-id values
-    std::map<GUID, GUID, wsl::windows::common::helpers::GuidLess> m_networkIdMappings;
+    std::map<GUID, GUID, lsw::windows::common::helpers::GuidLess> m_networkIdMappings;
 
     // Ephemeral port range allocated for the VM.
     std::pair<uint16_t, uint16_t> m_ephemeralPortRange;
 };
 
-} // namespace wsl::core
+} // namespace lsw::core

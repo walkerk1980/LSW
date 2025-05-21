@@ -72,7 +72,7 @@ public:
         _In_ ULONG Flags);
 
     static inline wil::unique_socket CreateLinuxProcess(
-        _In_ LPCSTR Path, _In_ LPCSTR* Arguments, const GUID& RuntimeId, wsl::shared::SocketChannel& channel, HANDLE terminatingEvent, DWORD Timeout)
+        _In_ LPCSTR Path, _In_ LPCSTR* Arguments, const GUID& RuntimeId, lsw::shared::SocketChannel& channel, HANDLE terminatingEvent, DWORD Timeout)
     {
         std::vector<char> ArgumentsData;
         for (const auto* e = Arguments; *e != nullptr; e++)
@@ -82,7 +82,7 @@ public:
 
         ArgumentsData.emplace_back('\0');
 
-        wsl::shared::MessageWriter<CREATE_PROCESS_MESSAGE> message(LxInitCreateProcess);
+        lsw::shared::MessageWriter<CREATE_PROCESS_MESSAGE> message(LxInitCreateProcess);
         message.WriteString(message->PathIndex, Path);
         gsl::copy(as_bytes(gsl::span(ArgumentsData)), message.InsertBuffer(message->CommandLineIndex, ArgumentsData.size()));
         channel.SendMessage<CREATE_PROCESS_MESSAGE>(message.Span());
@@ -92,7 +92,7 @@ public:
             return message.Result;
         };
 
-        auto processSocket = wsl::windows::common::hvsocket::Connect(RuntimeId, readResult(), terminatingEvent);
+        auto processSocket = lsw::windows::common::hvsocket::Connect(RuntimeId, readResult(), terminatingEvent);
 
         const auto execResult = readResult();
         THROW_HR_IF_MSG(E_FAIL, execResult != 0, "Failed to execute '%hs', error=%d", Path, execResult);
@@ -154,7 +154,7 @@ public:
     virtual void Stop() = 0;
     virtual void RegisterPlan9ConnectionTarget(_In_ HANDLE userToken) = 0;
     virtual void UpdateTimezone() = 0;
-    virtual const WSLDistributionInformation* DistributionInformation() const noexcept = 0;
+    virtual const LSWDistributionInformation* DistributionInformation() const noexcept = 0;
 
     int GetIdleTimeout() const noexcept
     {

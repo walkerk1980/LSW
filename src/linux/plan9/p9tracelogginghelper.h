@@ -4,7 +4,7 @@
 namespace p9fs {
 
 // Class to help construct tracelogging messages for verbose logging of server traffic.
-// N.B. To avoid needlessly increasing the size of the statically linked WSL init binary, this
+// N.B. To avoid needlessly increasing the size of the statically linked LSW init binary, this
 //      helper allows for constructing log messages without the use of printf or iostream.
 class LogMessageBuilder
 {

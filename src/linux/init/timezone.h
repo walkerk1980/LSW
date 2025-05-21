@@ -16,6 +16,6 @@ Abstract:
 
 #include "WslDistributionConfig.h"
 
-void UpdateTimezone(std::string_view Timezone, const wsl::linux::WslDistributionConfig& Config);
+void UpdateTimezone(std::string_view Timezone, const lsw::linux::WslDistributionConfig& Config);
 
-void UpdateTimezone(gsl::span<gsl::byte> Buffer, const wsl::linux::WslDistributionConfig& Config);
+void UpdateTimezone(gsl::span<gsl::byte> Buffer, const lsw::linux::WslDistributionConfig& Config);

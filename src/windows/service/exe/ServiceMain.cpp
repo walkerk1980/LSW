@@ -20,10 +20,10 @@ Abstract:
 #include "LxssUserSessionFactory.h"
 #include <ctime>
 
-using namespace wsl::windows::common::registry;
-using namespace wsl::windows::common::string;
-using namespace wsl::windows::common::wslutil;
-using namespace wsl::windows::policies;
+using namespace lsw::windows::common::registry;
+using namespace lsw::windows::common::string;
+using namespace lsw::windows::common::lswutil;
+using namespace lsw::windows::policies;
 
 bool g_lxcoreInitialized{false};
 wil::unique_event g_networkingReady{wil::EventOptions::ManualReset};
@@ -74,11 +74,11 @@ private:
 
 void WslService::EvaluateWslPolicy()
 {
-    // If WSL is disabled, terminate any sessions and block future sessions from being created.
+    // If LSW is disabled, terminate any sessions and block future sessions from being created.
     //
     // N.B. This is done instead of failing service start so a proper error can be returned to the user.
     const auto policiesKey = OpenPoliciesKey();
-    const auto enabled = IsFeatureAllowed(policiesKey.get(), c_allowWSL);
+    const auto enabled = IsFeatureAllowed(policiesKey.get(), c_allowLSW);
     if (enabled)
     {
         Initialize();
@@ -93,15 +93,15 @@ void WslService::Initialize()
     std::call_once(flag, [&]() {
         // Initialize the connection to the LxCore driver.
         //
-        // N.B. The WSL optional component is required on Windows 10. On Windows 11 and later,
-        //      the lifted WSL service can run but will only support WSL2 distros.
+        // N.B. The LSW optional component is required on Windows 10. On Windows 11 and later,
+        //      the lifted LSW service can run but will only support LSW2 distros.
         g_lxcoreInitialized = NT_SUCCESS(::LxssClientInitialize());
 
         try
         {
             // Initialize the Plan 9 redirector (can fail iff the OC is not enabled on Win10).
             // Failures here are silently ignored because we don't want the service to fail to start in that case
-            // so it can return WSL_E_WSL_OPTIONAL_COMPONENT_REQUIRED in LxssUserSession
+            // so it can return LSW_E_LSW_OPTIONAL_COMPONENT_REQUIRED in LxssUserSession
             InitializePlan9Redirector();
         }
         CATCH_LOG()
@@ -116,7 +116,7 @@ void WslService::InitializePlan9Redirector()
     try
     {
         // Acquire backup and restore privileges to modify the P9NP trigger start registry key.
-        auto restore = wsl::windows::common::security::AcquirePrivileges({SE_BACKUP_NAME, SE_RESTORE_NAME});
+        auto restore = lsw::windows::common::security::AcquirePrivileges({SE_BACKUP_NAME, SE_RESTORE_NAME});
 
         // Read the P9NP registry key and ensure it contains the correct value.
         constexpr auto* keyName = L"SYSTEM\\CurrentControlSet\\Services\\P9NP\\NetworkProvider";
@@ -131,7 +131,7 @@ void WslService::InitializePlan9Redirector()
             // which was added in the same commit.
             // This theoretically shouldn't happen since the package shouldn't install on Windows 10 builds that are too old to
             // support lifted, but if this block ran on such a build it would completely break p9rdr, so better safe than sorry.
-            if (!wsl::windows::common::helpers::IsWindows11OrAbove())
+            if (!lsw::windows::common::helpers::IsWindows11OrAbove())
             {
                 auto appIdFlags = ReadDword(HKEY_CLASSES_ROOT, L"AppID\\{DFB65C4C-B34F-435D-AFE9-A86218684AA8}", L"AppIdFlags", 0);
                 THROW_HR_IF_MSG(
@@ -140,16 +140,16 @@ void WslService::InitializePlan9Redirector()
                     "TriggerStartPrefix needs update, but AppIdFlags isn't up to date");
             }
 
-            WSL_LOG("Updating TriggerStartPrefix", TraceLoggingLevel(WINEVENT_LEVEL_INFO));
+            LSW_LOG("Updating TriggerStartPrefix", TraceLoggingLevel(WINEVENT_LEVEL_INFO));
 
-            constexpr wchar_t newValue[] = L"wsl.localhost\0wsl$\0";
+            constexpr wchar_t newValue[] = L"lsw.localhost\0lsw$\0";
             THROW_IF_WIN32_ERROR(RegSetValueEx(key.get(), valueName, 0, REG_MULTI_SZ, (BYTE*)newValue, sizeof(newValue)));
         }
     }
     CATCH_LOG()
 
     // Make sure the Plan 9 redirector driver is loaded.
-    wsl::windows::common::redirector::EnsureRedirectorStarted();
+    lsw::windows::common::redirector::EnsureRedirectorStarted();
 }
 
 HRESULT WslService::OnServiceStarting()
@@ -158,26 +158,26 @@ try
     ConfigureCrt();
 
     // Enable contextualized errors
-    wsl::windows::common::EnableContextualizedErrors(true);
+    lsw::windows::common::EnableContextualizedErrors(true);
 
     // Initialize telemetry.
-    WslTraceLoggingInitialize(WslServiceTelemetryProvider, !wsl::shared::OfficialBuild);
+    WslTraceLoggingInitialize(WslServiceTelemetryProvider, !lsw::shared::OfficialBuild);
 
-    WSL_LOG("Service starting", TraceLoggingLevel(WINEVENT_LEVEL_INFO));
+    LSW_LOG("Service starting", TraceLoggingLevel(WINEVENT_LEVEL_INFO));
 
     // Don't kill the process on unknown C++ exceptions.
     wil::g_fResultFailFastUnknownExceptions = false;
 
-    wsl::windows::common::security::ApplyProcessMitigationPolicies();
+    lsw::windows::common::security::ApplyProcessMitigationPolicies();
 
-    // Ensure that the OS has support for running lifted WSL.
-    THROW_HR_IF(HRESULT_FROM_WIN32(ERROR_SERVICE_DISABLED), !wsl::windows::common::helpers::IsWslSupportInterfacePresent());
+    // Ensure that the OS has support for running lifted LSW.
+    THROW_HR_IF(HRESULT_FROM_WIN32(ERROR_SERVICE_DISABLED), !lsw::windows::common::helpers::IsWslSupportInterfacePresent());
 
     // Initialize Winsock.
     WSADATA Data;
     THROW_IF_WIN32_ERROR(WSAStartup(MAKEWORD(2, 2), &Data));
 
-    // Check if WSL is disabled via policy and set up a registry watcher to watch for changes.
+    // Check if LSW is disabled via policy and set up a registry watcher to watch for changes.
     //
     // N.B. The registry watcher must be created before checking the policy to avoid missing notifications.
     m_watcher = wil::make_registry_watcher(HKEY_LOCAL_MACHINE, ROOT_POLICIES_KEY, true, [this](wil::RegistryChangeKind) {
@@ -196,10 +196,10 @@ CATCH_RETURN()
 void WslService::RegisterEventSource()
 try
 {
-    m_eventLog.reset(::RegisterEventSource(nullptr, L"WSL"));
+    m_eventLog.reset(::RegisterEventSource(nullptr, L"LSW"));
     THROW_LAST_ERROR_IF(!m_eventLog);
 
-    wsl::windows::common::SetEventLog(m_eventLog.get());
+    lsw::windows::common::SetEventLog(m_eventLog.get());
 }
 CATCH_LOG();
 
@@ -211,7 +211,7 @@ HRESULT WslService::ServiceStarted()
     LxssIpTables::CleanupRemnants();
     g_networkingReady.SetEvent();
 
-    if constexpr (wsl::shared::OfficialBuild)
+    if constexpr (lsw::shared::OfficialBuild)
     {
         StartCheckingForUpdates();
     }
@@ -229,12 +229,12 @@ void WslService::OnSessionChanged(DWORD eventType, DWORD sessionId)
 
 void WslService::ServiceStopped()
 {
-    WSL_LOG("Service stopping", TraceLoggingLevel(WINEVENT_LEVEL_INFO));
+    LSW_LOG("Service stopping", TraceLoggingLevel(WINEVENT_LEVEL_INFO));
 
     // Stop checking for updates.
     m_updateCheckTimer.reset();
 
-    // Stop watching the WSL policy registry keys.
+    // Stop watching the LSW policy registry keys.
     m_watcher.reset();
 
     // Terminate all user sessions.
@@ -264,11 +264,11 @@ try
     const auto lxssKey = OpenLxssMachineKey(KEY_QUERY_VALUE);
     constexpr std::uint64_t c_updateCheckPeriodDefaultMs = 24 * 60 * 60 * 1000; // 24h
     const auto period =
-        wsl::windows::common::registry::ReadDword(lxssKey.get(), nullptr, L"UpdateCheckPeriodMs", c_updateCheckPeriodDefaultMs);
+        lsw::windows::common::registry::ReadDword(lxssKey.get(), nullptr, L"UpdateCheckPeriodMs", c_updateCheckPeriodDefaultMs);
 
     if (period <= 0)
     {
-        WSL_LOG("Update check is disabled via the registry", TraceLoggingLevel(WINEVENT_LEVEL_INFO));
+        LSW_LOG("Update check is disabled via the registry", TraceLoggingLevel(WINEVENT_LEVEL_INFO));
 
         return;
     }
@@ -286,15 +286,15 @@ void WslService::CheckForUpdates(_Inout_ PTP_CALLBACK_INSTANCE, _Inout_ PVOID Co
 try
 {
     auto [version, _] = GetLatestGithubRelease(false);
-    if (ParseWslPackageVersion(version) > ParseWslPackageVersion(TEXT(WSL_PACKAGE_VERSION)))
+    if (ParseWslPackageVersion(version) > ParseWslPackageVersion(TEXT(LSW_PACKAGE_VERSION)))
     {
-        WSL_LOG("WSL Package update is available", TraceLoggingLevel(WINEVENT_LEVEL_INFO));
+        LSW_LOG("LSW Package update is available", TraceLoggingLevel(WINEVENT_LEVEL_INFO));
 
         // Reset the timer since there's no reason to check for updates anymore.
         SetThreadpoolTimer(static_cast<WslService*>(Context)->m_updateCheckTimer.get(), nullptr, 0, 0);
 
         // Get current release date
-        std::wstring currentReleaseCreatedAtDate = GetGithubReleaseByTag(TEXT(WSL_PACKAGE_VERSION)).created_at;
+        std::wstring currentReleaseCreatedAtDate = GetGithubReleaseByTag(TEXT(LSW_PACKAGE_VERSION)).created_at;
 
         std::tm tm = {};
         std::wstring dateTimeFormat = L"%Y-%m-%dT%H:%M:%SZ";
@@ -302,13 +302,13 @@ try
         ss >> std::get_time(&tm, dateTimeFormat.c_str());
         auto tp = std::chrono::system_clock::from_time_t(std::mktime(&tm));
 
-        // If their release of WSL is older than 30 days, then show a notification to update
+        // If their release of LSW is older than 30 days, then show a notification to update
         if (std::chrono::system_clock::now() - std::chrono::days(30) > tp)
         {
             // Create a notification to inform the user that an update is available
-            THROW_IF_FAILED(wsl::windows::common::notifications::DisplayUpdateNotification(version));
+            THROW_IF_FAILED(lsw::windows::common::notifications::DisplayUpdateNotification(version));
 
-            WSL_LOG("WSL Package update notification displayed", TraceLoggingLevel(WINEVENT_LEVEL_INFO));
+            LSW_LOG("LSW Package update notification displayed", TraceLoggingLevel(WINEVENT_LEVEL_INFO));
         }
     }
 }

@@ -8,7 +8,7 @@ Module Name:
 
 Abstract:
 
-    This file contains WSL Core Instance function declarations.
+    This file contains LSW Core Instance function declarations.
 
 --*/
 
@@ -37,14 +37,14 @@ public:
 
         std::shared_ptr<LxssPort> CreateSessionLeader(_In_ HANDLE ClientProcess) override;
         void DisconnectConsole(_In_ HANDLE ClientProcess) override;
-        wsl::shared::SocketChannel& GetChannel();
+        lsw::shared::SocketChannel& GetChannel();
         wil::cs_leave_scope_exit Lock() override;
         void Receive(_Out_writes_bytes_(Length) PVOID Buffer, _In_ ULONG Length, _In_opt_ HANDLE ClientProcess = nullptr, _In_ DWORD Timeout = INFINITE) override;
         void Send(_In_reads_bytes_(Length) PVOID Buffer, _In_ ULONG Length) override;
 
     private:
         wil::critical_section m_lock;
-        wsl::shared::SocketChannel m_channel;
+        lsw::shared::SocketChannel m_channel;
         GUID m_runtimeId{};
         DWORD m_socketTimeout{};
     };
@@ -107,14 +107,14 @@ public:
 
     void RegisterPlan9ConnectionTarget(_In_ HANDLE userToken) override;
 
-    const WSLDistributionInformation* DistributionInformation() const noexcept override;
+    const LSWDistributionInformation* DistributionInformation() const noexcept override;
 
     wil::unique_socket CreateLinuxProcess(_In_ LPCSTR Path, _In_ LPCSTR* Arguments);
 
 private:
     void MountDrvfs(bool Admin) const;
 
-    void ReadOOBEResult(wil::unique_socket&& Socket, wsl::windows::service::DistributionRegistration&& registration);
+    void ReadOOBEResult(wil::unique_socket&& Socket, lsw::windows::service::DistributionRegistration&& registration);
 
     std::recursive_mutex m_lock;
     wil::unique_handle m_userToken;
@@ -131,10 +131,10 @@ private:
     std::shared_ptr<WslCorePort> m_initChannel;
     std::shared_ptr<ConsoleManager> m_consoleManager;
     ULONG64 m_ntClientLifetimeId{};
-    wsl::windows::common::redirector::ConnectionTargetManager m_redirectorConnectionTargets;
+    lsw::windows::common::redirector::ConnectionTargetManager m_redirectorConnectionTargets;
     ULONG m_plan9Port{LX_INIT_UTILITY_VM_INVALID_PORT};
     std::shared_ptr<WslCoreInstance> m_systemDistro;
-    WSLDistributionInformation m_distributionInfo{};
+    LSWDistributionInformation m_distributionInfo{};
     DWORD m_socketTimeout{};
     std::thread m_oobeThread;
     wil::unique_event m_destroyingEvent{wil::EventOptions::ManualReset};

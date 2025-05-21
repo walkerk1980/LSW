@@ -27,7 +27,7 @@ Abstract:
 #include <sstream>
 #include <regex>
 #include "common.h"
-#include "wslpath.h"
+#include "lswpath.h"
 #include "util.h"
 #include "drvfs.h"
 #include "escape.h"
@@ -40,17 +40,17 @@ Abstract:
 
 #define INITIAL_MESSAGE_BUFFER_SIZE (0x1000)
 
-#define PLAN9_RDR_PREFIX "\\\\wsl.localhost\\"
-#define PLAN9_RDR_COMPAT_PREFIX "\\\\wsl$\\"
+#define PLAN9_RDR_PREFIX "\\\\lsw.localhost\\"
+#define PLAN9_RDR_COMPAT_PREFIX "\\\\lsw$\\"
 
-#define WSLENV_ENV "WSLENV"
+#define LSWENV_ENV "LSWENV"
 
-#define WSL_CGROUPS_FIELD_ENABLED (3)
-#define WSL_CGROUPS_FIELD_MAX WSL_CGROUPS_FIELD_ENABLED
-#define WSL_CGROUPS_FIELD_SEP '\t'
-#define WSL_CGROUPS_FIELD_SUBSYSTEM (0)
+#define LSW_CGROUPS_FIELD_ENABLED (3)
+#define LSW_CGROUPS_FIELD_MAX LSW_CGROUPS_FIELD_ENABLED
+#define LSW_CGROUPS_FIELD_SEP '\t'
+#define LSW_CGROUPS_FIELD_SUBSYSTEM (0)
 
-#define WSL_MOUNT_OPTION_SEP ','
+#define LSW_MOUNT_OPTION_SEP ','
 
 int g_IsVmMode = -1;
 static sigset_t g_originalSignals;
@@ -91,13 +91,13 @@ Return Value:
     // Generate a unique name to be used for the interop socket path.
     //
 
-    m_InteropSocketPath = std::format(WSL_INTEROP_SOCKET_FORMAT, WSL_TEMP_FOLDER, getpid(), WSL_INTEROP_SOCKET);
+    m_InteropSocketPath = std::format(LSW_INTEROP_SOCKET_FORMAT, LSW_TEMP_FOLDER, getpid(), LSW_INTEROP_SOCKET);
 
     //
-    // Ensure the WSL temp folder exists and has the correct mode.
+    // Ensure the LSW temp folder exists and has the correct mode.
     //
 
-    if (UtilMkdir(WSL_TEMP_FOLDER, WSL_TEMP_FOLDER_MODE) < 0)
+    if (UtilMkdir(LSW_TEMP_FOLDER, LSW_TEMP_FOLDER_MODE) < 0)
     {
         return -1;
     }
@@ -455,7 +455,7 @@ try
     std::string Path;
     if (Pid.has_value())
     {
-        Path = std::format(WSL_INTEROP_SOCKET_FORMAT, WSL_TEMP_FOLDER, Pid.value(), WSL_INTEROP_SOCKET);
+        Path = std::format(LSW_INTEROP_SOCKET_FORMAT, LSW_TEMP_FOLDER, Pid.value(), LSW_INTEROP_SOCKET);
         InteropSocketPath = Path.data();
     }
     else
@@ -466,13 +466,13 @@ try
         // interop server.
         //
 
-        InteropSocketPath = getenv(WSL_INTEROP_ENV);
+        InteropSocketPath = getenv(LSW_INTEROP_ENV);
         if (InteropSocketPath == nullptr || (access(InteropSocketPath, F_OK) < 0 && errno == ENOENT))
         {
             pid_t Parent = getppid();
             while (Parent > 0)
             {
-                Path = std::format(WSL_INTEROP_SOCKET_FORMAT, WSL_TEMP_FOLDER, Parent, WSL_INTEROP_SOCKET);
+                Path = std::format(LSW_INTEROP_SOCKET_FORMAT, LSW_TEMP_FOLDER, Parent, LSW_INTEROP_SOCKET);
                 if (access(Path.c_str(), F_OK) == 0)
                 {
                     InteropSocketPath = Path.data();
@@ -487,7 +487,7 @@ try
                 return {};
             }
 
-            setenv(WSL_INTEROP_ENV, InteropSocketPath, 1);
+            setenv(LSW_INTEROP_ENV, InteropSocketPath, 1);
         }
     }
 
@@ -1059,7 +1059,7 @@ std::string UtilGetEnvironmentVariable(const char* Name)
 Routine Description:
 
     This queries the specified environment variable. If the value does not exist it gets the value from
-    the WSL interop server.
+    the LSW interop server.
 
 Arguments:
 
@@ -1081,13 +1081,13 @@ try
     auto Value = getenv(Name);
     if (Value == nullptr)
     {
-        wsl::shared::SocketChannel channel{UtilConnectToInteropServer(), "InteropClient"};
+        lsw::shared::SocketChannel channel{UtilConnectToInteropServer(), "InteropClient"};
         if (channel.Socket() < 0)
         {
             return {};
         }
 
-        wsl::shared::MessageWriter<LX_INIT_QUERY_ENVIRONMENT_VARIABLE> Message(LxInitMessageQueryEnvironmentVariable);
+        lsw::shared::MessageWriter<LX_INIT_QUERY_ENVIRONMENT_VARIABLE> Message(LxInitMessageQueryEnvironmentVariable);
         Message.WriteString(Name);
 
         channel.SendMessage<LX_INIT_QUERY_ENVIRONMENT_VARIABLE>(Message.Span());
@@ -1116,7 +1116,7 @@ catch (...)
     return {};
 }
 
-int UtilGetFeatureFlags(const wsl::linux::WslDistributionConfig& Config)
+int UtilGetFeatureFlags(const lsw::linux::WslDistributionConfig& Config)
 
 /*++
 
@@ -1165,7 +1165,7 @@ Return Value:
 
     int FeatureFlags = LxInitFeatureNone;
 
-    const char* FeatureFlagEnv = getenv(WSL_FEATURE_FLAGS_ENV);
+    const char* FeatureFlagEnv = getenv(LSW_FEATURE_FLAGS_ENV);
 
     if (FeatureFlagEnv != nullptr)
     {
@@ -1177,7 +1177,7 @@ Return Value:
         // Query init for the value.
         //
 
-        wsl::shared::SocketChannel channel{UtilConnectUnix(WSL_INIT_INTEROP_SOCKET), "wslinfo"};
+        lsw::shared::SocketChannel channel{UtilConnectUnix(LSW_INIT_INTEROP_SOCKET), "lswinfo"};
         if (channel.Socket() < 0)
         {
             return FeatureFlags;
@@ -1220,7 +1220,7 @@ try
     // Query init for the value.
     //
 
-    wsl::shared::SocketChannel channel{UtilConnectUnix(WSL_INIT_INTEROP_SOCKET), "wslinfo"};
+    lsw::shared::SocketChannel channel{UtilConnectUnix(LSW_INIT_INTEROP_SOCKET), "lswinfo"};
     THROW_LAST_ERROR_IF(channel.Socket() < 0);
 
     MESSAGE_HEADER Message;
@@ -1436,7 +1436,7 @@ Return Value:
     // N.B. For Windows paths, this is done case insensitive.
     //
 
-    if (!wsl::shared::string::StartsWith(Path, Prefix, WinPath))
+    if (!lsw::shared::string::StartsWith(Path, Prefix, WinPath))
     {
         return 0;
     }
@@ -1451,7 +1451,7 @@ bool UtilIsUtilityVm(void)
 Routine Description:
 
     This routine determines if the current process is running in a Utility VM or
-    an WSL1 based instance.
+    an LSW1 based instance.
 
 Arguments:
 
@@ -1683,7 +1683,7 @@ Return Value:
     {
         if (TimeoutSeconds.has_value())
         {
-            wsl::shared::retry::RetryWithTimeout<void>(
+            lsw::shared::retry::RetryWithTimeout<void>(
                 [&]() { THROW_LAST_ERROR_IF(mount(Source, Target, Type, MountFlags, Options) < 0); },
                 c_defaultRetryPeriod,
                 TimeoutSeconds.value(),
@@ -1858,8 +1858,8 @@ Return Value:
         *Current = '\0';
     }
 
-    for (Field = 0, Current = Line; ((Current != nullptr) && (Field <= WSL_CGROUPS_FIELD_MAX));
-         Field += 1, Current = strchr(Current, WSL_CGROUPS_FIELD_SEP))
+    for (Field = 0, Current = Line; ((Current != nullptr) && (Field <= LSW_CGROUPS_FIELD_MAX));
+         Field += 1, Current = strchr(Current, LSW_CGROUPS_FIELD_SEP))
     {
         //
         // Replace field separators with NULL characters and skip past them.
@@ -1873,11 +1873,11 @@ Return Value:
 
         switch (Field)
         {
-        case WSL_CGROUPS_FIELD_SUBSYSTEM:
+        case LSW_CGROUPS_FIELD_SUBSYSTEM:
             *SubsystemName = Current;
             break;
 
-        case WSL_CGROUPS_FIELD_ENABLED:
+        case LSW_CGROUPS_FIELD_ENABLED:
             *Enabled = (*Current == '1');
             break;
         }
@@ -1887,7 +1887,7 @@ Return Value:
     // Check if all the fields were found. If not, this is a malformed line.
     //
 
-    if (Field < WSL_CGROUPS_FIELD_MAX)
+    if (Field < LSW_CGROUPS_FIELD_MAX)
     {
         Result = -1;
         goto ParseCgroupsLineEnd;
@@ -1928,8 +1928,8 @@ Return Value:
 
     while (!MountOptions.empty())
     {
-        auto Current = UtilStringNextToken(MountOptions, WSL_MOUNT_OPTION_SEP);
-        if (wsl::shared::string::StartsWith(Current, PLAN9_ANAME_DRVFS))
+        auto Current = UtilStringNextToken(MountOptions, LSW_MOUNT_OPTION_SEP);
+        if (lsw::shared::string::StartsWith(Current, PLAN9_ANAME_DRVFS))
         {
             //
             // Search for the sub path.
@@ -1955,7 +1955,7 @@ Return Value:
             {
                 Plan9Source = MountSource;
             }
-            else if (wsl::shared::string::StartsWith(MountSource, PLAN9_UNC_TRANSLATED_PREFIX))
+            else if (lsw::shared::string::StartsWith(MountSource, PLAN9_UNC_TRANSLATED_PREFIX))
             {
                 Plan9Source = PLAN9_UNC_PREFIX;
                 Plan9Source += MountSource.substr(PLAN9_UNC_TRANSLATED_PREFIX_LENGTH);
@@ -1998,12 +1998,12 @@ Return Value:
 
 {
     std::string MountSource{};
-    if (wsl::shared::string::StartsWith(Source, LX_INIT_DRVFS_ADMIN_VIRTIO_TAG) && (Source.size() >= sizeof(LX_INIT_DRVFS_ADMIN_VIRTIO_TAG)))
+    if (lsw::shared::string::StartsWith(Source, LX_INIT_DRVFS_ADMIN_VIRTIO_TAG) && (Source.size() >= sizeof(LX_INIT_DRVFS_ADMIN_VIRTIO_TAG)))
     {
         MountSource = Source[sizeof(LX_INIT_DRVFS_ADMIN_VIRTIO_TAG) - 1];
         MountSource += ":";
     }
-    else if (wsl::shared::string::StartsWith(Source, LX_INIT_DRVFS_VIRTIO_TAG) && (Source.size() >= sizeof(LX_INIT_DRVFS_VIRTIO_TAG)))
+    else if (lsw::shared::string::StartsWith(Source, LX_INIT_DRVFS_VIRTIO_TAG) && (Source.size() >= sizeof(LX_INIT_DRVFS_VIRTIO_TAG)))
     {
         MountSource = Source[sizeof(LX_INIT_DRVFS_VIRTIO_TAG) - 1];
         MountSource += ":";
@@ -2018,7 +2018,7 @@ std::vector<char> UtilParseWslEnv(char* NtEnvironment)
 
 Routine Description:
 
-    This routine parses the WSLENV environment variable and constructs an
+    This routine parses the LSWENV environment variable and constructs an
     environment block with the resulting values.
 
 Arguments:
@@ -2048,12 +2048,12 @@ Return Value:
     Reverse = (NtEnvironment != nullptr);
 
     //
-    // Always add WSLENV to the block.
+    // Always add LSWENV to the block.
     //
 
-    Append(WSLENV_ENV "=");
+    Append(LSWENV_ENV "=");
 
-    EnvList = UtilGetEnv(WSLENV_ENV, NtEnvironment);
+    EnvList = UtilGetEnv(LSWENV_ENV, NtEnvironment);
     if (EnvList.has_value())
     {
         Append(EnvList.value());
@@ -2095,7 +2095,7 @@ Return Value:
                         }
                         break;
 
-                    case 'u': // Win32 -> WSL translation only
+                    case 'u': // Win32 -> LSW translation only
                         if (Reverse == false)
                         {
                             SkipTranslation = true;
@@ -2103,7 +2103,7 @@ Return Value:
 
                         break;
 
-                    case 'w': // WSL -> Win32 translation only
+                    case 'w': // LSW -> Win32 translation only
                         if (Reverse != false)
                         {
                             SkipTranslation = true;
@@ -2855,7 +2855,7 @@ Return Value:
         {
             if (wil::ScopedWarningsCollector::CanCollectWarning())
             {
-                EMIT_USER_WARNING(wsl::shared::Localization::MessageFailedToTranslate(Path));
+                EMIT_USER_WARNING(lsw::shared::Localization::MessageFailedToTranslate(Path));
             }
             else
             {
@@ -3029,14 +3029,14 @@ try
     // Get the distribution name from the environment variable.
     //
 
-    const auto DistributionName = UtilGetEnvironmentVariable(WSL_DISTRO_NAME_ENV);
+    const auto DistributionName = UtilGetEnvironmentVariable(LSW_DISTRO_NAME_ENV);
     if (DistributionName.empty())
     {
         return {};
     }
 
     //
-    // Construct a prefix (\\wsl.localhost\DistributionName).
+    // Construct a prefix (\\lsw.localhost\DistributionName).
     //
 
     std::string Prefix{PLAN9_RDR_PREFIX};
@@ -3060,15 +3060,15 @@ try
     else
     {
         auto PrefixLength = Prefix.length();
-        if (!wsl::shared::string::StartsWith(Path, Prefix, true))
+        if (!lsw::shared::string::StartsWith(Path, Prefix, true))
         {
             //
-            // Check the old \\wsl$ prefix if it's not \\wsl.localhost.
+            // Check the old \\lsw$ prefix if it's not \\lsw.localhost.
             //
 
             std::string CompatPrefix{PLAN9_RDR_COMPAT_PREFIX};
             CompatPrefix += DistributionName;
-            if (!wsl::shared::string::StartsWith(Path, CompatPrefix, true))
+            if (!lsw::shared::string::StartsWith(Path, CompatPrefix, true))
             {
                 return {};
             }
@@ -3277,7 +3277,7 @@ Return Value:
     return 0;
 }
 
-int ProcessCreateProcessMessage(wsl::shared::SocketChannel& channel, gsl::span<gsl::byte> Buffer)
+int ProcessCreateProcessMessage(lsw::shared::SocketChannel& channel, gsl::span<gsl::byte> Buffer)
 {
     auto* Message = gslhelpers::try_get_struct<CREATE_PROCESS_MESSAGE>(Buffer);
     if (!Message)
@@ -3298,8 +3298,8 @@ int ProcessCreateProcessMessage(wsl::shared::SocketChannel& channel, gsl::span<g
     int execResult = -1;
     auto sendExecResult = wil::scope_exit([&]() { sendResult(execResult); });
 
-    const char* Path = wsl::shared::string::FromSpan(Buffer, Message->PathIndex);
-    const char* Arguments = wsl::shared::string::FromSpan(Buffer, Message->CommandLineIndex);
+    const char* Path = lsw::shared::string::FromSpan(Buffer, Message->PathIndex);
+    const char* Arguments = lsw::shared::string::FromSpan(Buffer, Message->CommandLineIndex);
 
     // Note: this makes the assumption that no empty arguments are in the message
     std::vector<const char*> ArgumentArray;

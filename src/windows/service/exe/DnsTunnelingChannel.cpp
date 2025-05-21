@@ -3,12 +3,12 @@
 #include "precomp.h"
 #include "DnsTunnelingChannel.h"
 
-using wsl::core::networking::DnsTunnelingChannel;
+using lsw::core::networking::DnsTunnelingChannel;
 
 DnsTunnelingChannel::DnsTunnelingChannel(wil::unique_socket&& socket, DnsTunnelingCallback&& reportDnsRequest) :
     m_channel{std::move(socket), "DnsTunneling", m_stopEvent.get()}, m_reportDnsRequest(std::move(reportDnsRequest))
 {
-    WSL_LOG("DnsTunnelingChannel::DnsTunnelingChannel [Windows]", TraceLoggingValue(m_channel.Socket(), "socket"));
+    LSW_LOG("DnsTunnelingChannel::DnsTunnelingChannel [Windows]", TraceLoggingValue(m_channel.Socket(), "socket"));
 
     // Start thread waiting for incoming messages from Linux side
     m_receiveWorkerThread = std::thread([this]() { ReceiveLoop(); });
@@ -28,7 +28,7 @@ try
         return;
     }
 
-    wsl::shared::MessageWriter<LX_GNS_DNS_TUNNELING_MESSAGE> message(LxGnsMessageDnsTunneling);
+    lsw::shared::MessageWriter<LX_GNS_DNS_TUNNELING_MESSAGE> message(LxGnsMessageDnsTunneling);
     message->DnsClientIdentifier = dnsClientIdentifier;
     message.WriteSpan(dnsBuffer);
 
@@ -49,14 +49,14 @@ void DnsTunnelingChannel::ReceiveLoop() noexcept
                 return;
             }
 
-            WSL_LOG_DEBUG("DnsTunnelingChannel::ReceiveLoop [Windows] - waiting for next message from Linux");
+            LSW_LOG_DEBUG("DnsTunnelingChannel::ReceiveLoop [Windows] - waiting for next message from Linux");
 
-            // Read next message. wsl::shared::socket::RecvMessage() first reads the message header, then uses it to determine the
+            // Read next message. lsw::shared::socket::RecvMessage() first reads the message header, then uses it to determine the
             // total size of the message and read the rest of the message, resizing the buffer if needed.
             auto [message, span] = m_channel.ReceiveMessageOrClosed<MESSAGE_HEADER>();
             if (message == nullptr)
             {
-                WSL_LOG("DnsTunnelingChannel::ReceiveLoop [Windows] - failed to read message");
+                LSW_LOG("DnsTunnelingChannel::ReceiveLoop [Windows] - failed to read message");
                 return;
             }
 
@@ -69,7 +69,7 @@ void DnsTunnelingChannel::ReceiveLoop() noexcept
                 auto* dnsMessage = gslhelpers::try_get_struct<LX_GNS_DNS_TUNNELING_MESSAGE>(span);
                 if (!dnsMessage)
                 {
-                    WSL_LOG(
+                    LSW_LOG(
                         "DnsTunnelingChannel::ReceiveLoop [Windows] - failed to convert message to LX_GNS_DNS_TUNNELING_MESSAGE");
                     return;
                 }
@@ -77,7 +77,7 @@ void DnsTunnelingChannel::ReceiveLoop() noexcept
                 // Extract DNS buffer from message
                 auto dnsBuffer = span.subspan(offsetof(LX_GNS_DNS_TUNNELING_MESSAGE, Buffer));
 
-                WSL_LOG_DEBUG(
+                LSW_LOG_DEBUG(
                     "DnsTunnelingChannel::ReceiveLoop [Windows] - received DNS message",
                     TraceLoggingValue(dnsBuffer.size(), "DNS buffer size"),
                     TraceLoggingValue(dnsMessage->DnsClientIdentifier.Protocol == IPPROTO_UDP ? "UDP" : "TCP", "Protocol"),
@@ -102,7 +102,7 @@ void DnsTunnelingChannel::ReceiveLoop() noexcept
 void DnsTunnelingChannel::Stop() noexcept
 try
 {
-    WSL_LOG("DnsTunnelingChannel::Stop [Windows]");
+    LSW_LOG("DnsTunnelingChannel::Stop [Windows]");
 
     m_stopEvent.SetEvent();
 

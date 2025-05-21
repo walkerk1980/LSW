@@ -26,15 +26,15 @@ public partial class OptionalFeaturesViewModel : WslConfigSettingViewModel
 
     protected override void InitializeConfigSettings()
     {
-        var wslConfigService = App.GetService<IWslConfigService>();
-        _memoryReclaimMode = wslConfigService.GetWslConfigSetting(WslConfigEntry.AutoMemoryReclaim);
-        _gUIApplications = wslConfigService.GetWslConfigSetting(WslConfigEntry.GUIApplicationsEnabled);
-        _nestedVirtualization = wslConfigService.GetWslConfigSetting(WslConfigEntry.NestedVirtualizationEnabled);
-        _safeMode = wslConfigService.GetWslConfigSetting(WslConfigEntry.SafeModeEnabled);
-        _sparseVHD = wslConfigService.GetWslConfigSetting(WslConfigEntry.SparseVHDEnabled);
-        _vMIdleTimeout = wslConfigService.GetWslConfigSetting(WslConfigEntry.VMIdleTimeout);
+        var lswConfigService = App.GetService<IWslConfigService>();
+        _memoryReclaimMode = lswConfigService.GetWslConfigSetting(WslConfigEntry.AutoMemoryReclaim);
+        _gUIApplications = lswConfigService.GetWslConfigSetting(WslConfigEntry.GUIApplicationsEnabled);
+        _nestedVirtualization = lswConfigService.GetWslConfigSetting(WslConfigEntry.NestedVirtualizationEnabled);
+        _safeMode = lswConfigService.GetWslConfigSetting(WslConfigEntry.SafeModeEnabled);
+        _sparseVHD = lswConfigService.GetWslConfigSetting(WslConfigEntry.SparseVHDEnabled);
+        _vMIdleTimeout = lswConfigService.GetWslConfigSetting(WslConfigEntry.VMIdleTimeout);
 
-        _defaultVMIdleTimeout = wslConfigService.GetWslConfigSetting(WslConfigEntry.VMIdleTimeout, true).Int32Value;
+        _defaultVMIdleTimeout = lswConfigService.GetWslConfigSetting(WslConfigEntry.VMIdleTimeout, true).Int32Value;
     }
 
     public List<string> MemoryReclaimModes

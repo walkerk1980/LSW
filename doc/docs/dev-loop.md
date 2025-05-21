@@ -1,8 +1,8 @@
-# Building WSL
+# Building LSW
 
 ## Prerequisites 
 
-The following tools are required to build WSL: 
+The following tools are required to build LSW: 
 
 - CMake >= 2.25
     - Can be installed with `winget install Kitware.CMake`
@@ -17,7 +17,7 @@ The following tools are required to build WSL:
     - .NET desktop development
     - .NET WinUI app development tools
     
-## Building WSL
+## Building LSW
 
 Once you have cloned the repository, generate the Visual Studio solution by running:
 
@@ -25,7 +25,7 @@ Once you have cloned the repository, generate the Visual Studio solution by runn
 cmake .
 ```
 
-This will generate a `wsl.sln` file that you can build either with Visual Studio, or via `cmake --build .`.
+This will generate a `lsw.sln` file that you can build either with Visual Studio, or via `cmake --build .`.
 
 Build parameters:
 
@@ -36,9 +36,9 @@ Build parameters:
 Note: To build and deploy faster during development, see options in `UserConfig.cmake`.
 
 
-## Deploying WSL 
+## Deploying LSW 
 
-Once the build is complete, you can install WSL by installing the MSI package found under `bin\<platform>\<target>\wsl.msi`, or by running `powershell tools\deploy\deploy-to-host.ps1`.
+Once the build is complete, you can install LSW by installing the MSI package found under `bin\<platform>\<target>\lsw.msi`, or by running `powershell tools\deploy\deploy-to-host.ps1`.
 
 To deploy on a Hyper-V virtual machine, you can use `powershell tools\deploy\deploy-to-vm.ps1 -VmName <vm> -Username <username> -Password <password>`
 
@@ -51,16 +51,16 @@ To run a specific test case run:
 `bin\<platform>\<target>\test.bat /name:<class>::<test>`
 Example: `bin\x64\debug\test.bat /name:UnitTests::UnitTests::ModernInstall` 
 
-To run the tests for WSL1, add `-Version 1`. 
+To run the tests for LSW1, add `-Version 1`. 
 Example: `bin\x64\debug\test.bat -Version 1` 
 
 
-After running the tests once, you can add `-f` to skip the package installation, which makes the tests faster (this requires test_distro to be the default WSL distribution).
+After running the tests once, you can add `-f` to skip the package installation, which makes the tests faster (this requires test_distro to be the default LSW distribution).
 
 Example:
 
 ```
-wsl --set-default test_distro
+lsw --set-default test_distro
 bin\x64\debug\test.bat /name:*UnitTest* -f
 ```
 

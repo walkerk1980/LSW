@@ -32,11 +32,11 @@ Abstract:
 #include "lxdef.h"
 #include "common.h"
 
-namespace wsl::shared {
+namespace lsw::shared {
 class SocketChannel;
 }
 
-namespace wsl::linux {
+namespace lsw::linux {
 struct WslDistributionConfig;
 }
 
@@ -67,15 +67,15 @@ struct WslDistributionConfig;
 #define PATH_SEP_NT '\\'
 #define DRIVE_SEP_NT ':'
 
-#define WSL_DISTRO_NAME_ENV "WSL_DISTRO_NAME"
-#define WSL_INTEROP_ENV "WSL_INTEROP"
-#define WSL_DRVFS_ELEVATED_ENV "WSL_DRVFS_ELEVATED"
-#define WSL_FEATURE_FLAGS_ENV "WSL_FEATURE_FLAGS"
-#define WSL_INTEROP_SOCKET "interop"
-#define WSL_INTEROP_SOCKET_FORMAT "{}/{}_{}"
-#define WSL_TEMP_FOLDER RUN_FOLDER "/WSL"
-#define WSL_TEMP_FOLDER_MODE 0777
-#define WSL_INIT_INTEROP_SOCKET WSL_TEMP_FOLDER "/1_" WSL_INTEROP_SOCKET
+#define LSW_DISTRO_NAME_ENV "LSW_DISTRO_NAME"
+#define LSW_INTEROP_ENV "LSW_INTEROP"
+#define LSW_DRVFS_ELEVATED_ENV "LSW_DRVFS_ELEVATED"
+#define LSW_FEATURE_FLAGS_ENV "LSW_FEATURE_FLAGS"
+#define LSW_INTEROP_SOCKET "interop"
+#define LSW_INTEROP_SOCKET_FORMAT "{}/{}_{}"
+#define LSW_TEMP_FOLDER RUN_FOLDER "/LSW"
+#define LSW_TEMP_FOLDER_MODE 0777
+#define LSW_INIT_INTEROP_SOCKET LSW_TEMP_FOLDER "/1_" LSW_INTEROP_SOCKET
 
 #define ARRAY_SIZE(x) (sizeof(x) / sizeof((x)[0]))
 
@@ -222,7 +222,7 @@ std::optional<std::string> UtilGetEnv(const char* Name, char* Environment);
 
 std::string UtilGetEnvironmentVariable(const char* Name);
 
-int UtilGetFeatureFlags(const wsl::linux::WslDistributionConfig& Config);
+int UtilGetFeatureFlags(const lsw::linux::WslDistributionConfig& Config);
 
 std::optional<LX_MINI_INIT_NETWORKING_MODE> UtilGetNetworkingMode(void);
 
@@ -308,4 +308,4 @@ uint16_t UtilWinAfToLinuxAf(uint16_t AddressFamily);
 
 int WriteToFile(const char* Path, const char* Content, int permissions = 0644);
 
-int ProcessCreateProcessMessage(wsl::shared::SocketChannel& channel, gsl::span<gsl::byte> Buffer);
+int ProcessCreateProcessMessage(lsw::shared::SocketChannel& channel, gsl::span<gsl::byte> Buffer);

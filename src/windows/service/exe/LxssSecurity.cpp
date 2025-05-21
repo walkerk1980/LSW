@@ -39,7 +39,7 @@ void Security::InitializeInstanceJob(_In_ HANDLE jobHandle)
 bool Security::IsTokenLocalAdministrator(_In_ HANDLE token)
 {
     auto [sid, buffer] =
-        wsl::windows::common::security::CreateSid(SECURITY_NT_AUTHORITY, SECURITY_BUILTIN_DOMAIN_RID, DOMAIN_ALIAS_RID_ADMINS);
+        lsw::windows::common::security::CreateSid(SECURITY_NT_AUTHORITY, SECURITY_BUILTIN_DOMAIN_RID, DOMAIN_ALIAS_RID_ADMINS);
 
     BOOL member{};
     THROW_IF_WIN32_BOOL_FALSE(::CheckTokenMembership(token, sid, &member));

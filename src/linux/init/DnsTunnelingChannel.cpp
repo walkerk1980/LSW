@@ -26,7 +26,7 @@ DnsTunnelingChannel::~DnsTunnelingChannel()
 void DnsTunnelingChannel::SendDnsMessage(const gsl::span<gsl::byte> dnsBuffer, const LX_GNS_DNS_CLIENT_IDENTIFIER& dnsClientIdentifier) noexcept
 try
 {
-    wsl::shared::MessageWriter<LX_GNS_DNS_TUNNELING_MESSAGE> message(LxGnsMessageDnsTunneling);
+    lsw::shared::MessageWriter<LX_GNS_DNS_TUNNELING_MESSAGE> message(LxGnsMessageDnsTunneling);
     message->DnsClientIdentifier = dnsClientIdentifier;
     message.WriteSpan(dnsBuffer);
 
@@ -94,7 +94,7 @@ void DnsTunnelingChannel::ReceiveLoop() noexcept
 
             GNS_LOG_INFO("processing next message from Windows");
 
-            // Read next message. wsl::shared::socket::RecvMessage() first reads the message header, then uses it to determine the
+            // Read next message. lsw::shared::socket::RecvMessage() first reads the message header, then uses it to determine the
             // total size of the message and read the rest of the message, resizing the buffer if needed.
             auto [message, span] = m_channel.ReceiveMessageOrClosed<MESSAGE_HEADER>();
             if (message == nullptr)

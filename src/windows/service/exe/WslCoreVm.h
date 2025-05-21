@@ -8,7 +8,7 @@ Module Name:
 
 Abstract:
 
-    This file contains WSL Core vm function declarations.
+    This file contains LSW Core vm function declarations.
 
 --*/
 
@@ -39,7 +39,7 @@ inline constexpr auto c_optionsValueName = L"Options";
 inline constexpr auto c_typeValueName = L"Type";
 inline constexpr auto c_mountNameValueName = L"Name";
 
-inline constexpr auto c_vmOwner = L"WSL";
+inline constexpr auto c_vmOwner = L"LSW";
 
 static constexpr GUID c_virtiofsAdminClassId = {0x7e6ad219, 0xd1b3, 0x42d5, {0xb8, 0xee, 0xd9, 0x63, 0x24, 0xe6, 0x4f, 0xf6}};
 
@@ -49,7 +49,7 @@ static constexpr GUID c_virtiofsClassId = {0x60285ae6, 0xaaf3, 0x4456, {0xb4, 0x
 namespace wrl = Microsoft::WRL;
 
 /// <summary>
-/// This object tracks a running WSL Core VM.
+/// This object tracks a running LSW Core VM.
 /// </summary>
 class WslCoreVm
 {
@@ -57,7 +57,7 @@ class WslCoreVm
     void operator=(const WslCoreVm&) = delete;
 
 public:
-    static std::unique_ptr<WslCoreVm> Create(_In_ const wil::shared_handle& UserToken, _In_ wsl::core::Config&& VmConfig, _In_ const GUID& VmId);
+    static std::unique_ptr<WslCoreVm> Create(_In_ const wil::shared_handle& UserToken, _In_ lsw::core::Config&& VmConfig, _In_ const GUID& VmId);
 
     ~WslCoreVm() noexcept;
 
@@ -97,7 +97,7 @@ public:
 
     void EjectVhd(_In_ PCWSTR VhdPath);
 
-    const wsl::core::Config& GetConfig() const noexcept;
+    const lsw::core::Config& GetConfig() const noexcept;
 
     GUID GetRuntimeId() const;
 
@@ -190,13 +190,13 @@ private:
         bool operator==(const VirtioFsShare& other) const;
     };
 
-    WslCoreVm(_In_ wsl::core::Config&& VmConfig);
+    WslCoreVm(_In_ lsw::core::Config&& VmConfig);
 
     _Requires_lock_held_(m_guestDeviceLock)
     void AddDrvFsShare(_In_ bool Admin, _In_ HANDLE UserToken);
 
     _Requires_lock_held_(m_guestDeviceLock)
-    void AddPlan9Share(_In_ PCWSTR AccessName, _In_ PCWSTR Path, _In_ UINT32 Port, _In_ wsl::windows::common::hcs::Plan9ShareFlags Flags, _In_ HANDLE UserToken, _In_ PCWSTR VirtIoTag);
+    void AddPlan9Share(_In_ PCWSTR AccessName, _In_ PCWSTR Path, _In_ UINT32 Port, _In_ lsw::windows::common::hcs::Plan9ShareFlags Flags, _In_ HANDLE UserToken, _In_ PCWSTR VirtIoTag);
 
     _Requires_lock_held_(m_guestDeviceLock)
     GUID AddHdvShare(_In_ const GUID& DeviceId, _In_ const GUID& ImplementationClsid, _In_ PCWSTR AccessName, _In_opt_ PCWSTR Path, _In_ UINT32 Flags, _In_ HANDLE UserToken);
@@ -254,7 +254,7 @@ private:
 
     std::wstring GenerateConfigJson();
 
-    static std::pair<int, LX_MINI_MOUNT_STEP> GetMountResult(_In_ wsl::shared::SocketChannel& Channel);
+    static std::pair<int, LX_MINI_MOUNT_STEP> GetMountResult(_In_ lsw::shared::SocketChannel& Channel);
 
     void GrantVmWorkerProcessAccessToDisk(_In_ PCWSTR Disk, _In_opt_ HANDLE UserToken) const;
 
@@ -325,7 +325,7 @@ private:
     std::wstring m_exitDetails;
     std::wstring m_machineId;
     GUID m_runtimeId;
-    wsl::core::Config m_vmConfig;
+    lsw::core::Config m_vmConfig;
     std::wstring m_comPipe0;
     std::wstring m_comPipe1;
     int m_coldDiscardShiftSize;
@@ -341,10 +341,10 @@ private:
     bool m_defaultKernel = true;
     LX_MINI_INIT_MOUNT_DEVICE_TYPE m_systemDistroDeviceType = LxMiniInitMountDeviceTypeInvalid;
     ULONG m_systemDistroDeviceId = ULONG_MAX;
-    wsl::windows::common::hcs::unique_hcs_system m_system;
+    lsw::windows::common::hcs::unique_hcs_system m_system;
     wil::unique_socket m_listenSocket;
     std::function<void(GUID)> m_onExit;
-    wsl::shared::SocketChannel m_miniInitChannel;
+    lsw::shared::SocketChannel m_miniInitChannel;
     wil::unique_socket m_notifyChannel;
     SE_SID m_userSid;
     Microsoft::WRL::ComPtr<DeviceHostProxy> m_deviceHostSupport;
@@ -359,7 +359,7 @@ private:
     std::wstring m_sharedMemoryRoot;
     std::filesystem::path m_installPath;
     std::wstring m_userProfile;
-    wsl::windows::common::helpers::WindowsVersion m_windowsVersion;
+    lsw::windows::common::helpers::WindowsVersion m_windowsVersion;
     std::shared_ptr<DmesgCollector> m_dmesgCollector;
     std::shared_ptr<GuestTelemetryLogger> m_gnsTelemetryLogger;
     std::wstring m_debugShellPipe;
@@ -370,7 +370,7 @@ private:
     wil::srwlock m_persistentMemoryLock;
     _Guarded_by_(m_persistentMemoryLock) ULONG m_nextPersistentMemoryId = 0;
 
-    std::unique_ptr<wsl::core::INetworkingEngine> m_networkingEngine;
+    std::unique_ptr<lsw::core::INetworkingEngine> m_networkingEngine;
 
     static const std::wstring c_defaultTag;
 };

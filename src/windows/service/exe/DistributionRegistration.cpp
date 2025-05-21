@@ -16,8 +16,8 @@ Abstract:
 
 #include "DistributionRegistration.h"
 
-using wsl::windows::service::DistributionRegistration;
-using namespace wsl::windows::common;
+using lsw::windows::service::DistributionRegistration;
+using namespace lsw::windows::common;
 using namespace registry;
 
 constexpr auto DefaultDistro = L"DefaultDistribution";
@@ -40,16 +40,16 @@ DistributionRegistration DistributionRegistration::Open(HKEY LxssKey, const GUID
 {
     ExecutionContext context(Context::ReadDistroConfig);
 
-    const auto distroGuidString = wsl::shared::string::GuidToString<wchar_t>(Id);
+    const auto distroGuidString = lsw::shared::string::GuidToString<wchar_t>(Id);
 
     wil::unique_hkey distroKey;
     try
     {
-        distroKey = wsl::windows::common::registry::OpenKey(LxssKey, distroGuidString.c_str(), (KEY_READ | KEY_WRITE));
+        distroKey = lsw::windows::common::registry::OpenKey(LxssKey, distroGuidString.c_str(), (KEY_READ | KEY_WRITE));
     }
     catch (...)
     {
-        THROW_HR_IF(WSL_E_DISTRO_NOT_FOUND, wil::ResultFromCaughtException() == HRESULT_FROM_WIN32(ERROR_FILE_NOT_FOUND));
+        THROW_HR_IF(LSW_E_DISTRO_NOT_FOUND, wil::ResultFromCaughtException() == HRESULT_FROM_WIN32(ERROR_FILE_NOT_FOUND));
         throw;
     }
 
@@ -65,8 +65,8 @@ DistributionRegistration DistributionRegistration::Create(
     if (Id.has_value())
     {
         distroId = Id.value();
-        distroGuidString = wsl::shared::string::GuidToString<wchar_t>(distroId);
-        distroKey = wsl::windows::common::registry::CreateKey(LxssKey, distroGuidString.c_str(), (KEY_READ | KEY_WRITE));
+        distroGuidString = lsw::shared::string::GuidToString<wchar_t>(distroId);
+        distroKey = lsw::windows::common::registry::CreateKey(LxssKey, distroGuidString.c_str(), (KEY_READ | KEY_WRITE));
     }
     else
     {
@@ -75,15 +75,15 @@ DistributionRegistration DistributionRegistration::Create(
         {
             THROW_IF_FAILED(CoCreateGuid(&distroId));
 
-            distroGuidString = wsl::shared::string::GuidToString<wchar_t>(distroId);
-            distroKey = wsl::windows::common::registry::CreateKey(LxssKey, distroGuidString.c_str(), (KEY_READ | KEY_WRITE), &disposition);
+            distroGuidString = lsw::shared::string::GuidToString<wchar_t>(distroId);
+            distroKey = lsw::windows::common::registry::CreateKey(LxssKey, distroGuidString.c_str(), (KEY_READ | KEY_WRITE), &disposition);
         } while (disposition != REG_CREATED_NEW_KEY);
     }
 
     WI_ASSERT(distroKey && !distroGuidString.empty());
 
     // Set up a scope exit member to delete the key if registration fails.
-    auto cleanup = wil::scope_exit([&] { wsl::windows::common::registry::DeleteKey(LxssKey, distroGuidString.c_str()); });
+    auto cleanup = wil::scope_exit([&] { lsw::windows::common::registry::DeleteKey(LxssKey, distroGuidString.c_str()); });
 
     DistributionRegistration distribution(distroId, std::move(distroKey));
 
@@ -119,13 +119,13 @@ DistributionRegistration DistributionRegistration::Create(
 
 std::optional<DistributionRegistration> DistributionRegistration::OpenDefault(HKEY LxssKey)
 {
-    const auto defaultId = wsl::windows::common::registry::ReadOptionalString(LxssKey, nullptr, DefaultDistro);
+    const auto defaultId = lsw::windows::common::registry::ReadOptionalString(LxssKey, nullptr, DefaultDistro);
     if (!defaultId.has_value())
     {
         return {};
     }
 
-    const auto distroGuid = wsl::shared::string::ToGuid(defaultId.value());
+    const auto distroGuid = lsw::shared::string::ToGuid(defaultId.value());
     if (!distroGuid.has_value())
     {
         return {};
@@ -150,7 +150,7 @@ DistributionRegistration DistributionRegistration::OpenOrDefault(HKEY LxssKey, c
     if (Id == nullptr)
     {
         auto defaultDistribution = OpenDefault(LxssKey);
-        THROW_HR_IF(WSL_E_DEFAULT_DISTRO_NOT_FOUND, !defaultDistribution.has_value());
+        THROW_HR_IF(LSW_E_DEFAULT_DISTRO_NOT_FOUND, !defaultDistribution.has_value());
 
         return std::move(defaultDistribution.value());
     }
@@ -162,13 +162,13 @@ DistributionRegistration DistributionRegistration::OpenOrDefault(HKEY LxssKey, c
 
 void DistributionRegistration::SetDefault(HKEY LxssKey, const DistributionRegistration& Distro)
 {
-    wsl::windows::common::registry::WriteString(
-        LxssKey, nullptr, DefaultDistro, wsl::shared::string::GuidToString<wchar_t>(Distro.Id()).c_str());
+    lsw::windows::common::registry::WriteString(
+        LxssKey, nullptr, DefaultDistro, lsw::shared::string::GuidToString<wchar_t>(Distro.Id()).c_str());
 }
 
 void DistributionRegistration::DeleteDefault(HKEY LxssKey)
 {
-    wsl::windows::common::registry::DeleteKeyValue(LxssKey, DefaultDistro);
+    lsw::windows::common::registry::DeleteKeyValue(LxssKey, DefaultDistro);
 }
 
 DistributionRegistration::DistributionRegistration(const GUID& Id, wil::unique_hkey&& key) : m_id(Id), m_key{std::move(key)}
@@ -197,7 +197,7 @@ std::optional<std::wstring> DistributionRegistration::Read(const DistributionPro
 
 std::vector<std::string> DistributionRegistration::Read(const DistributionPropertyWithDefault<std::vector<std::string>>& property) const
 {
-    return wsl::windows::common::registry::ReadStringSet(m_key.get(), nullptr, property.Name, property.DefaultValue);
+    return lsw::windows::common::registry::ReadStringSet(m_key.get(), nullptr, property.Name, property.DefaultValue);
 }
 
 std::wstring DistributionRegistration::Read(const ExpectedProperty<LPCWSTR>& property) const
@@ -207,8 +207,8 @@ std::wstring DistributionRegistration::Read(const ExpectedProperty<LPCWSTR>& pro
     {
         THROW_HR_WITH_USER_ERROR(
             E_UNEXPECTED,
-            wsl::shared::Localization::MessageCorruptedDistroRegistration(
-                property.Name, wsl::shared::string::GuidToString<wchar_t>(m_id).c_str()));
+            lsw::shared::Localization::MessageCorruptedDistroRegistration(
+                property.Name, lsw::shared::string::GuidToString<wchar_t>(m_id).c_str()));
     }
 
     return value.value();
@@ -235,7 +235,7 @@ DistributionRegistration::ApplyGlobalFlagsOverride(DWORD Flags)
     WI_ASSERT(!WI_IsAnyFlagSet(Flags, ~LXSS_DISTRO_FLAGS_ALL));
 
     DWORD globalFlags =
-        wsl::windows::common::registry::ReadDword(HKEY_LOCAL_MACHINE, LXSS_SERVICE_REGISTRY_PATH, L"DistributionFlags", LXSS_DISTRO_FLAGS_ALL);
+        lsw::windows::common::registry::ReadDword(HKEY_LOCAL_MACHINE, LXSS_SERVICE_REGISTRY_PATH, L"DistributionFlags", LXSS_DISTRO_FLAGS_ALL);
 
     // The VM Mode flag cannot be overridden by global flags.
     WI_SetFlag(globalFlags, LXSS_DISTRO_FLAGS_VM_MODE);
@@ -245,5 +245,5 @@ DistributionRegistration::ApplyGlobalFlagsOverride(DWORD Flags)
 
 void DistributionRegistration::Delete(HKEY LxssKey) const
 {
-    DeleteKey(LxssKey, wsl::shared::string::GuidToString<wchar_t>(m_id).c_str());
+    DeleteKey(LxssKey, lsw::shared::string::GuidToString<wchar_t>(m_id).c_str());
 }

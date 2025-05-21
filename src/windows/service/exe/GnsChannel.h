@@ -6,9 +6,9 @@
 #include "SocketChannel.h"
 #include "hns_schema.h"
 
-namespace wsl::core {
+namespace lsw::core {
 
-// This class manages the hvsocket channel between wslservice and the gns process inside the VM.
+// This class manages the hvsocket channel between lswservice and the gns process inside the VM.
 // This channel is used for network configuration inside the guest.
 class GnsChannel
 {
@@ -23,7 +23,7 @@ public:
 
     GnsChannel& operator=(GnsChannel&&) = default;
 
-    void SendEndpointState(const wsl::shared::hns::HNSEndpoint& Notification);
+    void SendEndpointState(const lsw::shared::hns::HNSEndpoint& Notification);
 
     void SendHnsNotification(LPCWSTR Notification, const GUID& AdapterId);
 
@@ -41,6 +41,6 @@ private:
 
     // m_channel depends on m_stopEvent, so m_channel needs to be destroyed first.
     wil::unique_event m_stopEvent{wil::EventOptions::ManualReset};
-    wsl::shared::SocketChannel m_channel;
+    lsw::shared::SocketChannel m_channel;
 };
-} // namespace wsl::core
+} // namespace lsw::core

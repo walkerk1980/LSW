@@ -28,8 +28,8 @@ Abstract:
 #include "util.h"
 #include "configfile.h"
 #include "binfmt.h"
-#include "wslpath.h"
-#include "wslinfo.h"
+#include "lswpath.h"
+#include "lswinfo.h"
 #include "drvfs.h"
 #include "timezone.h"
 #include "message.h"
@@ -60,11 +60,11 @@ Abstract:
 #define RESOLV_CONF_FILE_PATH ETC_FOLDER RESOLV_CONF_FILE_NAME
 #define RESOLV_CONF_FOLDER RUN_FOLDER "/resolvconf"
 #define RESOLV_CONF_SYMLINK_TARGET ".." RESOLV_CONF_FOLDER "/" RESOLV_CONF_FILE_NAME
-#define RESOLV_CONF_SYMLINK_WSL_MOUNT_SUFFIX SHARED_MOUNT_FOLDER "/" RESOLV_CONF_FILE_NAME
+#define RESOLV_CONF_SYMLINK_LSW_MOUNT_SUFFIX SHARED_MOUNT_FOLDER "/" RESOLV_CONF_FILE_NAME
 #define RUN_FOLDER "/run"
-#define SHARED_MOUNT_FOLDER "wsl"
+#define SHARED_MOUNT_FOLDER "lsw"
 #define USER_MOUNT_FOLDER "user"
-#define WINDOWS_LD_CONF_FILE "/etc/ld.so.conf.d/ld.wsl.conf"
+#define WINDOWS_LD_CONF_FILE "/etc/ld.so.conf.d/ld.lsw.conf"
 #define WINDOWS_LD_CONF_FILE_MODE 0644
 
 #define MOUNTS_FILE "/proc/self/mounts"
@@ -73,7 +73,7 @@ Abstract:
 #define MOUNTS_DEVICE_FIELD 0
 #define MOUNTS_FSTYPE_FIELD 2
 
-static void ConfigApplyWindowsLibPath(const wsl::linux::WslDistributionConfig& Config);
+static void ConfigApplyWindowsLibPath(const lsw::linux::WslDistributionConfig& Config);
 
 class RemoveMountAndEnvironmentOnScopeExit
 {
@@ -205,8 +205,8 @@ const INIT_STARTUP_ANY LxssStartupCommon[] = {
     INIT_ANY_DIRECTORY("/run/user", ROOT_UID, ROOT_GID, S_IFDIR | 0755),
     INIT_ANY_MOUNT_OPTION("/run/user", "tmpfs", "mode=755", MS_NOATIME | MS_NOSUID | MS_NOEXEC | MS_NODEV),
     INIT_ANY_DIRECTORY("/bin", ROOT_UID, ROOT_GID, S_IFDIR | 0755),
-    INIT_ANY_SYMLINK("/bin/" WSLINFO_NAME, "/init"),
-    INIT_ANY_SYMLINK("/bin/" WSLPATH_NAME, "/init"),
+    INIT_ANY_SYMLINK("/bin/" LSWINFO_NAME, "/init"),
+    INIT_ANY_SYMLINK("/bin/" LSWPATH_NAME, "/init"),
     INIT_ANY_DIRECTORY("/sbin", ROOT_UID, ROOT_GID, S_IFDIR | 0755),
     INIT_ANY_SYMLINK("/sbin/" MOUNT_DRVFS_NAME, "/init"),
     INIT_ANY_MOUNT_DEVICE(BINFMT_MISC_MOUNT_TARGET, "binfmt_misc", "binfmt_misc", MS_RELATIME),
@@ -242,7 +242,7 @@ int g_NonElevatedMountNamespace = -1;
 // Boot state bookkeeping.
 //
 
-extern wsl::shared::SocketChannel g_plan9ControlChannel;
+extern lsw::shared::SocketChannel g_plan9ControlChannel;
 
 void ConfigAppendNtPath(EnvironmentBlock& Environment, char* NtPath)
 
@@ -330,12 +330,12 @@ try
 CATCH_LOG()
 
 void ConfigHandleInteropMessage(
-    wsl::shared::SocketChannel& ResponseChannel,
-    wsl::shared::SocketChannel& InteropChannel,
+    lsw::shared::SocketChannel& ResponseChannel,
+    lsw::shared::SocketChannel& InteropChannel,
     bool Elevated,
     gsl::span<gsl::byte> Message,
     const MESSAGE_HEADER* Header,
-    const wsl::linux::WslDistributionConfig& Config)
+    const lsw::linux::WslDistributionConfig& Config)
 
 /*++
 
@@ -391,7 +391,7 @@ try
         }
 
         auto Value = UtilGetEnvironmentVariable(Query->Buffer);
-        wsl::shared::MessageWriter<LX_INIT_QUERY_ENVIRONMENT_VARIABLE> Response(LxInitMessageQueryEnvironmentVariable);
+        lsw::shared::MessageWriter<LX_INIT_QUERY_ENVIRONMENT_VARIABLE> Response(LxInitMessageQueryEnvironmentVariable);
         Response.WriteString(Value);
         ResponseChannel.SendMessage<LX_INIT_QUERY_ENVIRONMENT_VARIABLE>(Response.Span());
     }
@@ -431,7 +431,7 @@ try
             return;
         }
 
-        // Symlink the content of the WSLG XDG runtime dir onto the user's runtime path and
+        // Symlink the content of the LSWG XDG runtime dir onto the user's runtime path and
         // create a login session to initialize PAM for the user.
         if (Config.GuiAppsEnabled)
         {
@@ -442,7 +442,7 @@ try
                 auto userFolder = std::format("/run/user/{}", CreateSession->Uid);
                 UtilMount("tmpfs", userFolder.c_str(), "tmpfs", (MS_NOSUID | MS_NODEV | MS_NOEXEC), "mode=755");
 
-                // Create the directory structure for wslg's symlinks.
+                // Create the directory structure for lswg's symlinks.
                 for (const auto* e : {"/", "/dbus-1", "/dbus-1/service", "/pulse"})
                 {
                     auto target = userFolder + e;
@@ -504,7 +504,7 @@ try
 }
 CATCH_LOG()
 
-wsl::linux::WslDistributionConfig ConfigInitializeCommon(struct sigaction* SavedSignalActions)
+lsw::linux::WslDistributionConfig ConfigInitializeCommon(struct sigaction* SavedSignalActions)
 
 /*++
 
@@ -574,7 +574,7 @@ Return Value:
     // Load the configuration file.
     //
 
-    wsl::linux::WslDistributionConfig Config{CONFIG_FILE};
+    lsw::linux::WslDistributionConfig Config{CONFIG_FILE};
 
     //
     // Initialize the static entries.
@@ -586,7 +586,7 @@ Return Value:
     }
 
     //
-    // Initialize WSL1 and WSL2 specific environment.
+    // Initialize LSW1 and LSW2 specific environment.
     //
 
     if (!UtilIsUtilityVm())
@@ -640,19 +640,19 @@ Return Value:
     return Config;
 }
 
-void ConfigInitializeX11(const wsl::linux::WslDistributionConfig& Config)
+void ConfigInitializeX11(const lsw::linux::WslDistributionConfig& Config)
 try
 {
     auto socketPath = "/tmp/" X11_SOCKET_NAME;
     THROW_LAST_ERROR_IF(UtilMkdir(socketPath, 0775) < 0);
 
     std::string source{Config.DrvFsPrefix};
-    source += WSLG_SHARED_FOLDER;
+    source += LSWG_SHARED_FOLDER;
     source += "/" X11_SOCKET_NAME;
     THROW_LAST_ERROR_IF(mount(source.c_str(), socketPath, NULL, (MS_BIND | MS_REC), NULL) < 0);
 
     // The .X11-unix folder is mounted read-only so the socket file can't be removed.
-    // It's left writable in the system distro since wslg is supposed to write to that folder to create it.
+    // It's left writable in the system distro since lswg is supposed to write to that folder to create it.
     if (WI_IsFlagClear(Config.FeatureFlags.value(), LxInitFeatureSystemDistro))
     {
         THROW_LAST_ERROR_IF(mount("none", socketPath, NULL, (MS_RDONLY | MS_REMOUNT | MS_BIND), NULL) < 0);
@@ -660,7 +660,7 @@ try
 }
 CATCH_LOG()
 
-int ConfigInitializeInstance(wsl::shared::SocketChannel& Channel, gsl::span<gsl::byte> Buffer, wsl::linux::WslDistributionConfig& Config)
+int ConfigInitializeInstance(lsw::shared::SocketChannel& Channel, gsl::span<gsl::byte> Buffer, lsw::linux::WslDistributionConfig& Config)
 
 /*++
 
@@ -700,12 +700,12 @@ try
     // Set the host name and domain name buffers.
     //
 
-    std::string Hostname = wsl::shared::string::FromSpan(Buffer, Message->HostnameOffset);
-    auto* Domainname = wsl::shared::string::FromSpan(Buffer, Message->DomainnameOffset);
-    auto* WindowsHosts = wsl::shared::string::FromSpan(Buffer, Message->WindowsHostsOffset);
-    auto* DistributionName = wsl::shared::string::FromSpan(Buffer, Message->DistributionNameOffset);
-    auto* Plan9SocketPath = wsl::shared::string::FromSpan(Buffer, Message->Plan9SocketOffset);
-    auto* Timezone = wsl::shared::string::FromSpan(Buffer, Message->TimezoneOffset);
+    std::string Hostname = lsw::shared::string::FromSpan(Buffer, Message->HostnameOffset);
+    auto* Domainname = lsw::shared::string::FromSpan(Buffer, Message->DomainnameOffset);
+    auto* WindowsHosts = lsw::shared::string::FromSpan(Buffer, Message->WindowsHostsOffset);
+    auto* DistributionName = lsw::shared::string::FromSpan(Buffer, Message->DistributionNameOffset);
+    auto* Plan9SocketPath = lsw::shared::string::FromSpan(Buffer, Message->Plan9SocketOffset);
+    auto* Timezone = lsw::shared::string::FromSpan(Buffer, Message->TimezoneOffset);
     bool Elevated = Message->DrvfsMount == LxInitDrvfsMountElevated;
 
     const std::string ThreadName = std::format("{}({})", (Config.BootInit ? "init-systemd" : "init"), DistributionName);
@@ -723,13 +723,13 @@ try
     Config.FeatureFlags = Message->FeatureFlags;
     char FeatureFlagsString[10];
     snprintf(FeatureFlagsString, sizeof(FeatureFlagsString), "%x", Config.FeatureFlags.value());
-    if (setenv(WSL_FEATURE_FLAGS_ENV, FeatureFlagsString, 1) < 0)
+    if (setenv(LSW_FEATURE_FLAGS_ENV, FeatureFlagsString, 1) < 0)
     {
         LOG_ERROR("setenv failed {}", errno);
     }
 
     //
-    // Determine the default UID which can be specified in /etc/wsl.conf.
+    // Determine the default UID which can be specified in /etc/lsw.conf.
     //
 
     uid_t DefaultUid = Message->DrvFsDefaultOwner;
@@ -759,7 +759,7 @@ try
     }
 
     //
-    // Perform additional WSL2-specific mounts.
+    // Perform additional LSW2-specific mounts.
     //
 
     if (UtilIsUtilityVm())
@@ -776,7 +776,7 @@ try
     }
 
     //
-    // If a hostname was specified in /etc/wsl.conf, use it.
+    // If a hostname was specified in /etc/lsw.conf, use it.
     //
 
     if (Config.HostName.has_value())
@@ -797,7 +797,7 @@ try
     // (from systemd-hostnamed's perspective), it's possible to override that
     // via Rename-Computer.
 
-    Hostname = wsl::shared::string::CleanHostname(Hostname);
+    Hostname = lsw::shared::string::CleanHostname(Hostname);
 
     //
     // Update the host and domain name.
@@ -806,7 +806,7 @@ try
     if (sethostname(Hostname.c_str(), Hostname.size()) < 0)
     {
         LOG_ERROR("sethostname({}) failed {}", Hostname.c_str(), errno);
-        Hostname = wsl::shared::string::c_defaultHostName;
+        Hostname = lsw::shared::string::c_defaultHostName;
         if (sethostname(Hostname.c_str(), Hostname.size()) < 0)
         {
             LOG_ERROR("sethostname({}) failed {}", Hostname.c_str(), errno);
@@ -884,9 +884,9 @@ try
     // Store the distribution name.
     //
 
-    if (setenv(WSL_DISTRO_NAME_ENV, DistributionName, 1) < 0)
+    if (setenv(LSW_DISTRO_NAME_ENV, DistributionName, 1) < 0)
     {
-        LOG_ERROR("setenv({}, {}, 1) failed {}", WSL_DISTRO_NAME_ENV, DistributionName, errno);
+        LOG_ERROR("setenv({}, {}, 1) failed {}", LSW_DISTRO_NAME_ENV, DistributionName, errno);
     }
 
     //
@@ -926,7 +926,7 @@ try
             // Create the /run/user bind mount.
             // This mount is required because systemd will mount a tmpfs on each /run/user/<uid> folder
             // so /run/user need to be in the global mount namespace so both elevated and non elevated processes see it.
-            const auto UserMountTarget = Config.DrvFsPrefix + WSLG_SHARED_FOLDER "/run/user";
+            const auto UserMountTarget = Config.DrvFsPrefix + LSWG_SHARED_FOLDER "/run/user";
             THROW_LAST_ERROR_IF(UtilMkdirPath(UserMountTarget.c_str(), 0755) < 0);
             THROW_LAST_ERROR_IF(UtilMount(UserMountTarget.c_str(), RUN_FOLDER "/" USER_MOUNT_FOLDER, nullptr, MS_BIND, nullptr) < 0)
         }
@@ -948,7 +948,7 @@ try
     // Send the config response to the service.
     //
 
-    wsl::shared::MessageWriter<LX_INIT_CONFIGURATION_INFORMATION_RESPONSE> Response(LxInitMessageInitializeResponse);
+    lsw::shared::MessageWriter<LX_INIT_CONFIGURATION_INFORMATION_RESPONSE> Response(LxInitMessageInitializeResponse);
     Response->Plan9Port = Plan9Port;
     Response->DefaultUid = DefaultUid;
     Response->InteropPort = ListenSocket ? SocketAddress.svm_port : LX_INIT_UTILITY_VM_INVALID_PORT;
@@ -976,7 +976,7 @@ try
     // Accept the interop connection.
     //
 
-    wsl::shared::SocketChannel InteropChannel;
+    lsw::shared::SocketChannel InteropChannel;
     if (ListenSocket)
     {
         InteropChannel = {UtilAcceptVsock(ListenSocket.get(), SocketAddress, INTEROP_TIMEOUT_MS), "Interop"};
@@ -999,7 +999,7 @@ try
     if (Config.InitPid.has_value())
         try
         {
-            std::string LinkPath = std::format(WSL_INTEROP_SOCKET_FORMAT, WSL_TEMP_FOLDER, 1, WSL_INTEROP_SOCKET);
+            std::string LinkPath = std::format(LSW_INTEROP_SOCKET_FORMAT, LSW_TEMP_FOLDER, 1, LSW_INTEROP_SOCKET);
             if (symlink(InteropServer.Path(), LinkPath.c_str()) < 0)
             {
                 LOG_ERROR("symlink({}, {}) failed {}", InteropServer.Path(), LinkPath.c_str(), errno);
@@ -1012,7 +1012,7 @@ try
             std::vector<gsl::byte> Buffer;
             for (;;)
             {
-                wsl::shared::SocketChannel ClientChannel{InteropServer.Accept(), "InteropServer"};
+                lsw::shared::SocketChannel ClientChannel{InteropServer.Accept(), "InteropServer"};
                 if (ClientChannel.Socket() < 0)
                 {
                     continue;
@@ -1029,7 +1029,7 @@ try
         });
 
     //
-    // If there was a command specified in /etc/wsl.conf, run it in a child process.
+    // If there was a command specified in /etc/lsw.conf, run it in a child process.
     //
 
     if (Config.BootCommand.has_value())
@@ -1057,7 +1057,7 @@ try
 }
 CATCH_RETURN_ERRNO()
 
-int ConfigInitializeVmMode(bool Elevated, wsl::linux::WslDistributionConfig& Config)
+int ConfigInitializeVmMode(bool Elevated, lsw::linux::WslDistributionConfig& Config)
 
 /*++
 
@@ -1086,7 +1086,7 @@ Return Value:
     {
         try
         {
-            auto variable = LX_WSL2_GPU_SHARE_ENV + std::string{share.Name};
+            auto variable = LX_LSW2_GPU_SHARE_ENV + std::string{share.Name};
             auto tempMount = RemoveMountAndEnvironmentOnScopeExit(variable.c_str());
             if (tempMount && Config.GpuEnabled)
             {
@@ -1103,7 +1103,7 @@ Return Value:
 
     try
     {
-        auto tempMount = RemoveMountAndEnvironmentOnScopeExit(LX_WSL2_CROSS_DISTRO_ENV);
+        auto tempMount = RemoveMountAndEnvironmentOnScopeExit(LX_LSW2_CROSS_DISTRO_ENV);
         if (tempMount)
         {
             const auto target = Config.DrvFsPrefix + SHARED_MOUNT_FOLDER;
@@ -1117,10 +1117,10 @@ Return Value:
 
     try
     {
-        auto tempMount = RemoveMountAndEnvironmentOnScopeExit(LX_WSL2_SYSTEM_DISTRO_SHARE_ENV);
+        auto tempMount = RemoveMountAndEnvironmentOnScopeExit(LX_LSW2_SYSTEM_DISTRO_SHARE_ENV);
         if (tempMount)
         {
-            const auto target = Config.DrvFsPrefix + WSLG_SHARED_FOLDER;
+            const auto target = Config.DrvFsPrefix + LSWG_SHARED_FOLDER;
             if (!tempMount.MoveMount(target.c_str()))
             {
                 Config.GuiAppsEnabled = false;
@@ -1130,7 +1130,7 @@ Return Value:
                 Config.GuiAppsEnabled = true;
 
                 //
-                // Create a bind mount of the shared WSLg path at the expected location for x11 clients.
+                // Create a bind mount of the shared LSWg path at the expected location for x11 clients.
                 //
                 // N.B. If using distro init, this is done after waiting for the distro init to finish booting
                 // since that will typically clear the /tmp directory.
@@ -1156,13 +1156,13 @@ Return Value:
 
     try
     {
-        auto tempMount = RemoveMountAndEnvironmentOnScopeExit(LX_WSL2_KERNEL_MODULES_MOUNT_ENV);
+        auto tempMount = RemoveMountAndEnvironmentOnScopeExit(LX_LSW2_KERNEL_MODULES_MOUNT_ENV);
         if (tempMount)
         {
-            auto target = getenv(LX_WSL2_KERNEL_MODULES_PATH_ENV);
+            auto target = getenv(LX_LSW2_KERNEL_MODULES_PATH_ENV);
             if (target)
             {
-                unsetenv(LX_WSL2_KERNEL_MODULES_PATH_ENV);
+                unsetenv(LX_LSW2_KERNEL_MODULES_PATH_ENV);
                 tempMount.MoveMount(target);
             }
         }
@@ -1212,7 +1212,7 @@ int ConfigInitializeWsl(void)
 
 Routine Description:
 
-    This routine sets up WSL-specific devices and mounts.
+    This routine sets up LSW-specific devices and mounts.
 
 Arguments:
 
@@ -1378,13 +1378,13 @@ InitializeEntryExit:
     return Result;
 }
 
-void ConfigCreateResolvConfSymlink(const wsl::linux::WslDistributionConfig& Config)
+void ConfigCreateResolvConfSymlink(const lsw::linux::WslDistributionConfig& Config)
 
 /*++
 
 Routine Description:
 
-    This routine ensures the /etc/resolv.conf symlink exists for WSL2.
+    This routine ensures the /etc/resolv.conf symlink exists for LSW2.
 
 Arguments:
 
@@ -1407,7 +1407,7 @@ Return Value:
         LOG_WARNING("{} updating disabled in {}", RESOLV_CONF_FILE_PATH, CONFIG_FILE);
 
         //
-        // Ensure that the symlink between /etc/resolv.conf -> /mnt/wsl/resolv.conf is removed
+        // Ensure that the symlink between /etc/resolv.conf -> /mnt/lsw/resolv.conf is removed
         //
 
         ConfigReconfigureResolvConfSymlink(Config);
@@ -1417,7 +1417,7 @@ Return Value:
 
     //
     // Create a /etc/resolv.conf symlink to the file that is automatically
-    // generated by WSL Core.
+    // generated by LSW Core.
     //
 
     try
@@ -1564,7 +1564,7 @@ CreateResolvConfSymlinkTargetExit:
     return Result;
 }
 
-int ConfigReconfigureResolvConfSymlink(const wsl::linux::WslDistributionConfig& Config)
+int ConfigReconfigureResolvConfSymlink(const lsw::linux::WslDistributionConfig& Config)
 
 /*++
 
@@ -1606,10 +1606,10 @@ Return Value:
     // null-terminate the symlink buffer string
     SymLinkBuffer[Result] = '\0';
 
-    // recreate the location of [automount root]/wsl/resolv.conf
-    auto target = Config.DrvFsPrefix + std::string{RESOLV_CONF_SYMLINK_WSL_MOUNT_SUFFIX};
+    // recreate the location of [automount root]/lsw/resolv.conf
+    auto target = Config.DrvFsPrefix + std::string{RESOLV_CONF_SYMLINK_LSW_MOUNT_SUFFIX};
 
-    // check if the symlink is pointing to /mnt/wsl/resolv.conf created by wslcore
+    // check if the symlink is pointing to /mnt/lsw/resolv.conf created by lswcore
     // do not interfere with symlinks set by other networking management processes (ie. resolvconf, NetworkManager, etc.)
     if (std::string_view{SymLinkBuffer} == target)
     {
@@ -1624,7 +1624,7 @@ Return Value:
     return Result;
 }
 
-EnvironmentBlock ConfigCreateEnvironmentBlock(const PLX_INIT_CREATE_PROCESS_COMMON Common, const wsl::linux::WslDistributionConfig& Config)
+EnvironmentBlock ConfigCreateEnvironmentBlock(const PLX_INIT_CREATE_PROCESS_COMMON Common, const lsw::linux::WslDistributionConfig& Config)
 
 /*++
 
@@ -1654,7 +1654,7 @@ Return Value:
     //
     // Add environment variables to support GUI applications.
     //
-    // N.B. This must be done before processing WSLENV so the user can override
+    // N.B. This must be done before processing LSWENV so the user can override
     //      these values if desired.
     //
 
@@ -1667,9 +1667,9 @@ Return Value:
     }
 
     //
-    // Add each Windows environment variable from WSLENV to the environment block.
+    // Add each Windows environment variable from LSWENV to the environment block.
     //
-    // N.B. Failure to parse WSLENV is non-fatal.
+    // N.B. Failure to parse LSWENV is non-fatal.
     //
 
     Buffer = (char*)Common + Common->NtEnvironmentOffset;
@@ -1729,10 +1729,10 @@ Return Value:
     // block.
     //
 
-    auto VmId = getenv(LX_WSL2_VM_ID_ENV);
+    auto VmId = getenv(LX_LSW2_VM_ID_ENV);
     if (VmId)
     {
-        Environment.AddVariable(LX_WSL2_VM_ID_ENV, VmId);
+        Environment.AddVariable(LX_LSW2_VM_ID_ENV, VmId);
     }
 
     return Environment;
@@ -1776,7 +1776,7 @@ Return Value:
 
         //
         // Extract the correct mount source depending on whether this is 9p
-        // (WSL2) or DrvFs (WSL1). For virtio-9p, the entry's mount source
+        // (LSW2) or DrvFs (LSW1). For virtio-9p, the entry's mount source
         // will just be "drvfs" or "drvfsa", so it must be extracted from the
         // aname (this works for hvsocket-9p too).
         // N.B. UtilParsePlan9MountSource always returns a canonicalized path.
@@ -1815,13 +1815,13 @@ Return Value:
     return MountPoints;
 }
 
-std::vector<std::pair<std::string, std::string>> ConfigGetWslgEnvironmentVariables(const wsl::linux::WslDistributionConfig& Config)
+std::vector<std::pair<std::string, std::string>> ConfigGetWslgEnvironmentVariables(const lsw::linux::WslDistributionConfig& Config)
 
 /*++
 
 Routine Description:
 
-    This routine returns the environment variables needed by WSLg.
+    This routine returns the environment variables needed by LSWg.
 
 Arguments:
 
@@ -1834,14 +1834,14 @@ Return Value:
 --*/
 
 {
-    std::string WaylandPath = std::format("{}{}/{}", Config.DrvFsPrefix, WSLG_SHARED_FOLDER, WAYLAND_RUNTIME_DIR);
-    std::string PulsePath = std::format("unix:{}{}/{}", Config.DrvFsPrefix, WSLG_SHARED_FOLDER, PULSE_SERVER_NAME);
+    std::string WaylandPath = std::format("{}{}/{}", Config.DrvFsPrefix, LSWG_SHARED_FOLDER, WAYLAND_RUNTIME_DIR);
+    std::string PulsePath = std::format("unix:{}{}/{}", Config.DrvFsPrefix, LSWG_SHARED_FOLDER, PULSE_SERVER_NAME);
     return std::vector<std::pair<std::string, std::string>>{
         {XDG_RUNTIME_DIR_ENV, std::move(WaylandPath)},
         {X11_DISPLAY_ENV, X11_DISPLAY_VALUE},
         {WAYLAND_DISPLAY_ENV, WAYLAND_DISPLAY_VALUE},
         {PULSE_SERVER_ENV, std::move(PulsePath)},
-        {LX_WSL2_GUI_APP_SUPPORT_ENV, "1"}};
+        {LX_LSW2_GUI_APP_SUPPORT_ENV, "1"}};
 }
 
 void ConfigInitializeCgroups(void)
@@ -1868,9 +1868,9 @@ try
 {
 
     //
-    // For WSL2 mount cgroup v2.
+    // For LSW2 mount cgroup v2.
     //
-    // N.B. Cgroup v2 is not implemented for WSL1.
+    // N.B. Cgroup v2 is not implemented for LSW1.
     //
 
     if (UtilIsUtilityVm())
@@ -1882,7 +1882,7 @@ try
     else
     {
         //
-        // Mount cgroup v1 when running in WSL1 mode.
+        // Mount cgroup v1 when running in LSW1 mode.
         //
         // Open the /proc/cgroups file and parse each line, ignoring malformed
         // lines and disabled controllers.
@@ -1971,7 +1971,7 @@ Return Value:
     return {};
 }
 
-void ConfigMountDrvFsVolumes(unsigned int DrvFsVolumes, uid_t OwnerUid, std::optional<bool> Admin, const wsl::linux::WslDistributionConfig& Config)
+void ConfigMountDrvFsVolumes(unsigned int DrvFsVolumes, uid_t OwnerUid, std::optional<bool> Admin, const lsw::linux::WslDistributionConfig& Config)
 
 /*++
 
@@ -2076,13 +2076,13 @@ try
         Source[0] = 'A' + Index;
         if (MountDrvfs(Source, Target.c_str(), Options.c_str(), Admin, Config) < 0)
         {
-            EMIT_USER_WARNING(wsl::shared::Localization::MessageDrvfsMountFailed(Source));
+            EMIT_USER_WARNING(lsw::shared::Localization::MessageDrvfsMountFailed(Source));
         }
     }
 }
 CATCH_LOG()
 
-static void ConfigApplyWindowsLibPath(const wsl::linux::WslDistributionConfig& Config)
+static void ConfigApplyWindowsLibPath(const lsw::linux::WslDistributionConfig& Config)
 
 /*++
 
@@ -2162,13 +2162,13 @@ Return Value:
 
 {
     //
-    // Note: The WSL_DRVFS_ELEVATED_ENV variable is used because the interop server isn't running yet.
+    // Note: The LSW_DRVFS_ELEVATED_ENV variable is used because the interop server isn't running yet.
     //
 
     const char* const Argv[] = {MOUNT_COMMAND, MOUNT_FSTAB_ARG, nullptr};
-    if (UtilCreateProcessAndWait(Argv[0], Argv, nullptr, {{WSL_DRVFS_ELEVATED_ENV, Elevated ? "1" : "0"}}) < 0)
+    if (UtilCreateProcessAndWait(Argv[0], Argv, nullptr, {{LSW_DRVFS_ELEVATED_ENV, Elevated ? "1" : "0"}}) < 0)
     {
-        auto message = wsl::shared::Localization::MessageFstabMountFailed();
+        auto message = lsw::shared::Localization::MessageFstabMountFailed();
         LOG_ERROR("{}", message.c_str());
 
         EMIT_USER_WARNING(std::move(message));
@@ -2215,7 +2215,7 @@ Return Value:
     return Result;
 }
 
-int ConfigRemountDrvFs(gsl::span<gsl::byte> Buffer, wsl::shared::SocketChannel& Channel, const wsl::linux::WslDistributionConfig& Config)
+int ConfigRemountDrvFs(gsl::span<gsl::byte> Buffer, lsw::shared::SocketChannel& Channel, const lsw::linux::WslDistributionConfig& Config)
 
 /*++
 
@@ -2241,7 +2241,7 @@ Return Value:
     return 0;
 }
 
-int ConfigRemountDrvFsImpl(gsl::span<gsl::byte> Buffer, const wsl::linux::WslDistributionConfig& Config)
+int ConfigRemountDrvFsImpl(gsl::span<gsl::byte> Buffer, const lsw::linux::WslDistributionConfig& Config)
 
 /*++
 
@@ -2437,7 +2437,7 @@ try
 
             NewMountOptions = MountEntry.MountOptions;
             NewMountOptions += ',';
-            if (WSL_USE_VIRTIO_9P(Config))
+            if (LSW_USE_VIRTIO_9P(Config))
             {
                 //
                 // Check if the existing mount is a drvfs mount that needs to be remounted.
@@ -2460,8 +2460,8 @@ try
             while (!SuperOptions.empty())
             {
                 auto Option = UtilStringNextToken(SuperOptions, ",");
-                if (wsl::shared::string::StartsWith(Option, "trans=") || wsl::shared::string::StartsWith(Option, "rfd=") ||
-                    wsl::shared::string::StartsWith(Option, "wfd=") || wsl::shared::string::StartsWith(Option, "msize="))
+                if (lsw::shared::string::StartsWith(Option, "trans=") || lsw::shared::string::StartsWith(Option, "rfd=") ||
+                    lsw::shared::string::StartsWith(Option, "wfd=") || lsw::shared::string::StartsWith(Option, "msize="))
                 {
                     continue;
                 }
@@ -2476,7 +2476,7 @@ try
         {
             std::string_view Source = MountEntry.Source;
             std::string_view OldTag = Message->Admin ? LX_INIT_DRVFS_VIRTIO_TAG : LX_INIT_DRVFS_ADMIN_VIRTIO_TAG;
-            if (!wsl::shared::string::StartsWith(Source, OldTag))
+            if (!lsw::shared::string::StartsWith(Source, OldTag))
             {
                 continue;
             }
@@ -2638,7 +2638,7 @@ try
 }
 CATCH_LOG()
 
-void ConfigUpdateNetworkInformation(gsl::span<gsl::byte> Buffer, const wsl::linux::WslDistributionConfig& Config)
+void ConfigUpdateNetworkInformation(gsl::span<gsl::byte> Buffer, const lsw::linux::WslDistributionConfig& Config)
 
 /*++
 
@@ -2651,7 +2651,7 @@ Arguments:
 
     Buffer - Supplies the message buffer.
 
-    Config - Supplies the WSL distribution configuration.
+    Config - Supplies the LSW distribution configuration.
 
 Return Value:
 
@@ -2692,13 +2692,13 @@ try
     wil::unique_fd Fd{TEMP_FAILURE_RETRY(open(RESOLV_CONF_FILE_PATH, (O_CREAT | O_RDWR | O_TRUNC), RESOLV_CONF_FILE_MODE))};
     THROW_LAST_ERROR_IF(!Fd);
 
-    const char* Header = wsl::shared::string::FromSpan(Buffer, Message->FileHeaderIndex);
+    const char* Header = lsw::shared::string::FromSpan(Buffer, Message->FileHeaderIndex);
     if (Header)
     {
         THROW_LAST_ERROR_IF(UtilWriteStringView(Fd.get(), Header) < 0);
     }
 
-    const char* Content = wsl::shared::string::FromSpan(Buffer, Message->FileContentsIndex);
+    const char* Content = lsw::shared::string::FromSpan(Buffer, Message->FileContentsIndex);
     if (Content)
     {
         THROW_LAST_ERROR_IF(UtilWriteStringView(Fd.get(), Content) < 0);

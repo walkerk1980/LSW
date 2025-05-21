@@ -17,13 +17,13 @@ template <typename... Args>
 using GetVmWorkerProcessType = decltype(GetVmWorkerProcess(std::declval<Args>()...))(Args...);
 
 // Limit the number of allowed doorbells registered by an external HDV vdev. Currently virtio-9p only uses
-// one doorbell and wsldevicehost uses only two.
+// one doorbell and lswdevicehost uses only two.
 #define DEVICE_HOST_PROXY_DOORBELL_LIMIT 8
 
-using namespace wsl::windows::common::hcs;
+using namespace lsw::windows::common::hcs;
 
 DeviceHostProxy::DeviceHostProxy(const std::wstring& VmId, const GUID& RuntimeId) :
-    m_systemId{VmId}, m_runtimeId{RuntimeId}, m_system{wsl::windows::common::hcs::OpenComputeSystem(VmId.c_str(), GENERIC_ALL)}, m_shutdown{false}
+    m_systemId{VmId}, m_runtimeId{RuntimeId}, m_system{lsw::windows::common::hcs::OpenComputeSystem(VmId.c_str(), GENERIC_ALL)}, m_shutdown{false}
 {
     m_devicesShutdown = false;
 }
@@ -56,10 +56,10 @@ GUID DeviceHostProxy::AddNewDevice(const GUID& Type, const wil::com_ptr<IPlan9Fi
     ModifySettingRequest<FlexibleIoDevice> request;
     request.RequestType = ModifyRequestType::Add;
     request.ResourcePath = L"VirtualMachine/Devices/FlexibleIov/";
-    request.ResourcePath += wsl::shared::string::GuidToString<wchar_t>(instanceId, wsl::shared::string::GuidToStringFlags::None);
+    request.ResourcePath += lsw::shared::string::GuidToString<wchar_t>(instanceId, lsw::shared::string::GuidToStringFlags::None);
     request.Settings.EmulatorId = Type;
     request.Settings.HostingModel = FlexibleIoDeviceHostingModel::ExternalRestricted;
-    wsl::windows::common::hcs::ModifyComputeSystem(m_system.get(), wsl::shared::ToJsonW(request).c_str());
+    lsw::windows::common::hcs::ModifyComputeSystem(m_system.get(), lsw::shared::ToJsonW(request).c_str());
     removeOnFailure.release();
     return instanceId;
 }

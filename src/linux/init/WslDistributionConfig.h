@@ -19,7 +19,7 @@ Abstract:
 #include "common.h"
 #include "SocketChannel.h"
 
-namespace wsl::linux {
+namespace lsw::linux {
 
 constexpr auto c_ConfigAutoMountOption = "automount.enabled";
 constexpr auto c_ConfigAutoUpdateTimezoneOption = "time.useWindowsTimezone";
@@ -72,7 +72,7 @@ struct WslDistributionConfig
     bool LinkOsLibs = true;
 
     //
-    // Values not set by /etc/wsl.conf.
+    // Values not set by /etc/lsw.conf.
     //
 
     bool GuiAppsEnabled = false;
@@ -85,8 +85,8 @@ struct WslDistributionConfig
     //
 
     wil::unique_fd BootStartWriteSocket;
-    wsl::shared::SocketChannel Plan9ControlChannel;
+    lsw::shared::SocketChannel Plan9ControlChannel;
     std::optional<pid_t> InitPid;
 };
 
-} // namespace wsl::linux
+} // namespace lsw::linux

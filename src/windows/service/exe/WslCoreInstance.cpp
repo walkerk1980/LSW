@@ -8,7 +8,7 @@ Module Name:
 
 Abstract:
 
-    This file contains WSL Core Instance function definitions.
+    This file contains LSW Core Instance function definitions.
 
 --*/
 
@@ -48,11 +48,11 @@ WslCoreInstance::WslCoreInstance(
     const auto& result = m_initChannel->GetChannel().ReceiveMessage<LX_MINI_INIT_CREATE_INSTANCE_RESULT>(&span, m_socketTimeout);
     if (result.WarningsOffset != 0)
     {
-        for (const auto& e : wsl::shared::string::Split<char>(wsl::shared::string::FromSpan(span, result.WarningsOffset), '\n'))
+        for (const auto& e : lsw::shared::string::Split<char>(lsw::shared::string::FromSpan(span, result.WarningsOffset), '\n'))
         {
             if (!e.empty())
             {
-                EMIT_USER_WARNING(wsl::shared::string::MultiByteToWide(e));
+                EMIT_USER_WARNING(lsw::shared::string::MultiByteToWide(e));
             }
         }
     }
@@ -61,12 +61,12 @@ WslCoreInstance::WslCoreInstance(
     {
         if (result.Result == EINVAL && result.FailureStep == LxInitCreateInstanceStepMountDisk)
         {
-            THROW_HR(WSL_E_DISK_CORRUPTED);
+            THROW_HR(LSW_E_DISK_CORRUPTED);
         }
         else
         {
             THROW_HR_WITH_USER_ERROR(
-                E_FAIL, wsl::shared::Localization::MessageDistributionFailedToStart(result.Result, static_cast<int>(result.FailureStep)));
+                E_FAIL, lsw::shared::Localization::MessageDistributionFailedToStart(result.Result, static_cast<int>(result.FailureStep)));
         }
     }
 
@@ -108,7 +108,7 @@ WslCoreInstance::WslCoreInstance(
         WI_SetFlag(systemDistroFeatureFlags, LxInitFeatureSystemDistro);
 
         // Create an instance for the system distro, this will fail if the distro has opted-out of
-        // GUI applications via /etc/wsl.conf.
+        // GUI applications via /etc/lsw.conf.
         try
         {
             wil::unique_socket empty{};
@@ -116,7 +116,7 @@ WslCoreInstance::WslCoreInstance(
                 UserToken,
                 SystemDistroSocket,
                 empty,
-                WSL2_SYSTEM_DISTRO_GUID,
+                LSW2_SYSTEM_DISTRO_GUID,
                 RuntimeId,
                 systemDistroConfig,
                 LX_UID_ROOT,
@@ -169,7 +169,7 @@ void WslCoreInstance::CreateLxProcess(
 
     if (m_oobeCompleteEvent && !m_oobeCompleteEvent.is_signaled())
     {
-        EMIT_USER_WARNING(wsl::shared::Localization::MessageWaitingForOobe(m_configuration.Name.c_str()));
+        EMIT_USER_WARNING(lsw::shared::Localization::MessageWaitingForOobe(m_configuration.Name.c_str()));
         m_oobeCompleteEvent.wait();
     }
 
@@ -228,7 +228,7 @@ void WslCoreInstance::CreateLxProcess(
 
     for (auto& socket : sockets)
     {
-        socket = wsl::windows::common::hvsocket::Connect(m_runtimeId, port);
+        socket = lsw::windows::common::hvsocket::Connect(m_runtimeId, port);
     }
 
     *InstanceId = m_runtimeId;
@@ -246,8 +246,8 @@ void WslCoreInstance::CreateLxProcess(
             m_oobeCompleteEvent.create(wil::EventOptions::ManualReset);
 
             auto impersonate = wil::CoImpersonateClient();
-            auto registration = wsl::windows::service::DistributionRegistration::Open(
-                wsl::windows::common::registry::OpenLxssUserKey().get(), m_configuration.DistroId);
+            auto registration = lsw::windows::service::DistributionRegistration::Open(
+                lsw::windows::common::registry::OpenLxssUserKey().get(), m_configuration.DistroId);
 
             // Wait for a potential previous oobe thread to complete before creating a new one.
             if (m_oobeThread.joinable())
@@ -268,9 +268,9 @@ void WslCoreInstance::CreateLxProcess(
     }
 }
 
-void WslCoreInstance::ReadOOBEResult(wil::unique_socket&& Socket, wsl::windows::service::DistributionRegistration&& registration)
+void WslCoreInstance::ReadOOBEResult(wil::unique_socket&& Socket, lsw::windows::service::DistributionRegistration&& registration)
 {
-    wsl::shared::SocketChannel channel(std::move(Socket), "OOBE", m_destroyingEvent.get());
+    lsw::shared::SocketChannel channel(std::move(Socket), "OOBE", m_destroyingEvent.get());
 
     const auto* oobeResult = channel.ReceiveMessageOrClosed<LX_INIT_OOBE_RESULT>().first;
 
@@ -281,7 +281,7 @@ void WslCoreInstance::ReadOOBEResult(wil::unique_socket&& Socket, wsl::windows::
     }
 
     // Logs the result of the OOBE process
-    WSL_LOG_TELEMETRY(
+    LSW_LOG_TELEMETRY(
         "OOBEResult",
         PDT_ProductAndServicePerformance,
         TraceLoggingValue(oobeResult->Result, "Result"),
@@ -293,11 +293,11 @@ void WslCoreInstance::ReadOOBEResult(wil::unique_socket&& Socket, wsl::windows::
     {
         // OOBE was successful, don't run it again.
         m_configuration.RunOOBE = false;
-        registration.Write(wsl::windows::service::Property::RunOOBE, 0);
+        registration.Write(lsw::windows::service::Property::RunOOBE, 0);
 
         if (oobeResult->DefaultUid != -1)
         {
-            registration.Write(wsl::windows::service::Property::DefaultUid, static_cast<int>(oobeResult->DefaultUid));
+            registration.Write(lsw::windows::service::Property::DefaultUid, static_cast<int>(oobeResult->DefaultUid));
             m_defaultUid = static_cast<int>(oobeResult->DefaultUid);
         }
     }
@@ -340,7 +340,7 @@ void WslCoreInstance::UpdateTimezone()
     }
 
     auto message =
-        wsl::windows::common::helpers::GenerateTimezoneUpdateMessage(wsl::windows::common::helpers::GetLinuxTimezone(m_userToken.get()));
+        lsw::windows::common::helpers::GenerateTimezoneUpdateMessage(lsw::windows::common::helpers::GetLinuxTimezone(m_userToken.get()));
 
     auto lock = m_initChannel->Lock();
     m_initChannel->GetChannel().SendMessage<LX_INIT_TIMEZONE_INFORMATION>(gsl::make_span(message));
@@ -374,8 +374,8 @@ void WslCoreInstance::Initialize()
         drvfsMount = m_initializeDrvFs(m_userToken.get());
     }
 
-    // If not using the WSL init, initialization is complete.
-    if (WI_IsFlagSet(m_configuration.Flags, LXSS_DISTRO_FLAGS_WSLCORE_MODE))
+    // If not using the LSW init, initialization is complete.
+    if (WI_IsFlagSet(m_configuration.Flags, LXSS_DISTRO_FLAGS_LSWCORE_MODE))
     {
         m_initialized = true;
         return;
@@ -388,11 +388,11 @@ void WslCoreInstance::Initialize()
     ULONG fixedDrives = 0;
     if (WI_IsFlagSet(m_configuration.Flags, LXSS_DISTRO_FLAGS_ENABLE_DRIVE_MOUNTING))
     {
-        fixedDrives = wsl::windows::common::filesystem::EnumerateFixedDrives().first;
+        fixedDrives = lsw::windows::common::filesystem::EnumerateFixedDrives().first;
     }
 
-    const auto timezone = wsl::windows::common::helpers::GetLinuxTimezone();
-    auto config = wsl::windows::common::helpers::GenerateConfigurationMessage(
+    const auto timezone = lsw::windows::common::helpers::GetLinuxTimezone();
+    auto config = lsw::windows::common::helpers::GenerateConfigurationMessage(
         m_configuration.Name, fixedDrives, m_defaultUid, timezone, {}, m_featureFlags, drvfsMount);
 
     m_initChannel->GetChannel().SendMessage<LX_INIT_CONFIGURATION_INFORMATION>(gsl::span(config));
@@ -406,13 +406,13 @@ void WslCoreInstance::Initialize()
 
     if (response.VersionIndex > 0)
     {
-        m_configuration.OsVersion = wsl::shared::string::MultiByteToWide(wsl::shared::string::FromSpan(span, response.VersionIndex));
+        m_configuration.OsVersion = lsw::shared::string::MultiByteToWide(lsw::shared::string::FromSpan(span, response.VersionIndex));
         m_distributionInfo.Version = m_configuration.OsVersion.c_str();
     }
 
     if (response.FlavorIndex > 0)
     {
-        m_configuration.Flavor = wsl::shared::string::MultiByteToWide(wsl::shared::string::FromSpan(span, response.FlavorIndex));
+        m_configuration.Flavor = lsw::shared::string::MultiByteToWide(lsw::shared::string::FromSpan(span, response.FlavorIndex));
         m_distributionInfo.Flavor = m_configuration.Flavor.c_str();
     }
 
@@ -420,8 +420,8 @@ void WslCoreInstance::Initialize()
     if (response.InteropPort != LX_INIT_UTILITY_VM_INVALID_PORT)
         try
         {
-            const wil::unique_socket socket{wsl::windows::common::hvsocket::Connect(m_runtimeId, response.InteropPort)};
-            wil::unique_handle info{wsl::windows::common::helpers::LaunchInteropServer(
+            const wil::unique_socket socket{lsw::windows::common::hvsocket::Connect(m_runtimeId, response.InteropPort)};
+            wil::unique_handle info{lsw::windows::common::helpers::LaunchInteropServer(
                 nullptr, reinterpret_cast<HANDLE>(socket.get()), nullptr, nullptr, &m_runtimeId, m_userToken.get())};
         }
     CATCH_LOG()
@@ -439,10 +439,10 @@ void WslCoreInstance::Initialize()
         m_nonAdminMountNamespaceCreated = true;
     }
 
-    WSL_LOG(
+    LSW_LOG(
         "WslCoreInstanceInitialize",
         TraceLoggingValue(m_configuration.Name.c_str(), "distroName"),
-        TraceLoggingValue(LXSS_WSL_VERSION_2, "version"),
+        TraceLoggingValue(LXSS_LSW_VERSION_2, "version"),
         TraceLoggingValue(m_instanceId, "instanceId"),
         TraceLoggingValue(m_configuration.DistroId, "distroId"),
         TraceLoggingValue(response.DefaultUid, "defaultUid"),
@@ -451,7 +451,7 @@ void WslCoreInstance::Initialize()
 
 void WslCoreInstance::MountDrvfs(bool Admin) const
 {
-    auto [drives, nonReadableDrives] = wsl::windows::common::filesystem::EnumerateFixedDrives();
+    auto [drives, nonReadableDrives] = lsw::windows::common::filesystem::EnumerateFixedDrives();
     LX_INIT_MOUNT_DRVFS Message{{LxInitMessageRemountDrvfs, sizeof(Message)}, Admin, drives, nonReadableDrives, static_cast<int>(m_defaultUid)};
 
     const auto& Result = m_initChannel->GetChannel().Transaction(Message, nullptr, m_socketTimeout);
@@ -459,7 +459,7 @@ void WslCoreInstance::MountDrvfs(bool Admin) const
     LOG_HR_IF_MSG(E_UNEXPECTED, Result.Result != 0, "Failed to mount the drvfs shares, %i", Result.Result);
 }
 
-const WSLDistributionInformation* WslCoreInstance::DistributionInformation() const noexcept
+const LSWDistributionInformation* WslCoreInstance::DistributionInformation() const noexcept
 {
     return &m_distributionInfo;
 }
@@ -488,12 +488,12 @@ void WslCoreInstance::Stop()
 {
     std::lock_guard lock(m_lock);
 
-    WSL_LOG_TELEMETRY(
+    LSW_LOG_TELEMETRY(
         "StopInstance",
         PDT_ProductAndServiceUsage,
         TraceLoggingKeyword(MICROSOFT_KEYWORD_CRITICAL_DATA),
         TraceLoggingValue(m_configuration.Name.c_str(), "distroName"),
-        TraceLoggingValue(LXSS_WSL_VERSION_2, "version"),
+        TraceLoggingValue(LXSS_LSW_VERSION_2, "version"),
         TraceLoggingValue(m_instanceId, "instanceId"),
         TraceLoggingValue(m_configuration.DistroId, "distroId"));
 
@@ -541,7 +541,7 @@ std::shared_ptr<LxssPort> WslCoreInstance::WslCorePort::CreateSessionLeader(_In_
     LX_INIT_CREATE_SESSION message{{LxInitMessageCreateSession, sizeof(message)}};
     const auto& response = m_channel.Transaction(message, nullptr, m_socketTimeout);
 
-    wil::unique_socket socket = wsl::windows::common::hvsocket::Connect(m_runtimeId, response.Port);
+    wil::unique_socket socket = lsw::windows::common::hvsocket::Connect(m_runtimeId, response.Port);
     return std::make_shared<WslCorePort>(socket.release(), m_runtimeId, m_socketTimeout);
 }
 
@@ -549,7 +549,7 @@ void WslCoreInstance::WslCorePort::DisconnectConsole(_In_ HANDLE)
 {
 }
 
-wsl::shared::SocketChannel& WslCoreInstance::WslCorePort::GetChannel()
+lsw::shared::SocketChannel& WslCoreInstance::WslCorePort::GetChannel()
 {
     return m_channel;
 }
@@ -562,12 +562,12 @@ wil::cs_leave_scope_exit WslCoreInstance::WslCorePort::Lock()
 void WslCoreInstance::WslCorePort::Receive(_Out_writes_bytes_(Length) PVOID Buffer, _In_ ULONG Length, _In_opt_ HANDLE ClientProcess, _In_ DWORD Timeout)
 {
     const auto span = gsl::make_span(reinterpret_cast<gsl::byte*>(Buffer), Length);
-    const ULONG bytesRead = wsl::windows::common::socket::Receive(m_channel.Socket(), span, ClientProcess, MSG_WAITALL, Timeout);
+    const ULONG bytesRead = lsw::windows::common::socket::Receive(m_channel.Socket(), span, ClientProcess, MSG_WAITALL, Timeout);
 
     THROW_HR_IF_MSG(E_UNEXPECTED, bytesRead < Length, "Expected %lu bytes, but received %lu", Length, bytesRead);
 }
 
 void WslCoreInstance::WslCorePort::Send(_In_reads_bytes_(Length) PVOID Buffer, _In_ ULONG Length)
 {
-    wsl::windows::common::socket::Send(m_channel.Socket(), gsl::make_span(reinterpret_cast<gsl::byte*>(Buffer), Length));
+    lsw::windows::common::socket::Send(m_channel.Socket(), gsl::make_span(reinterpret_cast<gsl::byte*>(Buffer), Length));
 }

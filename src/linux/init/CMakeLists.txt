@@ -19,8 +19,8 @@ set(SOURCES
     SecCompDispatcher.cpp
     util.cpp
     WslDistributionConfig.cpp
-    wslinfo.cpp
-    wslpath.cpp)
+    lswinfo.cpp
+    lswpath.cpp)
 
 set(HEADERS
     ../inc/lxwil.h
@@ -42,8 +42,8 @@ set(HEADERS
     SecCompDispatcher.h
     util.h
     WslDistributionConfig.h
-    wslinfo.h
-    wslpath.h)
+    lswinfo.h
+    lswpath.h)
 
 set(LINUX_CXXFLAGS ${LINUX_CXXFLAGS} -I "${CMAKE_CURRENT_LIST_DIR}/../netlinkutil")
 set(INIT_LIBRAIRIES ${COMMON_LINUX_LINK_LIBRARIES} netlinkutil plan9 mountutil configfile)

@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.25)
 set(CMAKE_SYSTEM_VERSION 10.0.26100.0)
 
-project(wsl)
+project(lsw)
 
 # Rationalize TARGET_PLATFORM
 if("${CMAKE_GENERATOR_PLATFORM}" STREQUAL "arm64" OR "${TARGET_PLATFORM}" STREQUAL "arm64")
@@ -56,16 +56,16 @@ restore_nuget_packages()
 parse_nuget_packages_versions()
 
 find_nuget_package(Microsoft.Direct3D.Linux DIRECT3D /build/native)
-find_nuget_package(Microsoft.Identity.MSAL.WSL.Proxy MSAL /build/native/bin)
+find_nuget_package(Microsoft.Identity.MSAL.LSW.Proxy MSAL /build/native/bin)
 find_nuget_package(Microsoft.RemoteDesktop.Client.MSRDC.SessionHost MSRDC /build/native/bin)
 find_nuget_package(Microsoft.Taef TAEF /)
 find_nuget_package(Microsoft.Windows.ImplementationLibrary WIL /)
-find_nuget_package(Microsoft.WSL.DeviceHost WSL_DEVICE_HOST /build/native)
-find_nuget_package(Microsoft.WSL.Kernel KERNEL /build/native)
-find_nuget_package(Microsoft.WSL.bsdtar BSDTARD /build/native/bin)
-find_nuget_package(Microsoft.WSL.LinuxSdk LINUXSDK /)
-find_nuget_package(Microsoft.WSL.TestDistro TEST_DISTRO /)
-find_nuget_package(Microsoft.WSLg WSLG /build/native/bin)
+find_nuget_package(Microsoft.LSW.DeviceHost LSW_DEVICE_HOST /build/native)
+find_nuget_package(Microsoft.LSW.Kernel KERNEL /build/native)
+find_nuget_package(Microsoft.LSW.bsdtar BSDTARD /build/native/bin)
+find_nuget_package(Microsoft.LSW.LinuxSdk LINUXSDK /)
+find_nuget_package(Microsoft.LSW.TestDistro TEST_DISTRO /)
+find_nuget_package(Microsoft.LSWg LSWG /build/native/bin)
 find_nuget_package(StrawberryPerl PERL /)
 find_nuget_package(vswhere VSWHERE /tools)
 find_nuget_package(Wix WIX /tools/net6.0/any)
@@ -73,14 +73,14 @@ find_nuget_package(Wix WIX /tools/net6.0/any)
 # Architecture-specific nuget packages from the OS repo.
 if (${TARGET_PLATFORM} STREQUAL "x64")
     find_nuget_package(Microsoft.DXCore.Linux.amd64fre DXCORE /build/native)
-    find_nuget_package(Microsoft.WSL.Dependencies.amd64fre WSLDEPS /build/native)
-    find_nuget_package(Microsoft.WSL.LxUtil.amd64fre LXUTIL /build/native)
+    find_nuget_package(Microsoft.LSW.Dependencies.amd64fre LSWDEPS /build/native)
+    find_nuget_package(Microsoft.LSW.LxUtil.amd64fre LXUTIL /build/native)
 endif()
 
 if (${TARGET_PLATFORM} STREQUAL "arm64")
     find_nuget_package(Microsoft.DXCore.Linux.arm64fre DXCORE /build/native)
-    find_nuget_package(Microsoft.WSL.Dependencies.arm64fre WSLDEPS /build/native)
-    find_nuget_package(Microsoft.WSL.LxUtil.arm64fre LXUTIL /build/native)
+    find_nuget_package(Microsoft.LSW.Dependencies.arm64fre LSWDEPS /build/native)
+    find_nuget_package(Microsoft.LSW.LxUtil.arm64fre LXUTIL /build/native)
 endif()
 
 # Wsl Settings packages
@@ -95,7 +95,7 @@ find_nuget_package(Microsoft.Xaml.Behaviors.WinUI.Managed XAML_BEHAVIORS /)
 find_nuget_package(WinUIEx WINUIEX /)
 
 set(BIN2CPIO ${CMAKE_CURRENT_LIST_DIR}/tools/bin2cpio/bin2cpio.pl)
-set(WSLG_TS_PLUGIN_DLL "WSLDVCPlugin.dll")
+set(LSWG_TS_PLUGIN_DLL "LSWDVCPlugin.dll")
 
 # Default to debug build if unspecified
 if(NOT CMAKE_BUILD_TYPE)
@@ -110,8 +110,8 @@ endif()
 
 # Optional target configuration
 
-if (NOT DEFINED WSL_BUILD_WSL_SETTINGS)
-    set(WSL_BUILD_WSL_SETTINGS true)
+if (NOT DEFINED LSW_BUILD_LSW_SETTINGS)
+    set(LSW_BUILD_LSW_SETTINGS true)
 endif ()
 
 # Only generate the build configuration that CMake is configured for
@@ -120,7 +120,7 @@ set(CMAKE_CONFIGURATION_TYPES "${CMAKE_BUILD_TYPE}" CACHE STRING "" FORCE)
 find_commit_hash(COMMIT_HASH)
 
 if (NOT PACKAGE_VERSION)
-    find_version(PACKAGE_VERSION WSL_NUGET_PACKAGE_VERSION) # Fetch the package version from git if not specified
+    find_version(PACKAGE_VERSION LSW_NUGET_PACKAGE_VERSION) # Fetch the package version from git if not specified
 endif ()
 
 if (NOT PACKAGE_VERSION MATCHES "^([0-9]+).([0-9]+).([0-9]+).([0-9]+)$")
@@ -151,10 +151,10 @@ set (GENERATED_DIR ${CMAKE_BINARY_DIR}/generated)
 file(MAKE_DIRECTORY ${GENERATED_DIR})
 
 set(PACKAGE_CERTIFICATE ${GENERATED_DIR}/dev-cert.pfx)
-file(CREATE_LINK ${WSL_DEVICE_HOST_SOURCE_DIR}/bin/${TARGET_PLATFORM}/wsldevicehost.dll ${BIN}/wsldevicehost.dll)
+file(CREATE_LINK ${LSW_DEVICE_HOST_SOURCE_DIR}/bin/${TARGET_PLATFORM}/lswdevicehost.dll ${BIN}/lswdevicehost.dll)
 file(CREATE_LINK ${LXUTIL_SOURCE_DIR}/bin/lxutil.dll ${BIN}/lxutil.dll)
-file(CREATE_LINK ${WSLG_SOURCE_DIR}/${TARGET_PLATFORM}/${WSLG_TS_PLUGIN_DLL} ${BIN}/${WSLG_TS_PLUGIN_DLL})
-file(CREATE_LINK ${WSLDEPS_SOURCE_DIR}/bin/wsldeps.dll ${BIN}/wsldeps.dll)
+file(CREATE_LINK ${LSWG_SOURCE_DIR}/${TARGET_PLATFORM}/${LSWG_TS_PLUGIN_DLL} ${BIN}/${LSWG_TS_PLUGIN_DLL})
+file(CREATE_LINK ${LSWDEPS_SOURCE_DIR}/bin/lswdeps.dll ${BIN}/lswdeps.dll)
 
 if (${SKIP_PACKAGE_SIGNING})
     set(PACKAGE_SIGN_COMMAND echo Skipped package signing for:)
@@ -197,27 +197,27 @@ add_compile_definitions(UNICODE
                         NOMINMAX
                         _CRT_SECURE_NO_WARNINGS
                         KERNEL_VERSION="${KERNEL_VERSION}"
-                        WSLDEPS_VERSION="${WSLDEPS_VERSION}"
-                        WSLG_VERSION="${WSLG_VERSION}"
-                        WSLG_TS_PLUGIN_DLL=L"${WSLG_TS_PLUGIN_DLL}"
-                        WSL_DEVICE_HOST_VERSION="${WSL_DEVICE_HOST_VERSION}"
+                        LSWDEPS_VERSION="${LSWDEPS_VERSION}"
+                        LSWG_VERSION="${LSWG_VERSION}"
+                        LSWG_TS_PLUGIN_DLL=L"${LSWG_TS_PLUGIN_DLL}"
+                        LSW_DEVICE_HOST_VERSION="${LSW_DEVICE_HOST_VERSION}"
                         COMMIT_HASH="${COMMIT_HASH}"
-                        WSL_PACKAGE_VERSION="${PACKAGE_VERSION}"
+                        LSW_PACKAGE_VERSION="${PACKAGE_VERSION}"
                         LXUTIL_VERSION="${LXUTIL_VERSION}"
                         MSRDC_VERSION="${MSRDC_VERSION}"
                         DIRECT3D_VERSION="${DIRECT3D_VERSION}"
                         DXCORE_VERSION="${DXCORE_VERSION}"
-                        WSL_PACKAGE_VERSION_MAJOR=${PACKAGE_VERSION_MAJOR}
-                        WSL_PACKAGE_VERSION_MINOR=${PACKAGE_VERSION_MINOR}
-                        WSL_PACKAGE_VERSION_REVISION=${PACKAGE_VERSION_REVISION}
-                        WSL_BUILD_WSL_SETTINGS=${WSL_BUILD_WSL_SETTINGS})
+                        LSW_PACKAGE_VERSION_MAJOR=${PACKAGE_VERSION_MAJOR}
+                        LSW_PACKAGE_VERSION_MINOR=${PACKAGE_VERSION_MINOR}
+                        LSW_PACKAGE_VERSION_REVISION=${PACKAGE_VERSION_REVISION}
+                        LSW_BUILD_LSW_SETTINGS=${LSW_BUILD_LSW_SETTINGS})
 
 if (${OFFICIAL_BUILD})
-    add_compile_definitions(WSL_OFFICIAL_BUILD)
+    add_compile_definitions(LSW_OFFICIAL_BUILD)
 endif()
 
-if (${WSL_BUILD_THIN_PACKAGE})
-    add_compile_definitions(WSL_DEV_THIN_MSI_PACKAGE="${BIN}/wsl.msi")
+if (${LSW_BUILD_THIN_PACKAGE})
+    add_compile_definitions(LSW_DEV_THIN_MSI_PACKAGE="${BIN}/lsw.msi")
 endif ()
 
 string(REPLACE "/Zi" "" CMAKE_CXX_FLAGS_DEBUG ${CMAKE_CXX_FLAGS_DEBUG})  # make sure /Zi is removed from the debug flags
@@ -234,7 +234,7 @@ if (${TARGET_PLATFORM} STREQUAL "x64")
 endif()
 
 # Common link libraries
-link_directories(${WSLDEPS_SOURCE_DIR}/lib/)
+link_directories(${LSWDEPS_SOURCE_DIR}/lib/)
 link_directories(${LXUTIL_SOURCE_DIR}/lib/)
 set(COMMON_LINK_LIBRARIES
     ws2_32.lib
@@ -254,7 +254,7 @@ set(COMMON_LINK_LIBRARIES
     MI.lib
     Wintrust.lib
     msi.lib
-    wsldeps.lib)
+    lswdeps.lib)
 
 # Linux
 if(${TARGET_PLATFORM} STREQUAL "" OR ${TARGET_PLATFORM} STREQUAL "x64")
@@ -290,9 +290,9 @@ endif()
 # Generate the clang-format script which contains a path to clang-format.exe
 configure_file(${CMAKE_CURRENT_LIST_DIR}/tools/FormatSource.ps1.in ${CMAKE_BINARY_DIR}/FormatSource.ps1)
 
-cmake_path(COMPARE "${wsl_SOURCE_DIR}" EQUAL "${wsl_BINARY_DIR}" BUILD_IN_SOURCE)
+cmake_path(COMPARE "${lsw_SOURCE_DIR}" EQUAL "${lsw_BINARY_DIR}" BUILD_IN_SOURCE)
 if (NOT ${BUILD_IN_SOURCE}) # Testing on 3.26 project_type_DIR paths appear canonicalized
-    file(CREATE_LINK ${LLVM_INSTALL_DIR}/clang-format.exe ${wsl_SOURCE_DIR}/tools/clang-format.exe COPY_ON_ERROR)
+    file(CREATE_LINK ${LLVM_INSTALL_DIR}/clang-format.exe ${lsw_SOURCE_DIR}/tools/clang-format.exe COPY_ON_ERROR)
 endif()
 
 set(LINUXSDK_PATH ${LINUXSDK_SOURCE_DIR}/${LLVM_ARCH})
@@ -307,8 +307,8 @@ set(LINUX_COMMON_FLAGS --gcc-toolchain=${LINUXSDK_PATH}
                        -isystem ${LINUXSDK_PATH}/include/c++/v1
                        -isystem ${LINUXSDK_PATH}/include
                        -isystem ${GSL_SOURCE_DIR}/include
-                       -isystem "${WSLDEPS_SOURCE_DIR}/include/lxcore"
-                       -isystem "${WSLDEPS_SOURCE_DIR}/include/schemas"
+                       -isystem "${LSWDEPS_SOURCE_DIR}/include/lxcore"
+                       -isystem "${LSWDEPS_SOURCE_DIR}/include/schemas"
                        -I "${CMAKE_CURRENT_LIST_DIR}/src/linux/inc"
                        -I "${CMAKE_CURRENT_LIST_DIR}/src/linux/mountutil"
                        -I "${CMAKE_CURRENT_LIST_DIR}/src/linux/plan9"
@@ -326,10 +326,10 @@ set(LINUX_COMMON_FLAGS --gcc-toolchain=${LINUXSDK_PATH}
                        -target ${LLVM_TARGET}
                        -D_GNU_SOURCE=1
                        -D_LARGEFILE64_SOURCE
-                       -DWSL_PACKAGE_VERSION="${PACKAGE_VERSION}"
-                       -DWSL_PACKAGE_VERSION_MAJOR=${PACKAGE_VERSION_MAJOR}
-                       -DWSL_PACKAGE_VERSION_MINOR=${PACKAGE_VERSION_MINOR}
-                       -DWSL_PACKAGE_VERSION_REVISION=${PACKAGE_VERSION_REVISION}
+                       -DLSW_PACKAGE_VERSION="${PACKAGE_VERSION}"
+                       -DLSW_PACKAGE_VERSION_MAJOR=${PACKAGE_VERSION_MAJOR}
+                       -DLSW_PACKAGE_VERSION_MINOR=${PACKAGE_VERSION_MINOR}
+                       -DLSW_PACKAGE_VERSION_REVISION=${PACKAGE_VERSION_REVISION}
                        )
 
 if (${TARGET_PLATFORM} STREQUAL "x64")
@@ -366,28 +366,28 @@ set(LINUX_LDFLAGS -target ${LLVM_TARGET}
 
 set(COMMON_LINUX_LINK_LIBRAIRIES configfile)
 
-if(DEFINED ENV{WSL_DEV_BINARY_PATH})
-    set(WSL_DEV_BINARY_PATH $ENV{WSL_DEV_BINARY_PATH})
+if(DEFINED ENV{LSW_DEV_BINARY_PATH})
+    set(LSW_DEV_BINARY_PATH $ENV{LSW_DEV_BINARY_PATH})
 endif()
 
-if (DEFINED WSL_DEV_BINARY_PATH) # Development shortcut to make the package smaller
-    add_compile_definitions(WSL_SYSTEM_DISTRO_PATH="${WSL_DEV_BINARY_PATH}/system.vhd"
-                            WSL_KERNEL_PATH="${WSL_DEV_BINARY_PATH}/kernel"
-                            WSL_KERNEL_MODULES_PATH="${WSL_DEV_BINARY_PATH}/modules.vhd"
-                            WSL_DEV_INSTALL_PATH="${WSL_DEV_BINARY_PATH}"
-                            WSL_GPU_LIB_PATH="${WSL_DEV_BINARY_PATH}/lib")
+if (DEFINED LSW_DEV_BINARY_PATH) # Development shortcut to make the package smaller
+    add_compile_definitions(LSW_SYSTEM_DISTRO_PATH="${LSW_DEV_BINARY_PATH}/system.vhd"
+                            LSW_KERNEL_PATH="${LSW_DEV_BINARY_PATH}/kernel"
+                            LSW_KERNEL_MODULES_PATH="${LSW_DEV_BINARY_PATH}/modules.vhd"
+                            LSW_DEV_INSTALL_PATH="${LSW_DEV_BINARY_PATH}"
+                            LSW_GPU_LIB_PATH="${LSW_DEV_BINARY_PATH}/lib")
 endif()
 
 # Common include paths
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/wil/include)
-include_directories(${WSLDEPS_SOURCE_DIR}/include)
-include_directories(${WSLDEPS_SOURCE_DIR}/include/Windows)
-include_directories(${WSLDEPS_SOURCE_DIR}/include/schemas)
-include_directories(${WSLDEPS_SOURCE_DIR}/include/lxcore)
+include_directories(${LSWDEPS_SOURCE_DIR}/include)
+include_directories(${LSWDEPS_SOURCE_DIR}/include/Windows)
+include_directories(${LSWDEPS_SOURCE_DIR}/include/schemas)
+include_directories(${LSWDEPS_SOURCE_DIR}/include/lxcore)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/src/shared/inc)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/src/windows/inc)
 include_directories(${CMAKE_CURRENT_BINARY_DIR}/src/windows/service/inc/${TARGET_PLATFORM}/${CMAKE_BUILD_TYPE})
-include_directories(${CMAKE_CURRENT_BINARY_DIR}/src/windows/wslinstaller/inc/${TARGET_PLATFORM}/${CMAKE_BUILD_TYPE})
+include_directories(${CMAKE_CURRENT_BINARY_DIR}/src/windows/lswinstaller/inc/${TARGET_PLATFORM}/${CMAKE_BUILD_TYPE})
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/src/linux/init/inc)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/src/windows/common)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/src/shared/configfile)
@@ -412,19 +412,19 @@ add_subdirectory(msipackage)
 add_subdirectory(msixinstaller)
 add_subdirectory(src/windows/common)
 add_subdirectory(src/windows/service)
-add_subdirectory(src/windows/wslinstaller/inc)
-add_subdirectory(src/windows/wslinstaller/stub)
-add_subdirectory(src/windows/wslinstaller/exe)
+add_subdirectory(src/windows/lswinstaller/inc)
+add_subdirectory(src/windows/lswinstaller/stub)
+add_subdirectory(src/windows/lswinstaller/exe)
 add_subdirectory(src/shared/configfile)
-add_subdirectory(src/windows/wsl)
-add_subdirectory(src/windows/wslg)
-add_subdirectory(src/windows/wslhost)
-add_subdirectory(src/windows/wslrelay)
-add_subdirectory(src/windows/wslinstall)
+add_subdirectory(src/windows/lsw)
+add_subdirectory(src/windows/lswg)
+add_subdirectory(src/windows/lswhost)
+add_subdirectory(src/windows/lswrelay)
+add_subdirectory(src/windows/lswinstall)
 
-if (WSL_BUILD_WSL_SETTINGS)
-    add_subdirectory(src/windows/libwsl)
-    add_subdirectory(src/windows/wslsettings)
+if (LSW_BUILD_LSW_SETTINGS)
+    add_subdirectory(src/windows/liblsw)
+    add_subdirectory(src/windows/lswsettings)
 endif()
 
 add_subdirectory(src/linux/netlinkutil)
@@ -440,6 +440,6 @@ if (DEFINED PIPELINE_BUILD_ID)
 endif()
 
 
-if(DEFINED ENV{WSL_POST_BUILD_COMMAND})
-    set(WSL_POST_BUILD_COMMAND $ENV{WSL_POST_BUILD_COMMAND})
+if(DEFINED ENV{LSW_POST_BUILD_COMMAND})
+    set(LSW_POST_BUILD_COMMAND $ENV{LSW_POST_BUILD_COMMAND})
 endif ()

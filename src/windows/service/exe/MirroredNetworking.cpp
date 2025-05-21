@@ -7,9 +7,9 @@
 #include "WslMirroredNetworking.h"
 #include "WslCoreVm.h"
 
-using wsl::core::MirroredNetworking;
-using wsl::core::networking::NetworkEndpoint;
-using namespace wsl::shared;
+using lsw::core::MirroredNetworking;
+using lsw::core::networking::NetworkEndpoint;
+using namespace lsw::shared;
 
 MirroredNetworking::MirroredNetworking(HCS_SYSTEM system, GnsChannel&& gnsChannel, const Config& config, GUID runtimeId, wil::unique_socket&& dnsHvsocket) :
     m_system(system), m_runtimeId(runtimeId), m_config(config), m_gnsChannel(std::move(gnsChannel))
@@ -63,23 +63,23 @@ MirroredNetworking::~MirroredNetworking()
 }
 
 // static
-bool MirroredNetworking::IsHyperVFirewallSupported(const wsl::core::Config& vmConfig) noexcept
+bool MirroredNetworking::IsHyperVFirewallSupported(const lsw::core::Config& vmConfig) noexcept
 {
     PCSTR executionStep = "";
     try
     {
-        const auto hyperVFirewallSupport = wsl::core::networking::GetHyperVFirewallSupportVersion(vmConfig.FirewallConfig);
+        const auto hyperVFirewallSupport = lsw::core::networking::GetHyperVFirewallSupportVersion(vmConfig.FirewallConfig);
 
-        if (hyperVFirewallSupport == wsl::core::networking::HyperVFirewallSupport::None)
+        if (hyperVFirewallSupport == lsw::core::networking::HyperVFirewallSupport::None)
         {
-            WSL_LOG("IsHyperVFirewallSupported returning false: No Hyper-V Firewall API present");
+            LSW_LOG("IsHyperVFirewallSupported returning false: No Hyper-V Firewall API present");
             return false;
         }
 
-        if (hyperVFirewallSupport == wsl::core::networking::HyperVFirewallSupport::Version1)
+        if (hyperVFirewallSupport == lsw::core::networking::HyperVFirewallSupport::Version1)
         {
-            // not allowing Hyper-V Firewall support with WSL with just the Version1 Hyper-V Firewall API
-            WSL_LOG("IsHyperVFirewallSupported returning false: WSL requires Hyper-V Firewall version2 but version1 is present");
+            // not allowing Hyper-V Firewall support with LSW with just the Version1 Hyper-V Firewall API
+            LSW_LOG("IsHyperVFirewallSupported returning false: LSW requires Hyper-V Firewall version2 but version1 is present");
             return false;
         }
 
@@ -87,17 +87,17 @@ bool MirroredNetworking::IsHyperVFirewallSupported(const wsl::core::Config& vmCo
         // Check to see if the network is already created without Hyper-V Firewall.
         // HNS only supports one networking configuration per boot cycle, so if it was configured with the
         // Mirrored flag but without the Hyper-V Firewall flag, then we MUST NOT attempt to enable Hyper-V Firewall.
-        for (const auto& id : wsl::core::networking::EnumerateNetworks())
+        for (const auto& id : lsw::core::networking::EnumerateNetworks())
         {
             executionStep = "HcnOpenNetwork";
-            auto network = wsl::core::networking::OpenNetwork(id);
+            auto network = lsw::core::networking::OpenNetwork(id);
 
             executionStep = "HcnQueryNetworkProperties";
-            auto [networkProperties, propertiesString] = wsl::core::networking::QueryNetworkProperties(network.get());
-            if (WI_IsFlagSet(static_cast<uint32_t>(networkProperties.Flags), WI_EnumValue(wsl::shared::hns::NetworkFlags::EnableFlowSteering)) &&
-                !WI_IsFlagSet(static_cast<uint32_t>(networkProperties.Flags), WI_EnumValue(wsl::shared::hns::NetworkFlags::EnableFirewall)))
+            auto [networkProperties, propertiesString] = lsw::core::networking::QueryNetworkProperties(network.get());
+            if (WI_IsFlagSet(static_cast<uint32_t>(networkProperties.Flags), WI_EnumValue(lsw::shared::hns::NetworkFlags::EnableFlowSteering)) &&
+                !WI_IsFlagSet(static_cast<uint32_t>(networkProperties.Flags), WI_EnumValue(lsw::shared::hns::NetworkFlags::EnableFirewall)))
             {
-                WSL_LOG(
+                LSW_LOG(
                     "IsHyperVFirewallSupported returning false: HNS Mirrored-network already created without Hyper-V Firewall "
                     "support, cannot enable Hyper-V Firewall");
                 return false;
@@ -109,7 +109,7 @@ bool MirroredNetworking::IsHyperVFirewallSupported(const wsl::core::Config& vmCo
     catch (...)
     {
         const auto hr = wil::ResultFromCaughtException();
-        WSL_LOG(
+        LSW_LOG(
             "IsHyperVFirewallSupportedFailed",
             TraceLoggingHResult(hr, "result"),
             TraceLoggingValue(executionStep, "executionStep"),
@@ -155,7 +155,7 @@ bool MirroredNetworking::IsExternalInterfaceConstrained(const HCN_NETWORK networ
             bool interfaceConstraintPresent = false;
             while (adapter != nullptr)
             {
-                if (wsl::shared::string::IsEqual(interfaceConstraint, adapter->FriendlyName, true))
+                if (lsw::shared::string::IsEqual(interfaceConstraint, adapter->FriendlyName, true))
                 {
                     interfaceConstraintPresent = true;
                     break;
@@ -169,14 +169,14 @@ bool MirroredNetworking::IsExternalInterfaceConstrained(const HCN_NETWORK networ
                 GUID endpointInterfaceGuid{};
                 wil::unique_cotaskmem_string error;
                 wil::unique_cotaskmem_string networkPropertiesString;
-                wsl::shared::hns::HNSNetwork networkProperties;
+                lsw::shared::hns::HNSNetwork networkProperties;
                 try
                 {
-                    std::tie(networkProperties, networkPropertiesString) = wsl::core::networking::QueryNetworkProperties(network);
+                    std::tie(networkProperties, networkPropertiesString) = lsw::core::networking::QueryNetworkProperties(network);
                 }
                 catch (...)
                 {
-                    WSL_LOG(
+                    LSW_LOG(
                         "IsExternalInterfaceConstrainedFailed",
                         TraceLoggingHResult(wil::ResultFromCaughtException(), "result"),
                         TraceLoggingValue("HcnQueryNetworkProperties", "executionStep"),
@@ -198,7 +198,7 @@ bool MirroredNetworking::IsExternalInterfaceConstrained(const HCN_NETWORK networ
                     // There is an external interface constraint configured, the constrained
                     // interface is present, and the interface in question is the ExternalInterfaceConstraint.
                     // This interface is allowed to operate normally and must not be constrained.
-                    WSL_LOG(
+                    LSW_LOG(
                         "IsExternalInterfaceConstrainedInterface",
                         TraceLoggingValue(endpointInterfaceGuid, "InterfaceGuid"),
                         TraceLoggingValue(
@@ -211,7 +211,7 @@ bool MirroredNetworking::IsExternalInterfaceConstrained(const HCN_NETWORK networ
                 // There is an external interface constraint configured and the constrained
                 // interface is present, but this is not the ExternalInterfaceConstraint.
                 // Thus, this interface must be constrained.
-                WSL_LOG(
+                LSW_LOG(
                     "IsExternalInterfaceConstrainedInterface",
                     TraceLoggingValue(endpointInterfaceGuid, "InterfaceGuid"),
                     TraceLoggingValue(
@@ -222,7 +222,7 @@ bool MirroredNetworking::IsExternalInterfaceConstrained(const HCN_NETWORK networ
             }
             // There is an ExternalInterfaceConstraint configured, but it is not present/up.
             // Thus, this interface must be constrained.
-            WSL_LOG(
+            LSW_LOG(
                 "IsExternalInterfaceConstrainedInterface",
                 TraceLoggingValue(
                     "ExternalInterfaceConstraint is configured and the ExternalInterfaceConstraint is NOT "
@@ -233,7 +233,7 @@ bool MirroredNetworking::IsExternalInterfaceConstrained(const HCN_NETWORK networ
 
         // There is no ExternalInterfaceConstraint configured.
         // This, this interface must NOT be constrained.
-        WSL_LOG(
+        LSW_LOG(
             "IsExternalInterfaceConstrainedInterface",
             TraceLoggingValue("ExternalInterfaceConstraint is not configured. All interfaces must NOT be constrained.", "state"));
         return false;
@@ -274,7 +274,7 @@ void MirroredNetworking::Initialize()
             // N.B. Mirrored networks may not yet exist and the NetworkManager c'tor will cause HCS to create them asynchronously.
             //      This is done by the query submitted to HcnEnumerateNetworks.
             //      Once the networks are created, the network change callback will be invoked and endpoints will be hot-added.
-            // implement wsl::core::networking::GnsMessageCallbackWithCallbackResult so WSL can serialize messages to Linux
+            // implement lsw::core::networking::GnsMessageCallbackWithCallbackResult so LSW can serialize messages to Linux
             auto networkManagerGnsMessageCallbackWithCallbackResult = [this](
                                                                           LX_MESSAGE_TYPE messageType,
                                                                           const std::wstring& notificationString,
@@ -284,7 +284,7 @@ void MirroredNetworking::Initialize()
                 return NetworkManagerGnsMessageCallback(messageType, notificationString, callbackFlags, returnedResult);
             };
 
-            m_networkManager = std::make_unique<wsl::core::networking::WslMirroredNetworkManager>(
+            m_networkManager = std::make_unique<lsw::core::networking::WslMirroredNetworkManager>(
                 m_system, m_config, std::move(networkManagerGnsMessageCallbackWithCallbackResult), std::move(addNetworkEndpointCallback), m_ephemeralPortRange);
 
             // Register notifications for DNS suffix changes
@@ -310,7 +310,7 @@ void MirroredNetworking::Initialize()
         catch (...)
         {
             const auto hr = wil::ResultFromCaughtException();
-            WSL_LOG(
+            LSW_LOG(
                 "FailedToStartNetworkManager",
                 TraceLoggingValue(m_runtimeId, "vmId"),
                 TraceLoggingValue(hr, "error"),
@@ -334,7 +334,7 @@ void MirroredNetworking::Initialize()
         const auto goalStateHr = m_networkManager->WaitForMirroredGoalState();
         if (FAILED(goalStateHr))
         {
-            WSL_LOG(
+            LSW_LOG(
                 "WaitForMirroredGoalStateFailed",
                 TraceLoggingHResult(goalStateHr, "hr"),
                 TraceLoggingValue(m_config.EnableDnsTunneling, "DnsTunnelingEnabled"),
@@ -398,21 +398,21 @@ void MirroredNetworking::AddNetworkEndpoint(const GUID& NetworkId) noexcept
 
         if (m_networkManager->DoesEndpointExist(NetworkId))
         {
-            WSL_LOG(
+            LSW_LOG(
                 "MirroredNetworking::AddNetworkEndpoint - NetworkId already exists", TraceLoggingValue(NetworkId, "networkId"));
             return;
         }
 
         executionStep = "HcnOpenNetwork";
-        auto network = wsl::core::networking::OpenNetwork(NetworkId);
-        WSL_LOG("MirroredNetworking::AddNetworkEndpoint [HcnOpenNetwork]", TraceLoggingValue(NetworkId, "networkId"));
+        auto network = lsw::core::networking::OpenNetwork(NetworkId);
+        LSW_LOG("MirroredNetworking::AddNetworkEndpoint [HcnOpenNetwork]", TraceLoggingValue(NetworkId, "networkId"));
 
         // Query the network properties for diagnostic purposes only.
-        wsl::shared::hns::HNSNetwork properties;
+        lsw::shared::hns::HNSNetwork properties;
         wil::unique_cotaskmem_string networkProperties;
         executionStep = "HcnQueryNetworkProperties";
-        std::tie(properties, networkProperties) = wsl::core::networking::QueryNetworkProperties(network.get());
-        WSL_LOG(
+        std::tie(properties, networkProperties) = lsw::core::networking::QueryNetworkProperties(network.get());
+        LSW_LOG(
             "MirroredNetworking::AddNetworkEndpoint [HcnQueryNetworkProperties]",
             TraceLoggingValue(NetworkId, "networkId"),
             TraceLoggingValue(networkProperties.get(), "networkProperties"));
@@ -424,7 +424,7 @@ void MirroredNetworking::AddNetworkEndpoint(const GUID& NetworkId) noexcept
         if (existingEndpointValue != m_networkIdMappings.end())
         {
             endpointId = existingEndpointValue->second;
-            WSL_LOG(
+            LSW_LOG(
                 "MirroredNetworking::AddNetworkEndpoint [using existing endpoint id]",
                 TraceLoggingValue(NetworkId, "networkId"),
                 TraceLoggingValue(endpointId, "endpointId"));
@@ -473,7 +473,7 @@ void MirroredNetworking::AddNetworkEndpoint(const GUID& NetworkId) noexcept
         else
         {
             // If Hyper-V Firewall is not supported for this scenario, only configure the basic HNS endpoint object
-            wsl::shared::hns::HNSEndpoint settings{};
+            lsw::shared::hns::HNSEndpoint settings{};
             settings.VirtualNetwork = NetworkId;
             endpointSettings = ToJsonW(settings);
         }
@@ -483,7 +483,7 @@ void MirroredNetworking::AddNetworkEndpoint(const GUID& NetworkId) noexcept
         wil::unique_cotaskmem_string error;
         auto result = HcnCreateEndpoint(network.get(), endpointInfo.EndpointId, endpointSettings.c_str(), &endpointInfo.Endpoint, &error);
 
-        WSL_LOG(
+        LSW_LOG(
             "MirroredNetworking::AddNetworkEndpoint [HcnCreateEndpoint]",
             TraceLoggingValue(NetworkId, "HNSEndpoint::NetworkId"),
             TraceLoggingValue(result, "result"),
@@ -493,7 +493,7 @@ void MirroredNetworking::AddNetworkEndpoint(const GUID& NetworkId) noexcept
         wil::unique_cotaskmem_string propertiesString;
         executionStep = "HcnQueryEndpointProperties";
         result = HcnQueryEndpointProperties(endpointInfo.Endpoint.get(), nullptr, &propertiesString, &error);
-        WSL_LOG(
+        LSW_LOG(
             "MirroredNetworking::AddNetworkEndpoint [HcnQueryEndpointProperties]",
             TraceLoggingValue(endpointInfo.EndpointId, "endpointId"),
             TraceLoggingValue(result, "result"),
@@ -507,7 +507,7 @@ void MirroredNetworking::AddNetworkEndpoint(const GUID& NetworkId) noexcept
         endpointInfo.Network = m_networkManager->GetEndpointSettings(endpointProperties);
         endpointInfo.InterfaceGuid = endpointProperties.InterfaceConstraint.InterfaceGuid;
 
-        WSL_LOG(
+        LSW_LOG(
             "MirroredNetworking::AddNetworkEndpoint",
             TraceLoggingValue(endpointInfo.EndpointId, "endpointId"),
             TraceLoggingValue(endpointInfo.InterfaceGuid, "endpointInterfaceGuid"),
@@ -525,7 +525,7 @@ void MirroredNetworking::AddNetworkEndpoint(const GUID& NetworkId) noexcept
             // Register for network connectivity change notifications to update the MTU.
             LOG_IF_WIN32_ERROR(NotifyNetworkConnectivityHintChange(
                 [](PVOID context, NL_NETWORK_CONNECTIVITY_HINT hint) {
-                    WSL_LOG(
+                    LSW_LOG(
                         "MirroredNetworking::NotifyNetworkConnectivityHintChange fired",
                         TraceLoggingValue(static_cast<uint32_t>(hint.ConnectivityLevel), "connectivityLevel"),
                         TraceLoggingValue(static_cast<uint32_t>(hint.ConnectivityCost), "connectivityCost"));
@@ -547,7 +547,7 @@ void MirroredNetworking::AddNetworkEndpoint(const GUID& NetworkId) noexcept
             LOG_IF_WIN32_ERROR(NotifyIpInterfaceChange(
                 AF_UNSPEC,
                 [](PVOID context, PMIB_IPINTERFACE_ROW row, MIB_NOTIFICATION_TYPE) {
-                    WSL_LOG(
+                    LSW_LOG(
                         "MirroredNetworking::NotifyIpInterfaceChange fired",
                         TraceLoggingValue(row->Family, "family"),
                         TraceLoggingValue(row->InterfaceIndex, "ifIndex"));
@@ -569,7 +569,7 @@ void MirroredNetworking::AddNetworkEndpoint(const GUID& NetworkId) noexcept
             LOG_IF_WIN32_ERROR(NotifyRouteChange2(
                 AF_UNSPEC,
                 [](PVOID context, PMIB_IPFORWARD_ROW2 row, MIB_NOTIFICATION_TYPE) {
-                    WSL_LOG("MirroredNetworking::NotifyRouteChange2 fired", TraceLoggingValue(row->InterfaceIndex, "ifIndex"));
+                    LSW_LOG("MirroredNetworking::NotifyRouteChange2 fired", TraceLoggingValue(row->InterfaceIndex, "ifIndex"));
 
                     auto* thisPtr = static_cast<MirroredNetworking*>(context);
                     thisPtr->m_networkingQueue.submit([thisPtr] {
@@ -588,7 +588,7 @@ void MirroredNetworking::AddNetworkEndpoint(const GUID& NetworkId) noexcept
             LOG_IF_WIN32_ERROR(NotifyUnicastIpAddressChange(
                 AF_UNSPEC,
                 [](PVOID context, PMIB_UNICASTIPADDRESS_ROW row, MIB_NOTIFICATION_TYPE) {
-                    WSL_LOG(
+                    LSW_LOG(
                         "MirroredNetworking::NotifyUnicastIpAddressChange fired",
                         TraceLoggingValue(row->InterfaceIndex, "ifIndex"));
 
@@ -608,7 +608,7 @@ void MirroredNetworking::AddNetworkEndpoint(const GUID& NetworkId) noexcept
         // we've successfully added a new endpoint - track that Id
         if (existingEndpointValue == m_networkIdMappings.end())
         {
-            WSL_LOG(
+            LSW_LOG(
                 "MirroredNetworking::AddNetworkEndpoint [tracking new endpoint]",
                 TraceLoggingValue(NetworkId, "networkId"),
                 TraceLoggingValue(endpointId, "endpointId"));
@@ -617,7 +617,7 @@ void MirroredNetworking::AddNetworkEndpoint(const GUID& NetworkId) noexcept
     }
     catch (...)
     {
-        WSL_LOG(
+        LSW_LOG(
             "AddNetworkEndpointFailure",
             TraceLoggingHResult(wil::ResultFromCaughtException(), "result"),
             TraceLoggingValue(executionStep, "executionStep"),
@@ -646,9 +646,9 @@ try
 
     // a network property changed on some interface that HNS is tracking
     // we're using this notification as a trigger to rediscover the preferred interface
-    WSL_LOG(
+    LSW_LOG(
         "MirroredNetworking::OnNetworkEndpointChange [GNS server notification]",
-        TraceLoggingValue(wsl::shared::string::GuidToString<wchar_t>(EndpointId).c_str(), "Endpoint"),
+        TraceLoggingValue(lsw::shared::string::GuidToString<wchar_t>(EndpointId).c_str(), "Endpoint"),
         TraceLoggingValue(Settings, "Payload"));
     m_networkManager->OnNetworkEndpointChange();
 
@@ -664,7 +664,7 @@ try
     if (returnedValueFromGns)
     {
         *returnedValueFromGns = ERROR_FATAL_APP_EXIT;
-        WI_ASSERT(WI_IsFlagSet(callbackFlags, wsl::core::networking::GnsCallbackFlags::Wait));
+        WI_ASSERT(WI_IsFlagSet(callbackFlags, lsw::core::networking::GnsCallbackFlags::Wait));
     }
 
     auto sendGnsMessage =
@@ -673,10 +673,10 @@ try
             {
                 auto retryCount = 0ul;
                 // RetryWithTimeout throws if fails after the timeout has elapsed - which is caught and returned by m_gnsMessageQueue below
-                return wsl::shared::retry::RetryWithTimeout<HRESULT>(
+                return lsw::shared::retry::RetryWithTimeout<HRESULT>(
                     [&]() {
                         const auto hr = wil::ResultFromException([&] {
-                            if (returnedValueFromGns && WI_IsFlagSet(callbackFlags, wsl::core::networking::GnsCallbackFlags::Wait))
+                            if (returnedValueFromGns && WI_IsFlagSet(callbackFlags, lsw::core::networking::GnsCallbackFlags::Wait))
                             {
                                 *returnedValueFromGns =
                                     m_gnsChannel.SendNetworkDeviceMessageReturnResult(messageType, capturedNotificationString.c_str());
@@ -686,7 +686,7 @@ try
                                 m_gnsChannel.SendNetworkDeviceMessage(messageType, capturedNotificationString.c_str());
                             }
                         });
-                        WSL_LOG(
+                        LSW_LOG(
                             "MirroredNetworking::NetworkManagerGnsMessageCallback",
                             TraceLoggingValue(ToString(messageType), "messageType"),
                             TraceLoggingValue(capturedNotificationString.c_str(), "notificationString"),
@@ -703,7 +703,7 @@ try
             CATCH_RETURN()
         };
 
-    if (WI_IsFlagSet(callbackFlags, wsl::core::networking::GnsCallbackFlags::Wait))
+    if (WI_IsFlagSet(callbackFlags, lsw::core::networking::GnsCallbackFlags::Wait))
     {
         return m_gnsMessageQueue.submit_and_wait(std::move(sendGnsMessage));
     }
@@ -716,9 +716,9 @@ CATCH_RETURN()
 void MirroredNetworking::GuestNetworkServiceCallback(DWORD NotificationType, HRESULT NotificationStatus, _In_opt_ PCWSTR NotificationData) noexcept
 try
 {
-    WSL_LOG(
+    LSW_LOG(
         "MirroredNetworking::GuestNetworkServiceCallback",
-        TraceLoggingValue(wsl::windows::common::stringify::HcnNotificationsToString(NotificationType), "NotificationType"),
+        TraceLoggingValue(lsw::windows::common::stringify::HcnNotificationsToString(NotificationType), "NotificationType"),
         TraceLoggingValue(NotificationStatus, "NotificationStatus"),
         TraceLoggingValue(NotificationData, "NotificationData"));
 

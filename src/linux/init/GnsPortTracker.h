@@ -19,7 +19,7 @@
 class GnsPortTracker
 {
 public:
-    GnsPortTracker(std::shared_ptr<wsl::shared::SocketChannel> hvSocketChannel, NetlinkChannel&& netlinkChannel, std::shared_ptr<SecCompDispatcher> seccompDispatcher);
+    GnsPortTracker(std::shared_ptr<lsw::shared::SocketChannel> hvSocketChannel, NetlinkChannel&& netlinkChannel, std::shared_ptr<SecCompDispatcher> seccompDispatcher);
 
     GnsPortTracker(const GnsPortTracker&) = delete;
     GnsPortTracker(GnsPortTracker&&) = delete;
@@ -127,7 +127,7 @@ private:
     static int GetSocketProtocol(int Pid, int Fd);
 
     std::map<PortAllocation, std::optional<time_t>> m_allocatedPorts;
-    std::shared_ptr<wsl::shared::SocketChannel> m_hvSocketChannel;
+    std::shared_ptr<lsw::shared::SocketChannel> m_hvSocketChannel;
     NetlinkChannel m_channel;
     std::promise<PortRefreshResult> m_allocatedPortsRefresh;
 

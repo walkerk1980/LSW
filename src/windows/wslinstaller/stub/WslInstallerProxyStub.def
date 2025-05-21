@@ -1,4 +1,4 @@
-LIBRARY wslinstallerproxystub.dll
+LIBRARY lswinstallerproxystub.dll
 
 EXPORTS
     DllGetClassObject      PRIVATE

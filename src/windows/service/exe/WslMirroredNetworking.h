@@ -8,7 +8,7 @@ Module Name:
 
 Abstract:
 
-    This file contains WSL mirrored networking function declarations.
+    This file contains LSW mirrored networking function declarations.
 
 --*/
 
@@ -35,11 +35,11 @@ Abstract:
 #include "IMirroredNetworkManager.h"
 
 /// <summary>
-/// Creates network-related information for WSL.
+/// Creates network-related information for LSW.
 /// </summary>
-namespace wsl::core::networking {
+namespace lsw::core::networking {
 
-class WslMirroredNetworkManager final : public wsl::core::networking::IMirroredNetworkManager
+class WslMirroredNetworkManager final : public lsw::core::networking::IMirroredNetworkManager
 {
 public:
     WslMirroredNetworkManager(
@@ -63,7 +63,7 @@ public:
 
     _Check_return_ HRESULT EnumerateNetworks(_Out_ std::vector<GUID>& NetworkIds) const noexcept override;
 
-    void AddEndpoint(NetworkEndpoint&& newEndpoint, wsl::shared::hns::HNSEndpoint&& endpointProperties) noexcept override;
+    void AddEndpoint(NetworkEndpoint&& newEndpoint, lsw::shared::hns::HNSEndpoint&& endpointProperties) noexcept override;
 
     void SendCreateNotificationsForInitialEndpoints() noexcept override;
 
@@ -80,7 +80,7 @@ public:
     // Client should call this if they detect the network is in a bad state and needs to be reconnected
     void ReconnectGuestNetwork() override;
 
-    std::shared_ptr<NetworkSettings> GetEndpointSettings(const wsl::shared::hns::HNSEndpoint& endpointProperties) const override;
+    std::shared_ptr<NetworkSettings> GetEndpointSettings(const lsw::shared::hns::HNSEndpoint& endpointProperties) const override;
 
     void TraceLoggingRundown() const override;
 
@@ -108,7 +108,7 @@ private:
 
     struct EndpointTracking
     {
-        EndpointTracking(NetworkEndpoint&& networkEndpoint, wsl::shared::hns::HNSEndpoint&& hnsEndpoint, uint32_t retryCount) :
+        EndpointTracking(NetworkEndpoint&& networkEndpoint, lsw::shared::hns::HNSEndpoint&& hnsEndpoint, uint32_t retryCount) :
             m_networkEndpoint{std::move(networkEndpoint)}, m_hnsEndpoint{std::move(hnsEndpoint)}, m_retryCount{retryCount}
         {
         }
@@ -119,7 +119,7 @@ private:
         EndpointTracking& operator=(EndpointTracking&&) = default;
 
         NetworkEndpoint m_networkEndpoint;
-        wsl::shared::hns::HNSEndpoint m_hnsEndpoint;
+        lsw::shared::hns::HNSEndpoint m_hnsEndpoint;
         uint32_t m_retryCount = 0;
     };
 
@@ -143,17 +143,17 @@ private:
 
     _Requires_lock_held_(m_networkLock)
     _Check_return_ HRESULT SendAddressRequestToGns(
-        const NetworkEndpoint& endpoint, const TrackedIpAddress& address, wsl::shared::hns::ModifyRequestType requestType) noexcept;
+        const NetworkEndpoint& endpoint, const TrackedIpAddress& address, lsw::shared::hns::ModifyRequestType requestType) noexcept;
 
     _Requires_lock_held_(m_networkLock)
-    _Check_return_ HRESULT SendRouteRequestToGns(const NetworkEndpoint& endpoint, const TrackedRoute& route, wsl::shared::hns::ModifyRequestType requestType) noexcept;
+    _Check_return_ HRESULT SendRouteRequestToGns(const NetworkEndpoint& endpoint, const TrackedRoute& route, lsw::shared::hns::ModifyRequestType requestType) noexcept;
 
     _Requires_lock_held_(m_networkLock)
     _Check_return_ HRESULT SendLoopbackRequestToGns(
-        const NetworkEndpoint& endpoint, const TrackedIpAddress& address, wsl::shared::hns::OperationType operation) noexcept;
+        const NetworkEndpoint& endpoint, const TrackedIpAddress& address, lsw::shared::hns::OperationType operation) noexcept;
 
     _Requires_lock_held_(m_networkLock)
-    _Check_return_ HRESULT SendDnsRequestToGns(const NetworkEndpoint& endpoint, const DnsInfo& dnsInfo, wsl::shared::hns::ModifyRequestType requestType) noexcept;
+    _Check_return_ HRESULT SendDnsRequestToGns(const NetworkEndpoint& endpoint, const DnsInfo& dnsInfo, lsw::shared::hns::ModifyRequestType requestType) noexcept;
 
     _Requires_lock_held_(m_networkLock)
     _Check_return_ HRESULT SendInterfaceRequestToGns(const NetworkEndpoint& endpoint) noexcept;
@@ -202,7 +202,7 @@ private:
     static void __stdcall DebounceCreateEndpointFailureTimerFired(_Inout_ PTP_CALLBACK_INSTANCE, _Inout_opt_ PVOID Context, _Inout_ PTP_TIMER);
 
     // Member variables tracking the WinRT and COM networking APIs required
-    wsl::windows::common::helpers::unique_mta_cookie m_mtaCookie;
+    lsw::windows::common::helpers::unique_mta_cookie m_mtaCookie;
     wil::com_ptr<ABI::Windows::Networking::Connectivity::INetworkInformationStatics> m_networkInformationStatics;
     wil::com_ptr<INetworkListManager> m_netListManager;
     wil::com_ptr<INetworkEvents> m_netListManagerEventSink;
@@ -212,7 +212,7 @@ private:
 
     // Members tracking all endpoints created in the container, and the current networks connected
     _Guarded_by_(m_networkLock) std::vector<NetworkEndpoint> m_networkEndpoints;
-    _Guarded_by_(m_networkLock) std::set<GUID, wsl::windows::common::helpers::GuidLess> m_hostConnectedInterfaces;
+    _Guarded_by_(m_networkLock) std::set<GUID, lsw::windows::common::helpers::GuidLess> m_hostConnectedInterfaces;
 
     // Members tracking callback functors back through the parent
     _Guarded_by_(m_networkLock) GnsMessageCallbackWithCallbackResult m_callbackForGnsMessage;
@@ -318,4 +318,4 @@ private:
     };
 };
 
-} // namespace wsl::core::networking
+} // namespace lsw::core::networking

@@ -19,22 +19,22 @@ extern wil::unique_event g_stopEvent;
 
 std::wstring GetMsiPackagePath()
 {
-#ifdef WSL_DEV_THIN_MSI_PACKAGE
+#ifdef LSW_DEV_THIN_MSI_PACKAGE
 
-    static_assert(!wsl::shared::OfficialBuild);
+    static_assert(!lsw::shared::OfficialBuild);
 
-    return std::filesystem::weakly_canonical(WSL_DEV_THIN_MSI_PACKAGE).wstring();
+    return std::filesystem::weakly_canonical(LSW_DEV_THIN_MSI_PACKAGE).wstring();
 
 #endif
 
-    return (wsl::windows::common::wslutil::GetBasePath() / L"wsl.msi").wstring();
+    return (lsw::windows::common::lswutil::GetBasePath() / L"lsw.msi").wstring();
 }
 
 std::optional<std::wstring> GetUpgradeLogFileLocation()
 try
 {
-    const auto key = wsl::windows::common::registry::OpenLxssMachineKey();
-    const auto path = wsl::windows::common::registry::ReadString(key.get(), L"MSI", L"UpgradeLogFile", L"");
+    const auto key = lsw::windows::common::registry::OpenLxssMachineKey();
+    const auto path = lsw::windows::common::registry::ReadString(key.get(), L"MSI", L"UpgradeLogFile", L"");
     if (path.empty())
     {
         return {};
@@ -75,10 +75,10 @@ std::pair<UINT, std::wstring> InstallMsipackageImpl()
         }
     };
 
-    auto result = wsl::windows::common::wslutil::UpgradeViaMsi(
+    auto result = lsw::windows::common::lswutil::UpgradeViaMsi(
         GetMsiPackagePath().c_str(), L"SKIPMSIX=1", logFile.has_value() ? logFile->c_str() : nullptr, messageCallback);
 
-    WSL_LOG("MSIUpgradeResult", TraceLoggingValue(result, "result"), TraceLoggingValue(errors.c_str(), "errorMessage"));
+    LSW_LOG("MSIUpgradeResult", TraceLoggingValue(result, "result"), TraceLoggingValue(errors.c_str(), "errorMessage"));
 
     return {result, errors};
 }
@@ -106,16 +106,16 @@ bool IsUpdateNeeded()
 {
     try
     {
-        const auto key = wsl::windows::common::registry::OpenLxssMachineKey();
+        const auto key = lsw::windows::common::registry::OpenLxssMachineKey();
 
-        const auto installedVersion = wsl::windows::common::registry::ReadString(key.get(), L"MSI", L"Version", L"");
+        const auto installedVersion = lsw::windows::common::registry::ReadString(key.get(), L"MSI", L"Version", L"");
 
-        WSL_LOG(
+        LSW_LOG(
             "DetectedInstalledVersion",
             TraceLoggingLevel(WINEVENT_LEVEL_INFO),
             TraceLoggingValue(installedVersion.c_str(), "InstalledVersion"));
 
-        return installedVersion.empty() || wsl::windows::common::wslutil::ParseWslPackageVersion(installedVersion) < wsl::shared::PackageVersion;
+        return installedVersion.empty() || lsw::windows::common::lswutil::ParseWslPackageVersion(installedVersion) < lsw::shared::PackageVersion;
     }
     catch (...)
     {

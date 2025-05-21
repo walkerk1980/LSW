@@ -47,7 +47,7 @@ extern bool g_lxcoreInitialized;
 
 using namespace std::placeholders;
 using namespace Microsoft::WRL;
-using namespace wsl::windows::common::filesystem;
+using namespace lsw::windows::common::filesystem;
 
 LxssInstance::LxssInstance(
     _In_ const GUID& InstanceId,
@@ -70,8 +70,8 @@ LxssInstance::LxssInstance(
     m_instanceBasicIntegrityLevelCheckEnabled(false),
     m_redirectorConnectionTargets{m_configuration.Name}
 {
-    // Running a WSL1 distro is not possible if the lxcore driver is not present.
-    THROW_HR_IF(WSL_E_WSL1_NOT_SUPPORTED, !g_lxcoreInitialized);
+    // Running a LSW1 distro is not possible if the lxcore driver is not present.
+    THROW_HR_IF(LSW_E_LSW1_NOT_SUPPORTED, !g_lxcoreInitialized);
 
     // Copy immutable distribution data into the info structure.
     m_distributionInfo.Id = m_configuration.DistroId;
@@ -90,12 +90,12 @@ LxssInstance::LxssInstance(
         Security::InitializeInstanceJob(m_instanceJob.get());
 
         // Check if VPN detection is enabled.
-        const wil::unique_hkey LxssKey = wsl::windows::common::registry::OpenLxssUserKey();
-        m_enableVpnDetection = (wsl::windows::common::registry::ReadDword(LxssKey.get(), nullptr, L"EnableVpnDetection", 1)) != 0;
+        const wil::unique_hkey LxssKey = lsw::windows::common::registry::OpenLxssUserKey();
+        m_enableVpnDetection = (lsw::windows::common::registry::ReadDword(LxssKey.get(), nullptr, L"EnableVpnDetection", 1)) != 0;
     }
 
     // Store the user token for access checks.
-    m_userToken = wsl::windows::common::security::GetUserToken(TokenImpersonation);
+    m_userToken = lsw::windows::common::security::GetUserToken(TokenImpersonation);
 
     // Create manual reset event that is signaled on instance termination
     m_instanceTerminatedEvent.reset(CreateEventW(nullptr, TRUE, FALSE, nullptr));
@@ -104,12 +104,12 @@ LxssInstance::LxssInstance(
     // Check if integrity level check is enabled.
     //
     // N.B. The registry value is only writable from high-IL and above.
-    if (wsl::windows::common::registry::ReadDword(
+    if (lsw::windows::common::registry::ReadDword(
             HKEY_LOCAL_MACHINE, LXSS_SERVICE_REGISTRY_PATH, LXSS_SERVICE_REGISTRY_INTEGRITY_CHECK, LXSS_SERVICE_REGISTRY_INTEGRITY_CHECK_DISABLED) ==
         LXSS_SERVICE_REGISTRY_INTEGRITY_CHECK_ENABLED)
     {
         // Query the integrity level of the caller and store it in the instance.
-        m_instanceBasicIntegrityLevel = wsl::windows::common::security::GetUserBasicIntegrityLevel(m_userToken.get());
+        m_instanceBasicIntegrityLevel = lsw::windows::common::security::GetUserBasicIntegrityLevel(m_userToken.get());
         m_instanceBasicIntegrityLevelCheckEnabled = true;
     }
 
@@ -201,21 +201,21 @@ void LxssInstance::CreateLxProcess(
     if (m_instanceBasicIntegrityLevelCheckEnabled != false)
     {
         const DWORD BasicIntegrityLevel =
-            wsl::windows::common::security::GetUserBasicIntegrityLevel(CreateProcessContext.UserToken.get());
+            lsw::windows::common::security::GetUserBasicIntegrityLevel(CreateProcessContext.UserToken.get());
         if (m_instanceBasicIntegrityLevel != BasicIntegrityLevel)
         {
             if (m_instanceBasicIntegrityLevel > BasicIntegrityLevel)
             {
-                THROW_HR(WSL_E_LOWER_INTEGRITY);
+                THROW_HR(LSW_E_LOWER_INTEGRITY);
             }
 
-            THROW_HR(WSL_E_HIGHER_INTEGRITY);
+            THROW_HR(LSW_E_HIGHER_INTEGRITY);
         }
     }
 
     if (m_oobeCompleteEvent && !m_oobeCompleteEvent.is_signaled())
     {
-        EMIT_USER_WARNING(wsl::shared::Localization::MessageWaitingForOobe(m_configuration.Name.c_str()));
+        EMIT_USER_WARNING(lsw::shared::Localization::MessageWaitingForOobe(m_configuration.Name.c_str()));
         m_oobeCompleteEvent.wait();
     }
 
@@ -223,17 +223,17 @@ void LxssInstance::CreateLxProcess(
     std::vector<wil::unique_handle> StdHandlesLocal(3);
     if (StdHandles->StdIn.Handle != LXSS_HANDLE_USE_CONSOLE)
     {
-        StdHandlesLocal[0].reset(wsl::windows::common::wslutil::DuplicateHandleFromCallingProcess(ULongToHandle(StdHandles->StdIn.Handle)));
+        StdHandlesLocal[0].reset(lsw::windows::common::lswutil::DuplicateHandleFromCallingProcess(ULongToHandle(StdHandles->StdIn.Handle)));
     }
 
     if (StdHandles->StdOut.Handle != LXSS_HANDLE_USE_CONSOLE)
     {
-        StdHandlesLocal[1].reset(wsl::windows::common::wslutil::DuplicateHandleFromCallingProcess(ULongToHandle(StdHandles->StdOut.Handle)));
+        StdHandlesLocal[1].reset(lsw::windows::common::lswutil::DuplicateHandleFromCallingProcess(ULongToHandle(StdHandles->StdOut.Handle)));
     }
 
     if (StdHandles->StdErr.Handle != LXSS_HANDLE_USE_CONSOLE)
     {
-        StdHandlesLocal[2].reset(wsl::windows::common::wslutil::DuplicateHandleFromCallingProcess(ULongToHandle(StdHandles->StdErr.Handle)));
+        StdHandlesLocal[2].reset(lsw::windows::common::lswutil::DuplicateHandleFromCallingProcess(ULongToHandle(StdHandles->StdErr.Handle)));
     }
 
     // Enable symlink creation privilege on the token, which is needed
@@ -244,8 +244,8 @@ void LxssInstance::CreateLxProcess(
     //      acquiring the privilege can fail, but creating the symlink
     //      will succeed even without the privilege. Therefore, it does
     //      not matter if this call fails.
-    const wil::unique_handle Token = wsl::windows::common::security::GetUserToken(TokenPrimary);
-    wsl::windows::common::security::EnableTokenPrivilege(Token.get(), SE_CREATE_SYMBOLIC_LINK_NAME);
+    const wil::unique_handle Token = lsw::windows::common::security::GetUserToken(TokenPrimary);
+    lsw::windows::common::security::EnableTokenPrivilege(Token.get(), SE_CREATE_SYMBOLIC_LINK_NAME);
 
     // Create an unnamed server port if the caller provided a buffer and
     // interop is enabled.
@@ -298,8 +298,8 @@ std::shared_ptr<LxssPort> LxssInstance::GetInitPort()
 
 void LxssInstance::UpdateTimezone()
 {
-    const auto timezone = wsl::windows::common::helpers::GetLinuxTimezone(m_userToken.get());
-    auto message = wsl::windows::common::helpers::GenerateTimezoneUpdateMessage(timezone);
+    const auto timezone = lsw::windows::common::helpers::GetLinuxTimezone(m_userToken.get());
+    auto message = lsw::windows::common::helpers::GenerateTimezoneUpdateMessage(timezone);
     auto lock = m_InitMessagePort->Lock();
     m_InitMessagePort->Send(message.data(), gsl::narrow_cast<ULONG>(message.size()));
 }
@@ -374,12 +374,12 @@ void LxssInstance::Stop()
     }
 
     // Logs when a distro is stopped
-    WSL_LOG_TELEMETRY(
+    LSW_LOG_TELEMETRY(
         "StopInstance",
         PDT_ProductAndServiceUsage,
         TraceLoggingKeyword(MICROSOFT_KEYWORD_CRITICAL_DATA),
         TraceLoggingValue(m_configuration.Name.c_str(), "distroName"),
-        TraceLoggingValue(LXSS_WSL_VERSION_1, "version"),
+        TraceLoggingValue(LXSS_LSW_VERSION_1, "version"),
         TraceLoggingValue(m_instanceId, "instanceId"));
 
     // Unregister the instance termination TP wait.
@@ -432,7 +432,7 @@ void LxssInstance::RegisterPlan9ConnectionTarget(_In_ HANDLE userToken)
         userToken, {}, m_defaultUid, std::wstring_view{socketPath.Buffer, socketPath.Length / sizeof(WCHAR)});
 }
 
-const WSLDistributionInformation* LxssInstance::DistributionInformation() const noexcept
+const LSWDistributionInformation* LxssInstance::DistributionInformation() const noexcept
 {
     return &m_distributionInfo;
 }
@@ -458,7 +458,7 @@ void LxssInstance::_ConfigureFilesystem(_In_ ULONG Flags)
     LOG_IF_FAILED(wil::RemoveDirectoryRecursiveNoThrow(tempFolder.c_str(), wil::RemoveDirectoryOptions::KeepRootDirectory));
 
     // Create a subdirectory to be used as the temp folder for this instance.
-    const auto instanceIdString = wsl::shared::string::GuidToString<wchar_t>(m_instanceId);
+    const auto instanceIdString = lsw::shared::string::GuidToString<wchar_t>(m_instanceId);
     m_tempPath = tempFolder / instanceIdString;
 
     // Make sure the directories of interest exist. Attributes are added
@@ -539,8 +539,8 @@ wil::unique_handle LxssInstance::_CreateLxProcess(
             m_oobeCompleteEvent.create(wil::EventOptions::ManualReset);
 
             auto impersonate = wil::CoImpersonateClient();
-            auto registration = wsl::windows::service::DistributionRegistration::Open(
-                wsl::windows::common::registry::OpenLxssUserKey().get(), m_configuration.DistroId);
+            auto registration = lsw::windows::service::DistributionRegistration::Open(
+                lsw::windows::common::registry::OpenLxssUserKey().get(), m_configuration.DistroId);
 
             // Wait for a potential previous oobe thread to complete before creating a new one.
             if (m_oobeThread.joinable())
@@ -555,7 +555,7 @@ wil::unique_handle LxssInstance::_CreateLxProcess(
                     auto* OobeResult = gslhelpers::try_get_struct<LX_INIT_OOBE_RESULT>(gsl::make_span(Message));
                     THROW_HR_IF(E_INVALIDARG, !OobeResult || (OobeResult->Header.MessageType != LxInitOobeResult));
 
-                    WSL_LOG(
+                    LSW_LOG(
                         "OOBEResult",
                         TraceLoggingValue(OobeResult->Result, "Result"),
                         TraceLoggingValue(OobeResult->DefaultUid, "DefaultUid"),
@@ -566,11 +566,11 @@ wil::unique_handle LxssInstance::_CreateLxProcess(
                     {
                         // OOBE was successful, don't run it again.
                         m_configuration.RunOOBE = false;
-                        registration.Write(wsl::windows::service::Property::RunOOBE, 0);
+                        registration.Write(lsw::windows::service::Property::RunOOBE, 0);
 
                         if (OobeResult->DefaultUid != -1)
                         {
-                            registration.Write(wsl::windows::service::Property::DefaultUid, static_cast<int>(OobeResult->DefaultUid));
+                            registration.Write(lsw::windows::service::Property::DefaultUid, static_cast<int>(OobeResult->DefaultUid));
                             m_defaultUid = static_cast<int>(OobeResult->DefaultUid);
                         }
                     }
@@ -658,7 +658,7 @@ std::vector<gsl::byte> LxssInstance::_CreateLxProcessMarshalMessage(
 
     {
         // Acquire assign primary token in order to pass the primary token for the new process.
-        auto revertPriv = wsl::windows::common::security::AcquirePrivilege(SE_ASSIGNPRIMARYTOKEN_NAME);
+        auto revertPriv = lsw::windows::common::security::AcquirePrivilege(SE_ASSIGNPRIMARYTOKEN_NAME);
         MessageLocal->ForkTokenId = MessagePort->MarshalForkToken(Token.get());
     }
 
@@ -729,19 +729,19 @@ void LxssInstance::_StartInstance(_In_ ULONG DistributionFlags)
     wil::unique_handle instanceToken;
     {
         // Be in the right session for creating the instance parameters.
-        const auto userToken = wsl::windows::common::security::GetUserToken(TokenImpersonation);
+        const auto userToken = lsw::windows::common::security::GetUserToken(TokenImpersonation);
         auto runAsUser = wil::impersonate_token(userToken.get());
 
         // Initialize mount points.
         mounts = _InitializeMounts();
 
         // Create token for the instance
-        instanceToken = wsl::windows::common::security::CreateRestrictedToken(userToken.get());
+        instanceToken = lsw::windows::common::security::CreateRestrictedToken(userToken.get());
     }
 
     // Create a new instance.
     LX_KINSTANCECREATESTART createParameters = {};
-    createParameters.RootFsType = LXSS_DISTRO_USES_WSL_FS(m_configuration.Version) ? LXSS_FS_TYPE_WSLFS : LXSS_FS_TYPE_LXFS;
+    createParameters.RootFsType = LXSS_DISTRO_USES_LSW_FS(m_configuration.Version) ? LXSS_FS_TYPE_LSWFS : LXSS_FS_TYPE_LXFS;
     WI_SetFlagIf(createParameters.Flags, LX_KINSTANCECREATESTART_FLAG_DISABLE_DRIVE_MOUNTING, WI_IsFlagClear(DistributionFlags, LXSS_DISTRO_FLAGS_ENABLE_DRIVE_MOUNTING));
     createParameters.InstanceId = m_instanceId;
     createParameters.RootDirectoryHandle = HandleToULong(m_rootDirectory.get());
@@ -761,14 +761,14 @@ void LxssInstance::_StartInstance(_In_ ULONG DistributionFlags)
 
     {
         // Acquire assign primary token in order to pass the primary token for init process.
-        auto revertPriv = wsl::windows::common::security::AcquirePrivilege(SE_ASSIGNPRIMARYTOKEN_NAME);
+        auto revertPriv = lsw::windows::common::security::AcquirePrivilege(SE_ASSIGNPRIMARYTOKEN_NAME);
         THROW_IF_NTSTATUS_FAILED(::LxssClientInstanceCreate(&createParameters, &m_instanceHandle));
     }
 
     auto deleter = wil::scope_exit([&] { LOG_IF_NTSTATUS_FAILED(::LxssClientInstanceDestroy(m_instanceHandle.get())); });
 
     // Launch the instance.
-    const wil::unique_handle clientProcess = wsl::windows::common::wslutil::OpenCallingProcess(PROCESS_CREATE_PROCESS | SYNCHRONIZE);
+    const wil::unique_handle clientProcess = lsw::windows::common::lswutil::OpenCallingProcess(PROCESS_CREATE_PROCESS | SYNCHRONIZE);
     THROW_IF_NTSTATUS_FAILED(::LxssClientInstanceStart(m_instanceHandle.get(), clientProcess.get()));
 
     deleter.release();
@@ -792,8 +792,8 @@ CATCH_LOG()
 void LxssInstance::_UpdateNetworkConfigurationFiles(_In_ bool UpdateAlways)
 {
     // Generate contents of /etc/resolv.conf file
-    wsl::core::networking::DnsSettingsFlags flags = wsl::core::networking::DnsSettingsFlags::IncludeIpv6Servers;
-    WI_SetFlagIf(flags, wsl::core::networking::DnsSettingsFlags::IncludeVpn, m_enableVpnDetection);
+    lsw::core::networking::DnsSettingsFlags flags = lsw::core::networking::DnsSettingsFlags::IncludeIpv6Servers;
+    WI_SetFlagIf(flags, lsw::core::networking::DnsSettingsFlags::IncludeVpn, m_enableVpnDetection);
 
     const auto dnsSettings = m_dnsInfo.GetDnsSettings(flags);
     std::string fileContents = GenerateResolvConf(dnsSettings);
@@ -804,8 +804,8 @@ void LxssInstance::_UpdateNetworkConfigurationFiles(_In_ bool UpdateAlways)
     }
 
     // Construct the network information message.
-    wsl::shared::MessageWriter<LX_INIT_NETWORK_INFORMATION> message(LxInitMessageNetworkInformation);
-    message.WriteString(message->FileHeaderIndex, wsl::shared::string::WideToMultiByte(LX_INIT_RESOLVCONF_FULL_HEADER));
+    lsw::shared::MessageWriter<LX_INIT_NETWORK_INFORMATION> message(LxInitMessageNetworkInformation);
+    message.WriteString(message->FileHeaderIndex, lsw::shared::string::WideToMultiByte(LX_INIT_RESOLVCONF_FULL_HEADER));
     message.WriteString(message->FileContentsIndex, fileContents);
     auto messageSpan = message.Span();
 
@@ -847,10 +847,10 @@ void LxssInstance::_InitializeConfiguration(_In_ const std::filesystem::path& Pl
         fixedDrives = EnumerateFixedDrives().first;
     }
 
-    const auto timezone = wsl::windows::common::helpers::GetLinuxTimezone(m_userToken.get());
+    const auto timezone = lsw::windows::common::helpers::GetLinuxTimezone(m_userToken.get());
     ULONG featureFlags{};
     WI_SetFlagIf(featureFlags, LxInitFeatureRootfsCompressed, WI_IsFlagSet(GetFileAttributesW(m_configuration.BasePath.c_str()), FILE_ATTRIBUTE_COMPRESSED));
-    auto message = wsl::windows::common::helpers::GenerateConfigurationMessage(
+    auto message = lsw::windows::common::helpers::GenerateConfigurationMessage(
         m_configuration.Name, fixedDrives, m_defaultUid, timezone, Plan9SocketPath.wstring(), featureFlags);
 
     // Send the message to the init daemon.
@@ -866,13 +866,13 @@ void LxssInstance::_InitializeConfiguration(_In_ const std::filesystem::path& Pl
     m_defaultUid = response->DefaultUid;
     if (response->VersionIndex > 0)
     {
-        m_configuration.OsVersion = wsl::shared::string::MultiByteToWide(wsl::shared::string::FromSpan(span, response->VersionIndex));
+        m_configuration.OsVersion = lsw::shared::string::MultiByteToWide(lsw::shared::string::FromSpan(span, response->VersionIndex));
         m_distributionInfo.Version = m_configuration.OsVersion.c_str();
     }
 
     if (response->FlavorIndex > 0)
     {
-        m_configuration.Flavor = wsl::shared::string::MultiByteToWide(wsl::shared::string::FromSpan(span, response->FlavorIndex));
+        m_configuration.Flavor = lsw::shared::string::MultiByteToWide(lsw::shared::string::FromSpan(span, response->FlavorIndex));
         m_distributionInfo.Flavor = m_configuration.Flavor.c_str();
     }
 }

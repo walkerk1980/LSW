@@ -54,7 +54,7 @@ private:
 
     std::wstring m_systemId;
     GUID m_runtimeId;
-    wsl::windows::common::hcs::unique_hcs_system m_system;
+    lsw::windows::common::hcs::unique_hcs_system m_system;
     wil::srwlock m_lock;
     std::vector<RemoteFileSystemInfo> m_fileSystems;
     bool m_shutdown;
@@ -68,7 +68,7 @@ private:
 
     wil::com_ptr<IVmVirtualDeviceAccess> m_deviceAccess;
     wil::srwlock m_devicesLock;
-    std::map<GUID, DeviceHostProxyEntry, wsl::windows::common::helpers::GuidLess> m_devices;
+    std::map<GUID, DeviceHostProxyEntry, lsw::windows::common::helpers::GuidLess> m_devices;
     bool m_devicesShutdown;
 
     static constexpr LPCWSTR c_hdvModuleName = L"vmdevicehost.dll";

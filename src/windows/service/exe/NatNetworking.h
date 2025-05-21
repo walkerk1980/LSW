@@ -13,12 +13,12 @@
 #include "WslCoreNetworkingSupport.h"
 #include "hns_schema.h"
 
-namespace wsl::core {
+namespace lsw::core {
 
 class NatNetworking final : public INetworkingEngine
 {
 public:
-    NatNetworking(HCS_SYSTEM system, wsl::windows::common::hcs::unique_hcn_network&& network, GnsChannel&& gnsChannel, Config& config, wil::unique_socket&& dnsHvsocket);
+    NatNetworking(HCS_SYSTEM system, lsw::windows::common::hcs::unique_hcn_network&& network, GnsChannel&& gnsChannel, Config& config, wil::unique_socket&& dnsHvsocket);
     ~NatNetworking() override;
 
     // Note: This class cannot be moved because m_networkNotifyHandle captures a 'this' pointer.
@@ -32,20 +32,20 @@ public:
     void FillInitialConfiguration(LX_MINI_INIT_NETWORKING_CONFIGURATION& message) override;
     void StartPortTracker(wil::unique_socket&& socket) override;
 
-    static wsl::windows::common::hcs::unique_hcn_network CreateNetwork(wsl::core::Config& config);
-    static bool IsHyperVFirewallSupported(const wsl::core::Config& vmConfig) noexcept;
+    static lsw::windows::common::hcs::unique_hcn_network CreateNetwork(lsw::core::Config& config);
+    static bool IsHyperVFirewallSupported(const lsw::core::Config& vmConfig) noexcept;
 
 private:
     static void NETIOAPI_API_ OnNetworkConnectivityChange(PVOID context, NL_NETWORK_CONNECTIVITY_HINT hint);
     static std::optional<ULONGLONG> FindNatInterfaceLuid(const SOCKADDR_INET& natAddress, const NL_NETWORK_CONNECTIVITY_HINT& currentConnectivityHint);
-    std::pair<networking::EphemeralHcnEndpoint, wsl::shared::hns::HNSEndpoint> CreateEndpoint(const std::wstring& IpAddress) const;
-    static wsl::windows::common::hcs::unique_hcn_network CreateNetworkInternal(wsl::core::Config& config);
+    std::pair<networking::EphemeralHcnEndpoint, lsw::shared::hns::HNSEndpoint> CreateEndpoint(const std::wstring& IpAddress) const;
+    static lsw::windows::common::hcs::unique_hcn_network CreateNetworkInternal(lsw::core::Config& config);
 
     void RefreshGuestConnection(NL_NETWORK_CONNECTIVITY_HINT connectivityHint) noexcept;
     _Requires_lock_held_(m_lock)
     void UpdateDns(std::optional<PCWSTR> gatewayAddress = std::nullopt) noexcept;
     void UpdateMtu();
-    void AttachEndpoint(networking::EphemeralHcnEndpoint&& endpoint, const wsl::shared::hns::HNSEndpoint& properties);
+    void AttachEndpoint(networking::EphemeralHcnEndpoint&& endpoint, const lsw::shared::hns::HNSEndpoint& properties);
     void TelemetryConnectionCallback(NLM_CONNECTIVITY hostConnectivity, uint32_t telemetryCounter) noexcept;
 
     mutable wil::srwlock m_lock;
@@ -53,10 +53,10 @@ private:
     // Handle for the Hcn* Api. Owned by the caller (WslCoreVm), this is a non-owning copy
     const HCS_SYSTEM m_system{};
     Config& m_config;
-    wsl::windows::common::hcs::unique_hcn_network m_network{};
+    lsw::windows::common::hcs::unique_hcn_network m_network{};
 
     bool m_connectivityTelemetryEnabled{false};
-    wsl::core::networking::ConnectivityTelemetry m_connectivityTelemetry;
+    lsw::core::networking::ConnectivityTelemetry m_connectivityTelemetry;
 
     // Optional DNS resolver used for DNS tunneling
     std::optional<networking::DnsResolver> m_dnsTunnelingResolver;
@@ -78,4 +78,4 @@ private:
     networking::unique_notify_handle m_networkNotifyHandle{};
 };
 
-} // namespace wsl::core
+} // namespace lsw::core

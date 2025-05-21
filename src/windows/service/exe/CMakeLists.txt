@@ -35,7 +35,7 @@ set(SOURCES
     WslCoreVm.cpp
     VirtioNetworking.cpp
     main.rc
-    ${CMAKE_CURRENT_BINARY_DIR}/../mc/${TARGET_PLATFORM}/${CMAKE_BUILD_TYPE}/wsleventschema.rc
+    ${CMAKE_CURRENT_BINARY_DIR}/../mc/${TARGET_PLATFORM}/${CMAKE_BUILD_TYPE}/lsweventschema.rc
     application.manifest)
 
 set(HEADERS
@@ -77,13 +77,13 @@ set(HEADERS
     WslCoreTcpIpStateTracking.h
     WslCoreVm.h)
 
-add_executable(wslservice ${SOURCES} ${HEADERS})
-add_dependencies(wslservice wslserviceidl wslservicemc)
+add_executable(lswservice ${SOURCES} ${HEADERS})
+add_dependencies(lswservice lswserviceidl lswservicemc)
 add_compile_definitions(__WRL_CLASSIC_COM__)
 add_compile_definitions(__WRL_DISABLE_STATIC_INITIALIZE__)
 add_compile_definitions(USE_COM_CONTEXT_DEF=1)
-set_target_properties(wslservice PROPERTIES LINK_FLAGS "/merge:minATL=.rdata /include:__minATLObjMap_LxssUserSession_COM")
-target_link_libraries(wslservice
+set_target_properties(lswservice PROPERTIES LINK_FLAGS "/merge:minATL=.rdata /include:__minATLObjMap_LxssUserSession_COM")
+target_link_libraries(lswservice
                       ${COMMON_LINK_LIBRARIES}
                       computecore
                       common
@@ -93,5 +93,5 @@ target_link_libraries(wslservice
                       Winhttp.lib
                       Synchronization.lib)
 
-target_precompile_headers(wslservice REUSE_FROM common)
-set_target_properties(wslservice PROPERTIES FOLDER windows)
+target_precompile_headers(lswservice REUSE_FROM common)
+set_target_properties(lswservice PROPERTIES FOLDER windows)

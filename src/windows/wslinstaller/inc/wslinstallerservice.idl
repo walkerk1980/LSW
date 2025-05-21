@@ -4,11 +4,11 @@ Copyright (c) Microsoft Corporation.  All rights reserved.
 
 Module Name:
 
-    wslinstalleridl.idl
+    lswinstalleridl.idl
 
 Abstract:
 
-    This file contains the COM object definitions used to talk with the WSL
+    This file contains the COM object definitions used to talk with the LSW
     service "WslInstaller"
 
 --*/

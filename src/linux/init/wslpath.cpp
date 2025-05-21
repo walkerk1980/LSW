@@ -4,11 +4,11 @@ Copyright (c) Microsoft. All rights reserved.
 
 Module Name:
 
-    wslpath.c
+    lswpath.c
 
 Abstract:
 
-    This file wslpath function definitions.
+    This file lswpath function definitions.
 
 --*/
 
@@ -22,12 +22,12 @@ Abstract:
 #include <endian.h>
 #include <lxbusapi.h>
 #include <pwd.h>
-#include "wslpath.h"
+#include "lswpath.h"
 
 #include "util.h"
 #include "CommandLine.h"
 
-using namespace wsl::shared;
+using namespace lsw::shared;
 
 #define INVALID_USAGE() Die(Argv[0], EINVAL, true, NULL)
 
@@ -658,7 +658,7 @@ Return Value:
             case PATH_SEP:
                 if (OutputCwdLength + 1 == TranslatedPath.length())
                 {
-                    // Special case for wslpath -u .
+                    // Special case for lswpath -u .
                     TranslatedPath = ".";
                 }
                 else

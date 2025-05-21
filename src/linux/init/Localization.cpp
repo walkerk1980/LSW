@@ -44,7 +44,7 @@ std::optional<std::string> GetUserLanguage()
     return {};
 }
 
-const char* wsl::shared::Localization::LookupString(const std::vector<std::pair<std::string, const char*>>& strings, Options options)
+const char* lsw::shared::Localization::LookupString(const std::vector<std::pair<std::string, const char*>>& strings, Options options)
 {
     try
     {
@@ -53,7 +53,7 @@ const char* wsl::shared::Localization::LookupString(const std::vector<std::pair<
         {
             for (const auto& e : strings)
             {
-                if (wsl::shared::string::IsEqual(e.first, language.value(), true))
+                if (lsw::shared::string::IsEqual(e.first, language.value(), true))
                 {
                     return e.second;
                 }

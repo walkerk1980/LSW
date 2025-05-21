@@ -81,9 +81,9 @@
     </EventProvider>
 
     <Profile
-      Id="WSL.Verbose.File"
-      Name="WSL"
-      Description="Traces for all WSL components"
+      Id="LSW.Verbose.File"
+      Name="LSW"
+      Description="Traces for all LSW components"
       LoggingMode="File"
       DetailLevel="Verbose"
       >

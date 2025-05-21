@@ -1,47 +1,47 @@
-# WSL contributing guide
+# LSW contributing guide
 
-There are a few main ways to contribute to WSL, with guides to each one:
+There are a few main ways to contribute to LSW, with guides to each one:
 
-1. [Add a feature or bugfix to WSL](#add-a-feature-or-bugfix-to-wsl)
-2. [File a WSL issue](#file-a-wsl-issue)
+1. [Add a feature or bugfix to LSW](#add-a-feature-or-bugfix-to-lsw)
+2. [File a LSW issue](#file-a-lsw-issue)
 
-## Add a feature or bugfix to WSL
+## Add a feature or bugfix to LSW
 
-We welcome any contributions to the WSL source code to add features or fix bugs! Before you start actually working on the feature, please **[file it as an issue, or a feature request in this repository](https://github.com/microsoft/WSL/issues)** so that we can track it and provide any feedback if necessary.
+We welcome any contributions to the LSW source code to add features or fix bugs! Before you start actually working on the feature, please **[file it as an issue, or a feature request in this repository](https://github.com/microsoft/LSW/issues)** so that we can track it and provide any feedback if necessary.
 
-Once you have done so, please see [the developer docs](./doc/docs/dev-loop.md) for instructions on how to build WSL locally on your machine for development. 
+Once you have done so, please see [the developer docs](./doc/docs/dev-loop.md) for instructions on how to build LSW locally on your machine for development. 
 
-When your fix is ready, please [submit it as a pull request in this repository](https://github.com/microsoft/WSL/pulls) and the WSL team will triage and respond to it. Most contributions require you to agree to a Contributor License Agreement (CLA) declaring that you have the right to, and actually do, grant us the rights to use your contribution. For details, visit https://cla.microsoft.com.
+When your fix is ready, please [submit it as a pull request in this repository](https://github.com/microsoft/LSW/pulls) and the LSW team will triage and respond to it. Most contributions require you to agree to a Contributor License Agreement (CLA) declaring that you have the right to, and actually do, grant us the rights to use your contribution. For details, visit https://cla.microsoft.com.
 
-## File a WSL issue
+## File a LSW issue
 
-You can file issues for WSL at the WSL repository, or linked repositories. Before filing an issue please search for any existing issues and upvote or comment on those if possible. 
+You can file issues for LSW at the LSW repository, or linked repositories. Before filing an issue please search for any existing issues and upvote or comment on those if possible. 
 
-1. If your issue is related to WSL documentation, please file it at [microsoftdocs/wsl](https://github.com/microsoftdocs/WSL/issues)
-2. If your issue is related to a Linux GUI app, please file it at [microsoft/wslg](https://github.com/microsoft/wslg/issues)
-3. Otherwise if you have a technical issue related to WSL in general, such as start up issues, etc., please file it at [microsoft/wsl](https://github.com/microsoft/WSL/issues)
+1. If your issue is related to LSW documentation, please file it at [microsoftdocs/lsw](https://github.com/microsoftdocs/LSW/issues)
+2. If your issue is related to a Linux GUI app, please file it at [microsoft/lswg](https://github.com/microsoft/lswg/issues)
+3. Otherwise if you have a technical issue related to LSW in general, such as start up issues, etc., please file it at [microsoft/lsw](https://github.com/microsoft/LSW/issues)
 
-Please provide as much information as possible when reporting a bug or filing an issue on the Windows Subsystem for Linux, and be sure to include logs as necessary!
+Please provide as much information as possible when reporting a bug or filing an issue on the Linux Subsystem for Windows, and be sure to include logs as necessary!
 
-Please see the [notes for collecting WSL logs](#notes-for-collecting-wsl-logs) section below for more info on filing issues.
+Please see the [notes for collecting LSW logs](#notes-for-collecting-lsw-logs) section below for more info on filing issues.
 
 ## Thank you
 
-Thank you in advance for your contribution! We appreciate your help in making WSL a better tool for everyone.
+Thank you in advance for your contribution! We appreciate your help in making LSW a better tool for everyone.
 
-## Notes for collecting WSL logs
+## Notes for collecting LSW logs
 
 ### Important: Reporting BSODs and Security issues
 **Do not open GitHub issues for Windows crashes (BSODs) or security issues.**. Instead, send Windows crashes or other security-related issues to secure@microsoft.com.
 See the `10) Reporting a Windows crash (BSOD)` section below for detailed instructions.
 
-### Reporting issues in Windows Console or WSL text rendering/user experience
-Note that WSL distro's launch in the Windows Console (unless you have taken steps to launch a 3rd party console/terminal). Therefore, *please file UI/UX related issues in the [Windows Console issue tracker](https://github.com/microsoft/console)*.
+### Reporting issues in Windows Console or LSW text rendering/user experience
+Note that LSW distro's launch in the Windows Console (unless you have taken steps to launch a 3rd party console/terminal). Therefore, *please file UI/UX related issues in the [Windows Console issue tracker](https://github.com/microsoft/console)*.
 
-### Collect WSL logs for networking issues
+### Collect LSW logs for networking issues
 
-Install tcpdump in your WSL distribution using the following commands.
-Note: This will not work if WSL has Internet connectivity issues.
+Install tcpdump in your LSW distribution using the following commands.
+Note: This will not work if LSW has Internet connectivity issues.
 
 ```
 # sudo apt-get update
@@ -50,10 +50,10 @@ Note: This will not work if WSL has Internet connectivity issues.
 
 Install [WPR](https://learn.microsoft.com/windows-hardware/test/wpt/windows-performance-recorder)
 
-To collect WSL networking logs, do the following steps in an administrative powershell prompt:
+To collect LSW networking logs, do the following steps in an administrative powershell prompt:
 
 ```
-Invoke-WebRequest -UseBasicParsing "https://raw.githubusercontent.com/microsoft/WSL/master/diagnostics/collect-networking-logs.ps1" -OutFile collect-networking-logs.ps1
+Invoke-WebRequest -UseBasicParsing "https://raw.githubusercontent.com/microsoft/LSW/master/diagnostics/collect-networking-logs.ps1" -OutFile collect-networking-logs.ps1
 Set-ExecutionPolicy Bypass -Scope Process -Force
 .\collect-networking-logs.ps1
 ```
@@ -63,19 +63,19 @@ The script will output the path of the log file once done.
 <!-- Preserving anchors -->
 <div id="8-detailed-logs"></div>
 <div id="9-networking-logs"></div>
-<div id="8-collect-wsl-logs-recommended-method"></div>
+<div id="8-collect-lsw-logs-recommended-method"></div>
 
 
-### Collect WSL logs (recommended method)
+### Collect LSW logs (recommended method)
 
-If you choose to email these logs instead of attaching to the bug, please send them to wsl-gh-logs@microsoft.com with the number of the github issue in the subject, and in the message a link to your comment in the github issue.
+If you choose to email these logs instead of attaching to the bug, please send them to lsw-gh-logs@microsoft.com with the number of the github issue in the subject, and in the message a link to your comment in the github issue.
 
-To collect WSL logs, download and execute [collect-wsl-logs.ps1](https://github.com/Microsoft/WSL/blob/master/diagnostics/collect-wsl-logs.ps1) in an administrative powershell prompt:
+To collect LSW logs, download and execute [collect-lsw-logs.ps1](https://github.com/Microsoft/LSW/blob/master/diagnostics/collect-lsw-logs.ps1) in an administrative powershell prompt:
 
 ```
-Invoke-WebRequest -UseBasicParsing "https://raw.githubusercontent.com/microsoft/WSL/master/diagnostics/collect-wsl-logs.ps1" -OutFile collect-wsl-logs.ps1
+Invoke-WebRequest -UseBasicParsing "https://raw.githubusercontent.com/microsoft/LSW/master/diagnostics/collect-lsw-logs.ps1" -OutFile collect-lsw-logs.ps1
 Set-ExecutionPolicy Bypass -Scope Process -Force
-.\collect-wsl-logs.ps1
+.\collect-lsw-logs.ps1
 ```
 The script will output the path of the log file once done.
 
@@ -95,18 +95,18 @@ Please send this dump to: secure@microsoft.com .
 Make sure that the email body contains:
 
 - The Github issue number, if any
-- That this dump is destinated to the WSL team
+- That this dump is destinated to the LSW team
 
-### 11) Reporting a WSL process crash
+### 11) Reporting a LSW process crash
 
-The easiest way to report a WSL process crash is by [collecting a user-mode crash dump](https://learn.microsoft.com/windows/win32/wer/collecting-user-mode-dumps).
+The easiest way to report a LSW process crash is by [collecting a user-mode crash dump](https://learn.microsoft.com/windows/win32/wer/collecting-user-mode-dumps).
 
-To collect dumps of all running WSL processe, please open a PowerShell prompt with admin privileges, navigate to a folder where you'd like to put your log files and run these commands: 
+To collect dumps of all running LSW processe, please open a PowerShell prompt with admin privileges, navigate to a folder where you'd like to put your log files and run these commands: 
 
 ```
-Invoke-WebRequest -UseBasicParsing "https://raw.githubusercontent.com/microsoft/WSL/master/diagnostics/collect-wsl-logs.ps1" -OutFile collect-wsl-logs.ps1
+Invoke-WebRequest -UseBasicParsing "https://raw.githubusercontent.com/microsoft/LSW/master/diagnostics/collect-lsw-logs.ps1" -OutFile collect-lsw-logs.ps1
 Set-ExecutionPolicy Bypass -Scope Process -Force
-.\collect-wsl-logs.ps1 -Dump
+.\collect-lsw-logs.ps1 -Dump
 ```
 
 The script will output the path to the log file when it is done.
@@ -130,7 +130,7 @@ Once you're done, crash dump collection can be disabled by running the following
 reg.exe delete "HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\Windows Error Reporting\LocalDumps" /f
 ```
 
-### 12) Collect wslservice time travel debugging traces
+### 12) Collect lswservice time travel debugging traces
 
 To collect time travel debugging traces:
 
@@ -144,7 +144,7 @@ To collect time travel debugging traces:
 
 4) Check `Show processes from all users` (at the bottom)
 
-5) Select `wslservice.exe`. Note, if wslservice.exe is not running, you make it start it with: `wsl.exe -l`
+5) Select `lswservice.exe`. Note, if lswservice.exe is not running, you make it start it with: `lsw.exe -l`
 
 6) Click `Configure and Record` (write down the folder you chose for the traces)
 
@@ -154,6 +154,6 @@ To collect time travel debugging traces:
 
 9) Once the trace is done collecting, click `Stop Debugging` and close Windbg
 
-10) Go to the folder where the trace was collected, and locate the .run file. It should look like: `wslservice*.run`
+10) Go to the folder where the trace was collected, and locate the .run file. It should look like: `lswservice*.run`
 
 11) Share that file on the issue

@@ -8,7 +8,7 @@
 #include <lxinitshared.h>
 #include "SocketChannel.h"
 
-namespace wsl::core {
+namespace lsw::core {
 class GnsPortTrackerChannel
 {
 public:
@@ -33,7 +33,7 @@ private:
     const std::function<int(const SOCKADDR_INET&, int, bool)> m_callback;
     const std::function<void(const std::string&, bool)> m_interfaceStateCallback;
     wil::unique_event m_stopEvent = wil::unique_event{wil::EventOptions::ManualReset};
-    wsl::shared::SocketChannel m_channel;
+    lsw::shared::SocketChannel m_channel;
     std::thread m_thread;
 };
-} // namespace wsl::core
+} // namespace lsw::core

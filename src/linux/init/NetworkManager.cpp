@@ -97,10 +97,10 @@ Interface NetworkManager::CreateProxyWifiAdapter(Interface& baseAdapter, const s
 
 // SUPPORTS IPV4 ONLY, and only supports 1 IP address per adapter.
 // Not used for mirroring.
-void NetworkManager::SetAdapterConfiguration(Interface& interface, const wsl::shared::hns::HNSEndpoint& configuration)
+void NetworkManager::SetAdapterConfiguration(Interface& interface, const lsw::shared::hns::HNSEndpoint& configuration)
 {
     InterfaceConfiguration config;
-    config.Addresses.emplace_back(Address{AF_INET, configuration.PrefixLength, wsl::shared::string::WideToMultiByte(configuration.IPAddress)});
+    config.Addresses.emplace_back(Address{AF_INET, configuration.PrefixLength, lsw::shared::string::WideToMultiByte(configuration.IPAddress)});
 
     config.LocalAddresses = config.Addresses;
     config.BroadcastAddress = utils::ComputeBroadcastAddress(config.Addresses[0]);
@@ -109,7 +109,7 @@ void NetworkManager::SetAdapterConfiguration(Interface& interface, const wsl::sh
     addressInfo << config.Addresses[0];
     GNS_LOG_INFO(
         "Setting the IPv4 address on endpointID ({}) to {} on interfaceName {}",
-        wsl::shared::string::GuidToString<char>(configuration.ID).c_str(),
+        lsw::shared::string::GuidToString<char>(configuration.ID).c_str(),
         addressInfo.str().c_str(),
         interface.Name().c_str());
     interface.SetIpv4Configuration(config);
@@ -532,7 +532,7 @@ void NetworkManager::EnableIpv4ArpFilter()
     ModifyNetSetting(AF_INET, "arp_filter", "default", c_enableSetting, strlen(c_enableSetting));
 }
 
-wsl::shared::conncheck::ConnCheckResult NetworkManager::SendConnectRequest(const char* remoteAddress)
+lsw::shared::conncheck::ConnCheckResult NetworkManager::SendConnectRequest(const char* remoteAddress)
 {
-    return wsl::shared::conncheck::CheckConnection(remoteAddress, nullptr, "80");
+    return lsw::shared::conncheck::CheckConnection(remoteAddress, nullptr, "80");
 }

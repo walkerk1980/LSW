@@ -40,8 +40,8 @@ function(add_appx_target target binaries manifest_in output_package dependencies
     list(APPEND BINARIES_DEPENDENCY ${BINARY_DEST})
     endforeach()
 
-    # Reduce the output of makeappx unless WSL_APPX_DEBUG is set to make the build output nicer to read
-    if (WSL_SILENT_APPX_BUILD)
+    # Reduce the output of makeappx unless LSW_APPX_DEBUG is set to make the build output nicer to read
+    if (LSW_SILENT_APPX_BUILD)
         set(COMMAND_SUFFIX "2>NUL;>;NUL")
     endif ()
 

@@ -11,7 +11,7 @@
 #include "WslCoreNetworkingSupport.h"
 #include "RegistryWatcher.h"
 
-namespace wsl::core::networking {
+namespace lsw::core::networking {
 struct DnsInfo
 {
     std::vector<std::string> Servers;
@@ -98,7 +98,7 @@ public:
 private:
     RegistryChangeCallback m_reportRegistryChange;
 
-    std::vector<wistd::unique_ptr<wsl::windows::common::slim_registry_watcher>> m_registryWatchers;
+    std::vector<wistd::unique_ptr<lsw::windows::common::slim_registry_watcher>> m_registryWatchers;
 };
 
-} // namespace wsl::core::networking
+} // namespace lsw::core::networking

@@ -6,7 +6,7 @@
 #include "WslCoreNetworkEndpoint.h"
 #include "WslCoreNetworkEndpointSettings.h"
 
-namespace wsl::core::networking {
+namespace lsw::core::networking {
 
 enum class GnsCallbackFlags
 {
@@ -46,7 +46,7 @@ public:
 
     virtual _Check_return_ HRESULT EnumerateNetworks(_Out_ std::vector<GUID>& NetworkIds) const noexcept = 0;
 
-    virtual void AddEndpoint(networking::NetworkEndpoint&& newEndpoint, wsl::shared::hns::HNSEndpoint&& endpointProperties) noexcept = 0;
+    virtual void AddEndpoint(networking::NetworkEndpoint&& newEndpoint, lsw::shared::hns::HNSEndpoint&& endpointProperties) noexcept = 0;
 
     virtual void SendCreateNotificationsForInitialEndpoints() noexcept = 0;
 
@@ -65,9 +65,9 @@ public:
     virtual void ReconnectGuestNetwork() = 0;
 
     // Returns the network settings of the endpoint.
-    virtual std::shared_ptr<NetworkSettings> GetEndpointSettings(const wsl::shared::hns::HNSEndpoint& endpointProperties) const = 0;
+    virtual std::shared_ptr<NetworkSettings> GetEndpointSettings(const lsw::shared::hns::HNSEndpoint& endpointProperties) const = 0;
 
     virtual void TraceLoggingRundown() const = 0;
 };
 
-} // namespace wsl::core::networking
+} // namespace lsw::core::networking

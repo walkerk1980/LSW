@@ -9,8 +9,8 @@
     <EventProvider Id="lxcore_kernel" Name="0CD1C309-0878-4515-83DB-749843B3F5C9"/>
     <EventProvider Id="lxcore_user" Name="D90B9468-67F0-5B3B-42CC-82AC81FFD960"/>
     <EventProvider Id="lxcore_service" Name="B99CDB5A-039C-5046-E672-1A0DE0A40211"/>
-    <EventProvider Id="wsl_devicehost" Name="9d6c7b9e-2581-4d8a-b8c5-b90b4a17094a"/>
-    <EventProvider Id="wslclient" Name="8cbb7724-7223-5d6f-8137-564dac45104d"/>
+    <EventProvider Id="lsw_devicehost" Name="9d6c7b9e-2581-4d8a-b8c5-b90b4a17094a"/>
+    <EventProvider Id="lswclient" Name="8cbb7724-7223-5d6f-8137-564dac45104d"/>
     <EventProvider Id="vm_chipset" Name="de9ba731-7f33-4f44-98c9-6cac856b9f83"/>
     <EventProvider Id="vmcompute_dll" Name="AF7FD3A7-B248-460C-A9F5-FEC39EF8468C"/>
     <EventProvider Id="vmcompute" Name="17103E3F-3C6E-4677-BB17-3B267EB5BE57"/>
@@ -210,9 +210,9 @@
     <EventProvider Id="Microsoft.Windows.Networking.FlowSteering" Name="662abf07-6dda-5b25-c2c5-345236dbb2d2"/>
     <EventProvider Id="Microsoft.Windows.HyperV.Socket" Name="b2ed3bdb-cd74-5b2c-f660-85079ca074b3"/>
     <Profile
-      Id="WSL.Verbose.File"
-      Name="WSL"
-      Description="Traces for all WSL components"
+      Id="LSW.Verbose.File"
+      Name="LSW"
+      Description="Traces for all LSW components"
       LoggingMode="File"
       DetailLevel="Verbose"
       >
@@ -222,8 +222,8 @@
             <EventProviderId Value="lxcore_kernel"/>
             <EventProviderId Value="lxcore_user"/>
             <EventProviderId Value="lxcore_service"/>
-            <EventProviderId Value="wsl_devicehost"/>
-            <EventProviderId Value="wslclient"/>
+            <EventProviderId Value="lsw_devicehost"/>
+            <EventProviderId Value="lswclient"/>
             <EventProviderId Value="vm_chipset"/>
             <EventProviderId Value="vmcompute_dll"/>
             <EventProviderId Value="vmcompute"/>

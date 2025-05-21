@@ -9,15 +9,15 @@
 #include "WslCoreVm.h"
 #include "hcs.hpp"
 
-using namespace wsl::core::networking;
-using namespace wsl::windows::common::stringify;
-using namespace wsl::windows::common::string;
-using namespace wsl::windows::common::hcs;
-using namespace wsl::shared;
-using wsl::core::NatNetworking;
-using wsl::windows::common::Context;
-using wsl::windows::common::ExecutionContext;
-using wsl::windows::common::hcs::unique_hcn_endpoint;
+using namespace lsw::core::networking;
+using namespace lsw::windows::common::stringify;
+using namespace lsw::windows::common::string;
+using namespace lsw::windows::common::hcs;
+using namespace lsw::shared;
+using lsw::core::NatNetworking;
+using lsw::windows::common::Context;
+using lsw::windows::common::ExecutionContext;
+using lsw::windows::common::hcs::unique_hcn_endpoint;
 
 // This static list is used to keep of which endpoints are in use by other users.
 // It's needed because when we see an endpoint with the same ip address we want,
@@ -27,7 +27,7 @@ static wil::srwlock g_endpointsInUseLock;
 static std::vector<GUID> g_endpointsInUse;
 
 NatNetworking::NatNetworking(
-    HCS_SYSTEM system, wsl::windows::common::hcs::unique_hcn_network&& network, GnsChannel&& gnsChannel, Config& config, wil::unique_socket&& dnsHvsocket) :
+    HCS_SYSTEM system, lsw::windows::common::hcs::unique_hcn_network&& network, GnsChannel&& gnsChannel, Config& config, wil::unique_socket&& dnsHvsocket) :
     m_system(system), m_config(config), m_network(std::move(network)), m_gnsChannel(std::move(gnsChannel))
 {
     m_connectivityTelemetryEnabled = config.EnableTelemetry && !WslTraceLoggingShouldDisableTelemetry();
@@ -40,12 +40,12 @@ NatNetworking::NatNetworking(
 
         m_dnsTunnelingResolver.emplace(std::move(dnsHvsocket), resolverFlags);
 
-        m_dnsTunnelingIpAddress = wsl::windows::common::string::IntegerIpv4ToWstring(config.DnsTunnelingIpAddress.value());
+        m_dnsTunnelingIpAddress = lsw::windows::common::string::IntegerIpv4ToWstring(config.DnsTunnelingIpAddress.value());
     }
     else if (!config.EnableDnsProxy)
     {
         // EnableDnsProxy indicates to use the DNS/NAT shared access service to proxy DNS requests
-        // If this is false then wsl will assign a prioritized set of DNS servers into the Linux container
+        // If this is false then lsw will assign a prioritized set of DNS servers into the Linux container
         // prioritized means:
         // - can only set 3 DNS servers (Linux limitation)
         // - when there are multiple host connected interfaces, we need to use the DNS servers from the most-likely-to-be-used interface on the host
@@ -76,7 +76,7 @@ NatNetworking::~NatNetworking()
 void NatNetworking::TelemetryConnectionCallback(NLM_CONNECTIVITY hostConnectivity, uint32_t telemetryCounter) noexcept
 try
 {
-    WSL_LOG("NatNetworking::TelemetryConnectionCallback");
+    LSW_LOG("NatNetworking::TelemetryConnectionCallback");
 
     // if this is the inital callback for checking container connectivity, push this through as telemetry, so we can observe the time-to-connect
     if ((telemetryCounter == 1) || (hostConnectivity & NLM_CONNECTIVITY_IPV4_INTERNET))
@@ -88,7 +88,7 @@ try
         });
 
         // make the same connect requests as we just requested from the container
-        const auto hostConnCheckResult = wsl::shared::conncheck::CheckConnection(c_ipv4TestRequestTargetA, nullptr, "80");
+        const auto hostConnCheckResult = lsw::shared::conncheck::CheckConnection(c_ipv4TestRequestTargetA, nullptr, "80");
         const auto WindowsIpv4ConnCheckStatus = static_cast<uint32_t>(hostConnCheckResult.Ipv4Status);
         const auto WindowsIpv6ConnCheckStatus = static_cast<uint32_t>(hostConnCheckResult.Ipv6Status);
 
@@ -99,7 +99,7 @@ try
         constexpr auto LinuxIPv6ConnCheckStatus = 2;
 
         const auto timeFromObjectCreation = std::chrono::steady_clock::now() - m_objectCreationTime;
-        WSL_LOG_TELEMETRY(
+        LSW_LOG_TELEMETRY(
             "TelemetryConnectionCallback",
             PDT_ProductAndServicePerformance,
             TraceLoggingValue("NAT", "networkingMode"),
@@ -107,7 +107,7 @@ try
             TraceLoggingValue(
                 (std::chrono::duration_cast<std::chrono::milliseconds>(timeFromObjectCreation)).count(),
                 "timeFromObjectCreationMs"),
-            TraceLoggingValue(wsl::core::networking::ToString(hostConnectivity).c_str(), "HostConnectivityLevel"),
+            TraceLoggingValue(lsw::core::networking::ToString(hostConnectivity).c_str(), "HostConnectivityLevel"),
             TraceLoggingValue(WindowsIPv4NlmConnectivityLevel, "WindowsIPv4ConnectivityLevel"),
             TraceLoggingValue(WindowsIPv6NlmConnectivityLevel, "WindowsIPv6ConnectivityLevel"),
             TraceLoggingValue(LinuxIPv4ConnCheckStatus, "LinuxIPv4ConnCheckStatus"),
@@ -122,26 +122,26 @@ try
     }
     else
     {
-        WSL_LOG(
+        LSW_LOG(
             "NatNetworking::TelemetryConnectionCallback - not testing connectivity - host is not connected",
-            TraceLoggingValue(wsl::core::networking::ToString(hostConnectivity).c_str(), "HostConnectivityLevel"));
+            TraceLoggingValue(lsw::core::networking::ToString(hostConnectivity).c_str(), "HostConnectivityLevel"));
     }
 }
 CATCH_LOG()
 
-bool NatNetworking::IsHyperVFirewallSupported(const wsl::core::Config& vmConfig) noexcept
+bool NatNetworking::IsHyperVFirewallSupported(const lsw::core::Config& vmConfig) noexcept
 {
-    const auto hyperVFirewallSupport = wsl::core::networking::GetHyperVFirewallSupportVersion(vmConfig.FirewallConfig);
+    const auto hyperVFirewallSupport = lsw::core::networking::GetHyperVFirewallSupportVersion(vmConfig.FirewallConfig);
 
     switch (hyperVFirewallSupport)
     {
     case HyperVFirewallSupport::None:
-        WSL_LOG("IsHyperVFirewallSupported returning false: No Hyper-V Firewall API present");
+        LSW_LOG("IsHyperVFirewallSupported returning false: No Hyper-V Firewall API present");
         return false;
 
     case HyperVFirewallSupport::Version1:
         // we don't support using a NAT *and* Hyper-V Firewall when Windows only has the V1 APIs
-        WSL_LOG(
+        LSW_LOG(
             "IsHyperVFirewallSupported returning false: Hyper-V Firewall not supported with a NAT-network and v1 Hyper-V "
             "Firewall APIs");
         return false;
@@ -157,7 +157,7 @@ bool NatNetworking::IsHyperVFirewallSupported(const wsl::core::Config& vmConfig)
     }
 }
 
-std::pair<wsl::core::networking::EphemeralHcnEndpoint, wsl::shared::hns::HNSEndpoint> NatNetworking::CreateEndpoint(const std::wstring& IpAddress) const
+std::pair<lsw::core::networking::EphemeralHcnEndpoint, lsw::shared::hns::HNSEndpoint> NatNetworking::CreateEndpoint(const std::wstring& IpAddress) const
 {
     hns::HostComputeEndpoint hnsEndpoint{};
     hnsEndpoint.SchemaVersion.Major = 2;
@@ -174,7 +174,7 @@ std::pair<wsl::core::networking::EphemeralHcnEndpoint, wsl::shared::hns::HNSEndp
     // IP Address
     if (!IpAddress.empty())
     {
-        wsl::shared::hns::IpConfig endpointIpConfig{};
+        lsw::shared::hns::IpConfig endpointIpConfig{};
         endpointIpConfig.IpAddress = IpAddress;
         hnsEndpoint.IpConfigurations.emplace_back(endpointIpConfig);
     }
@@ -189,16 +189,16 @@ std::pair<wsl::core::networking::EphemeralHcnEndpoint, wsl::shared::hns::HNSEndp
         hnsEndpoint.Policies.emplace_back(std::move(endpointFirewallPolicy));
     }
 
-    auto endpoint = wsl::core::networking::CreateEphemeralHcnEndpoint(m_network.get(), hnsEndpoint);
+    auto endpoint = lsw::core::networking::CreateEphemeralHcnEndpoint(m_network.get(), hnsEndpoint);
 
-    return {std::move(endpoint), wsl::windows::common::hcs::GetEndpointProperties(endpoint.Endpoint.get())};
+    return {std::move(endpoint), lsw::windows::common::hcs::GetEndpointProperties(endpoint.Endpoint.get())};
 }
 
 void NatNetworking::Initialize()
 {
     auto lock = m_lock.lock_exclusive();
     wil::unique_cotaskmem_string error;
-    wsl::shared::hns::HNSEndpoint endpointProperties{};
+    lsw::shared::hns::HNSEndpoint endpointProperties{};
 
     // First try to find an existing endpoint that we can use.
     if (!m_config.NatIpAddress.empty())
@@ -221,13 +221,13 @@ void NatNetworking::Initialize()
             for (const auto& id : EnumerateEndpointsByNetworkId(m_config.NatNetworkId()))
             {
                 wil::unique_cotaskmem_string openEndpointError;
-                wsl::windows::common::hcs::unique_hcn_endpoint openEndpoint;
+                lsw::windows::common::hcs::unique_hcn_endpoint openEndpoint;
                 executionStep = "HcnOpenEndpoint";
                 auto result = HcnOpenEndpoint(id, &openEndpoint, &openEndpointError);
                 THROW_HR_IF_MSG(result, FAILED(result), "HcnOpenEndpoint %ls", openEndpointError.get());
 
                 executionStep = "HcnQueryEndpointProperties";
-                auto properties = wsl::windows::common::hcs::GetEndpointProperties(openEndpoint.get());
+                auto properties = lsw::windows::common::hcs::GetEndpointProperties(openEndpoint.get());
                 if (properties.IPAddress == m_config.NatIpAddress)
                 {
                     THROW_HR_IF_MSG(
@@ -235,7 +235,7 @@ void NatNetworking::Initialize()
                         std::ranges::find(g_endpointsInUse, id) != g_endpointsInUse.end(),
                         "Endpoint is in use by another address. Refusing to delete it.");
 
-                    // TODO: this means WSL just whacked a different container's NAT address
+                    // TODO: this means LSW just whacked a different container's NAT address
                     //   e.g., this just broke MDAG or Sandbox if they happened to use this same address range
                     //   this sounds like a really bad idea
 
@@ -250,7 +250,7 @@ void NatNetworking::Initialize()
             }
 
             // Create and attach the endpoint.
-            wsl::core::networking::EphemeralHcnEndpoint endpoint;
+            lsw::core::networking::EphemeralHcnEndpoint endpoint;
             executionStep = "HcnCreateEndpoint";
             std::tie(endpoint, endpointProperties) = CreateEndpoint(m_config.NatIpAddress);
             executionStep = "AttachEndpoint";
@@ -259,7 +259,7 @@ void NatNetworking::Initialize()
         }
         catch (...)
         {
-            WSL_LOG(
+            LSW_LOG(
                 "ConstrainedNetworkEndpointCreationFailed",
                 TraceLoggingValue(executionStep, "executionStep"),
                 TraceLoggingValue("NAT", "networkingMode"),
@@ -285,7 +285,7 @@ void NatNetworking::Initialize()
         catch (...)
         {
             const auto hr = wil::ResultFromCaughtException();
-            WSL_LOG(
+            LSW_LOG(
                 "NewEndpointCreationFailed",
                 TraceLoggingValue(executionStep, "executionStep"),
                 TraceLoggingValue("NAT", "networkingMode"),
@@ -298,7 +298,7 @@ void NatNetworking::Initialize()
 
         if (!m_config.NatIpAddress.empty())
         {
-            EMIT_USER_WARNING(wsl::shared::Localization::MessageFailedToCreateNetworkEndpoint(
+            EMIT_USER_WARNING(lsw::shared::Localization::MessageFailedToCreateNetworkEndpoint(
                 m_config.NatIpAddress.c_str(), endpointProperties.IPAddress.c_str()));
         }
 
@@ -355,26 +355,26 @@ void NatNetworking::Initialize()
     }
 }
 
-void NatNetworking::AttachEndpoint(wsl::core::networking::EphemeralHcnEndpoint&& endpoint, const wsl::shared::hns::HNSEndpoint& properties)
+void NatNetworking::AttachEndpoint(lsw::core::networking::EphemeralHcnEndpoint&& endpoint, const lsw::shared::hns::HNSEndpoint& properties)
 {
 
     // for mirrored endpoints, we will set the InstanceId to the InterfaceGuid of the host interface we mirror - as we add &
     // remove them dynamically for NAT endpoints, we will just set the InstanceId to the EndpointId
 
     ModifySettingRequest<NetworkAdapter> networkRequest{};
-    networkRequest.ResourcePath = networking::c_networkAdapterPrefix + wsl::shared::string::GuidToString<wchar_t>(properties.ID);
+    networkRequest.ResourcePath = networking::c_networkAdapterPrefix + lsw::shared::string::GuidToString<wchar_t>(properties.ID);
     networkRequest.RequestType = ModifyRequestType::Add;
     networkRequest.Settings.EndpointId = properties.ID;
     networkRequest.Settings.InstanceId = properties.ID;
 
-    networkRequest.Settings.MacAddress = wsl::shared::string::ParseMacAddress(properties.MacAddress);
+    networkRequest.Settings.MacAddress = lsw::shared::string::ParseMacAddress(properties.MacAddress);
     auto retryCount = 0ul;
-    const auto hr = wsl::shared::retry::RetryWithTimeout<HRESULT>(
+    const auto hr = lsw::shared::retry::RetryWithTimeout<HRESULT>(
         [&] {
             HRESULT exceptionHr = wil::ResultFromException(
-                [&] { wsl::windows::common::hcs::ModifyComputeSystem(m_system, wsl::shared::ToJsonW(networkRequest).c_str()); });
+                [&] { lsw::windows::common::hcs::ModifyComputeSystem(m_system, lsw::shared::ToJsonW(networkRequest).c_str()); });
 
-            WSL_LOG(
+            LSW_LOG(
                 "NatNetworking::AttachEndpoint [ModifyComputeSystem(ModifyRequestType::Add)]",
                 TraceLoggingValue(properties.ID, "endpointId"),
                 TraceLoggingValue(exceptionHr, "hr"),
@@ -383,13 +383,13 @@ void NatNetworking::AttachEndpoint(wsl::core::networking::EphemeralHcnEndpoint&&
             ++retryCount;
             return THROW_IF_FAILED(exceptionHr);
         },
-        wsl::core::networking::AddEndpointRetryPeriod,
-        wsl::core::networking::AddEndpointRetryTimeout,
-        wsl::core::networking::AddEndpointRetryPredicate);
+        lsw::core::networking::AddEndpointRetryPeriod,
+        lsw::core::networking::AddEndpointRetryTimeout,
+        lsw::core::networking::AddEndpointRetryPredicate);
 
     if (hr == HCN_E_ENDPOINT_ALREADY_ATTACHED)
     {
-        WSL_LOG(
+        LSW_LOG(
             "NatNetworking::AttachEndpoint [Adding the endpoint returned HCN_E_ENDPOINT_ALREADY_ATTACHED - continuing]",
             TraceLoggingValue(properties.ID, "endpointId"));
     }
@@ -420,10 +420,10 @@ try
 {
     auto lock = m_lock.lock_exclusive();
 
-    WSL_LOG(
+    LSW_LOG(
         "NatNetworking::RefreshGuestConnection",
-        TraceLoggingValue(wsl::windows::common::stringify::ToString(connectivityHint.ConnectivityLevel), "ConnectivityLevel"),
-        TraceLoggingValue(wsl::windows::common::stringify::ToString(connectivityHint.ConnectivityCost), "ConnectivityCost"));
+        TraceLoggingValue(lsw::windows::common::stringify::ToString(connectivityHint.ConnectivityLevel), "ConnectivityLevel"),
+        TraceLoggingValue(lsw::windows::common::stringify::ToString(connectivityHint.ConnectivityCost), "ConnectivityCost"));
 
     UpdateMtu();
     UpdateDns();
@@ -471,24 +471,24 @@ try
     else if (gatewayAddress)
     {
         // set the NAT gateway address when using the NAT IPv4 DNS proxy
-        latestDnsSettings.Servers.emplace_back(wsl::shared::string::WideToMultiByte(gatewayAddress.value()));
+        latestDnsSettings.Servers.emplace_back(lsw::shared::string::WideToMultiByte(gatewayAddress.value()));
     }
 
     if (latestDnsSettings != m_trackedDnsSettings)
     {
-        notification.Settings.ServerList = wsl::shared::string::MultiByteToWide(wsl::shared::string::Join(latestDnsSettings.Servers, ','));
+        notification.Settings.ServerList = lsw::shared::string::MultiByteToWide(lsw::shared::string::Join(latestDnsSettings.Servers, ','));
 
         if (configureLinuxDomain)
         {
             WI_ASSERT(!latestDnsSettings.Domains.empty());
-            notification.Settings.Domain = wsl::shared::string::MultiByteToWide(latestDnsSettings.Domains.front());
+            notification.Settings.Domain = lsw::shared::string::MultiByteToWide(latestDnsSettings.Domains.front());
         }
         else
         {
-            notification.Settings.Search = wsl::shared::string::MultiByteToWide(wsl::shared::string::Join(latestDnsSettings.Domains, ','));
+            notification.Settings.Search = lsw::shared::string::MultiByteToWide(lsw::shared::string::Join(latestDnsSettings.Domains, ','));
         }
 
-        WSL_LOG(
+        LSW_LOG(
             "NatNetworking::UpdateDns",
             TraceLoggingValue(notification.Settings.Domain.c_str(), "domain"),
             TraceLoggingValue(notification.Settings.Options.c_str(), "options"),
@@ -531,7 +531,7 @@ void NatNetworking::UpdateMtu()
         notification.Settings.Connected = true;
         notification.Settings.NlMtu = m_networkMtu;
 
-        WSL_LOG(
+        LSW_LOG(
             "NatNetworking::UpdateMtu", TraceLoggingValue(m_endpoint.Id, "endpointId"), TraceLoggingValue(m_networkMtu, "natMtu"));
 
         m_gnsChannel.SendHnsNotification(ToJsonW(notification).c_str(), m_endpoint.Id);
@@ -542,7 +542,7 @@ void NatNetworking::TraceLoggingRundown() noexcept
 {
     auto lock = m_lock.lock_exclusive();
 
-    WSL_LOG(
+    LSW_LOG(
         "NatNetworking::TraceLoggingRundown",
         TraceLoggingValue(m_config.NatNetworkId(), "networkId"),
         TraceLoggingValue(m_endpoint.Id, "endpointId"),
@@ -582,11 +582,11 @@ std::optional<ULONGLONG> NatNetworking::FindNatInterfaceLuid(const SOCKADDR_INET
                 break;
             }
 
-            WSL_LOG(
+            LSW_LOG(
                 "NatNetworking::FindNatInterfaceLuid [IP Address comparison mismatch]",
-                TraceLoggingValue(wsl::windows::common::string::SockAddrInetToString(natAddress).c_str(), "natAddress"),
+                TraceLoggingValue(lsw::windows::common::string::SockAddrInetToString(natAddress).c_str(), "natAddress"),
                 TraceLoggingValue(
-                    wsl::windows::common::string::SockAddrInetToString(address.Address).c_str(), "enumeratedAddress"));
+                    lsw::windows::common::string::SockAddrInetToString(address.Address).c_str(), "enumeratedAddress"));
         }
 
         if (natLuid.Value != 0)
@@ -606,24 +606,24 @@ std::optional<ULONGLONG> NatNetworking::FindNatInterfaceLuid(const SOCKADDR_INET
         GetNetworkConnectivityHint(&latestConnectivityHint);
         if (latestConnectivityHint != currentConnectivityHint)
         {
-            WSL_LOG("NatNetworking::FindNatInterfaceLuid [connectivity changed while waiting for the NAT interface]");
+            LSW_LOG("NatNetworking::FindNatInterfaceLuid [connectivity changed while waiting for the NAT interface]");
             THROW_WIN32_MSG(ERROR_RETRY, "connectivity changed while waiting for the NAT interface");
         }
     }
 
     if (natLuid.Value == 0)
     {
-        WSL_LOG(
+        LSW_LOG(
             "NatNetworking::FindNatInterfaceLuid [IP address not found]",
             TraceLoggingValue(natLuid.Value, "natInterfaceLuid"),
-            TraceLoggingValue(wsl::windows::common::string::SockAddrInetToString(natAddress).c_str(), "natIPAddress"));
+            TraceLoggingValue(lsw::windows::common::string::SockAddrInetToString(natAddress).c_str(), "natIPAddress"));
         return {};
     }
 
-    WSL_LOG(
+    LSW_LOG(
         "NatNetworking::FindNatInterfaceLuid [waiting for NAT interface to be connected]",
         TraceLoggingValue(natLuid.Value, "natInterfaceLuid"),
-        TraceLoggingValue(wsl::windows::common::string::SockAddrInetToString(natAddress).c_str(), "natIPAddress"));
+        TraceLoggingValue(lsw::windows::common::string::SockAddrInetToString(natAddress).c_str(), "natIPAddress"));
 
     bool ipv4Connected = false;
     for (;;)
@@ -657,7 +657,7 @@ std::optional<ULONGLONG> NatNetworking::FindNatInterfaceLuid(const SOCKADDR_INET
         GetNetworkConnectivityHint(&latestConnectivityHint);
         if (latestConnectivityHint != currentConnectivityHint)
         {
-            WSL_LOG("NatNetworking::FindNatInterfaceLuid [connectivity changed while waiting for the NAT interface]");
+            LSW_LOG("NatNetworking::FindNatInterfaceLuid [connectivity changed while waiting for the NAT interface]");
             THROW_WIN32_MSG(ERROR_RETRY, "connectivity changed while waiting for the NAT interface");
         }
     }
@@ -666,13 +666,13 @@ std::optional<ULONGLONG> NatNetworking::FindNatInterfaceLuid(const SOCKADDR_INET
     return ipv4Connected ? natLuid.Value : std::optional<ULONGLONG>();
 }
 
-wsl::windows::common::hcs::unique_hcn_network NatNetworking::CreateNetwork(wsl::core::Config& config)
+lsw::windows::common::hcs::unique_hcn_network NatNetworking::CreateNetwork(lsw::core::Config& config)
 {
-    wsl::windows::common::hcs::unique_hcn_network natNetwork;
+    lsw::windows::common::hcs::unique_hcn_network natNetwork;
     wil::ResultFromException(WI_DIAGNOSTICS_INFO, [&] {
         try
         {
-            wsl::core::networking::ConfigureHyperVFirewall(config.FirewallConfig, c_vmOwner);
+            lsw::core::networking::ConfigureHyperVFirewall(config.FirewallConfig, c_vmOwner);
             natNetwork = CreateNetworkInternal(config);
         }
         catch (...)
@@ -690,7 +690,7 @@ wsl::windows::common::hcs::unique_hcn_network NatNetworking::CreateNetwork(wsl::
                 config.NatGateway.c_str());
 
             const auto error = wil::ResultFromCaughtException();
-            WSL_LOG(
+            LSW_LOG(
                 "ConstrainedNetworkCreationFailed",
                 TraceLoggingHexUInt32(error, "result"),
                 TraceLoggingValue("NAT", "networkingMode"),
@@ -704,15 +704,15 @@ wsl::windows::common::hcs::unique_hcn_network NatNetworking::CreateNetwork(wsl::
             // Note that the firewall config is NOT cleared here as we MUST always configure firewall if it has been requested
             natNetwork = CreateNetworkInternal(config);
 
-            EMIT_USER_WARNING(wsl::shared::Localization::MessageFailedToCreateNetwork(
-                previousRange.c_str(), config.NatNetwork.c_str(), wsl::windows::common::wslutil::GetSystemErrorString(error).c_str()));
+            EMIT_USER_WARNING(lsw::shared::Localization::MessageFailedToCreateNetwork(
+                previousRange.c_str(), config.NatNetwork.c_str(), lsw::windows::common::lswutil::GetSystemErrorString(error).c_str()));
         }
     });
 
     return natNetwork;
 }
 
-wsl::windows::common::hcs::unique_hcn_network NatNetworking::CreateNetworkInternal(wsl::core::Config& config)
+lsw::windows::common::hcs::unique_hcn_network NatNetworking::CreateNetworkInternal(lsw::core::Config& config)
 {
     HRESULT hr = S_OK;
     PCSTR executionStep = "";
@@ -721,7 +721,7 @@ wsl::windows::common::hcs::unique_hcn_network NatNetworking::CreateNetworkIntern
     const auto startTimeMs = GetTickCount64();
 
     // Log how long it takes for networking to be created
-    WSL_LOG_TELEMETRY(
+    LSW_LOG_TELEMETRY(
         "CreateNetworkBegin",
         PDT_ProductAndServicePerformance,
         TraceLoggingValue(config.NatNetworkName(), "NetworkName"),
@@ -733,7 +733,7 @@ wsl::windows::common::hcs::unique_hcn_network NatNetworking::CreateNetworkIntern
 
     auto createEnd = wil::scope_exit([&] {
         const auto TimeToCreateNetworkMs = GetTickCount64() - startTimeMs;
-        WSL_LOG_TELEMETRY(
+        LSW_LOG_TELEMETRY(
             "CreateNetworkEnd",
             PDT_ProductAndServicePerformance,
             TraceLoggingValue(config.NatNetworkName(), "NetworkName"),
@@ -785,17 +785,17 @@ wsl::windows::common::hcs::unique_hcn_network NatNetworking::CreateNetworkIntern
     }
     CATCH_LOG()
 
-    wsl::windows::common::hcs::unique_hcn_network network{};
+    lsw::windows::common::hcs::unique_hcn_network network{};
     try
     {
         auto retryCount = 0ul;
-        wsl::shared::retry::RetryWithTimeout<void>(
+        lsw::shared::retry::RetryWithTimeout<void>(
             [&] {
                 executionStep = "HcnCreateNetwork";
                 ExecutionContext context(Context::HNS);
                 wil::unique_cotaskmem_string error;
                 HRESULT hns_hr = HcnCreateNetwork(config.NatNetworkId(), ToJsonW(settings).c_str(), &network, &error);
-                WSL_LOG(
+                LSW_LOG(
                     "NatNetworking::CreateNetwork [HcnCreateNetwork]",
                     TraceLoggingValue(config.NatNetworkId(), "networkGuid"),
                     TraceLoggingValue(settings.Name.c_str(), "settingsName"),
@@ -813,7 +813,7 @@ wsl::windows::common::hcs::unique_hcn_network NatNetworking::CreateNetworkIntern
                 if (hns_hr == HCN_E_NETWORK_ALREADY_EXISTS)
                 {
                     executionStep = "HcnOpenNetwork";
-                    network = wsl::core::networking::OpenNetwork(config.NatNetworkId());
+                    network = lsw::core::networking::OpenNetwork(config.NatNetworkId());
                 }
                 else
                 {
@@ -822,8 +822,8 @@ wsl::windows::common::hcs::unique_hcn_network NatNetworking::CreateNetworkIntern
                 }
 
                 executionStep = "HcnQueryNetworkProperties";
-                // Save the networks settings in the configuration (used for WSL to save the NAT network configuration)
-                auto [properties, propertiesString] = wsl::core::networking::QueryNetworkProperties(network.get());
+                // Save the networks settings in the configuration (used for LSW to save the NAT network configuration)
+                auto [properties, propertiesString] = lsw::core::networking::QueryNetworkProperties(network.get());
                 THROW_HR_IF_MSG(
                     E_UNEXPECTED, properties.Subnets.size() != 1, "Unexpected number of subnets in network: %ls", propertiesString.get());
 

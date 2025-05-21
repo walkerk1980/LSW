@@ -18,7 +18,7 @@ Abstract:
 DmesgCollector::DmesgCollector(GUID VmId, const wil::unique_event& ExitEvent, bool EnableTelemetry, bool EnableDebugConsole, const std::wstring& Com1PipeName) :
     m_com1PipeName(Com1PipeName), m_runtimeId(VmId), m_debugConsole(EnableDebugConsole), m_telemetry(EnableTelemetry)
 {
-    m_exitEvent.reset(wsl::windows::common::helpers::DuplicateHandle(ExitEvent.get()));
+    m_exitEvent.reset(lsw::windows::common::helpers::DuplicateHandle(ExitEvent.get()));
     m_overlappedEvent.create(wil::EventOptions::ManualReset);
     m_overlapped.hEvent = m_overlappedEvent.get();
     m_threadExit.create(wil::EventOptions::ManualReset);
@@ -55,7 +55,7 @@ std::shared_ptr<DmesgCollector> DmesgCollector::Create(
 
 std::pair<std::wstring, std::thread> DmesgCollector::StartDmesgThread(InputSource Source)
 {
-    std::wstring pipeName = wsl::windows::common::helpers::GetUniquePipeName();
+    std::wstring pipeName = lsw::windows::common::helpers::GetUniquePipeName();
     wil::unique_hfile pipe(CreateNamedPipeW(
         pipeName.c_str(), (PIPE_ACCESS_DUPLEX | FILE_FLAG_OVERLAPPED), (PIPE_TYPE_BYTE | PIPE_READMODE_BYTE | PIPE_WAIT), 1, LX_RELAY_BUFFER_SIZE, LX_RELAY_BUFFER_SIZE, 0, nullptr));
 
@@ -64,10 +64,10 @@ std::pair<std::wstring, std::thread> DmesgCollector::StartDmesgThread(InputSourc
     auto workerThread = std::thread([Self = shared_from_this(), Source, Pipe = std::move(pipe)]() {
         try
         {
-            wsl::windows::common::wslutil::SetThreadDescription(L"Dmesg");
+            lsw::windows::common::lswutil::SetThreadDescription(L"Dmesg");
 
             // When the pipe connects, start reading data.
-            wsl::windows::common::helpers::ConnectPipe(Pipe.get(), INFINITE, Self->m_exitEvents);
+            lsw::windows::common::helpers::ConnectPipe(Pipe.get(), INFINITE, Self->m_exitEvents);
 
             std::vector<char> buffer(LX_RELAY_BUFFER_SIZE);
             const auto allBuffer = gsl::make_span(buffer);
@@ -77,7 +77,7 @@ std::pair<std::wstring, std::thread> DmesgCollector::StartDmesgThread(InputSourc
             for (;;)
             {
                 overlappedEvent.ResetEvent();
-                const auto bytesRead = wsl::windows::common::relay::InterruptableRead(
+                const auto bytesRead = lsw::windows::common::relay::InterruptableRead(
                     Pipe.get(), gslhelpers::convert_span<gsl::byte>(allBuffer), Self->m_exitEvents, &overlapped);
 
                 if (bytesRead == 0)
@@ -133,7 +133,7 @@ void DmesgCollector::ProcessInput(InputSource Source, const gsl::span<char>& Inp
             const auto newStrings = ringBuffer->GetLastDelimitedStrings('\n', delimiterCount);
             for (const auto& logLine : newStrings)
             {
-                WSL_LOG("GuestLog", TraceLoggingValue(logLine.c_str(), "text"), TraceLoggingValue(m_runtimeId, "vmId"));
+                LSW_LOG("GuestLog", TraceLoggingValue(logLine.c_str(), "text"), TraceLoggingValue(m_runtimeId, "vmId"));
             }
         }
     }
@@ -157,7 +157,7 @@ void DmesgCollector::WriteToCom1(const gsl::span<char>& Input)
     if (m_waitForConnection)
     {
         if (FAILED(wil::ResultFromException(
-                [&]() { wsl::windows::common::helpers::ConnectPipe(m_com1Pipe.get(), INFINITE, m_exitEvents); })))
+                [&]() { lsw::windows::common::helpers::ConnectPipe(m_com1Pipe.get(), INFINITE, m_exitEvents); })))
         {
             return;
         }
@@ -167,7 +167,7 @@ void DmesgCollector::WriteToCom1(const gsl::span<char>& Input)
 
     m_overlappedEvent.ResetEvent();
     const auto buffer = gslhelpers::convert_span<gsl::byte>(Input);
-    if (wsl::windows::common::relay::InterruptableWrite(m_com1Pipe.get(), buffer, m_exitEvents, &m_overlapped) == 0)
+    if (lsw::windows::common::relay::InterruptableWrite(m_com1Pipe.get(), buffer, m_exitEvents, &m_overlapped) == 0)
     {
         if (m_debugConsole || !m_pipeServer)
         {

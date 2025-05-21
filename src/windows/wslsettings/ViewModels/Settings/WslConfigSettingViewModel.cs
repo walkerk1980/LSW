@@ -40,14 +40,14 @@ namespace WslSettings.ViewModels.Settings
             return true;
         }
 
-        protected void Set<T>(ref IWslConfigSetting wslConfigSetting, T newValue, [CallerMemberName] string? propertyName = null)
+        protected void Set<T>(ref IWslConfigSetting lswConfigSetting, T newValue, [CallerMemberName] string? propertyName = null)
         {
-            if (wslConfigSetting.Equals(newValue))
+            if (lswConfigSetting.Equals(newValue))
             {
                 return;
             }
 
-            if (wslConfigSetting.SetValue(newValue) != 0)
+            if (lswConfigSetting.SetValue(newValue) != 0)
             {
                 SettingsContentVisibility = false;
                 ErrorVisibility = !SettingsContentVisibility;

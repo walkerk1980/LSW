@@ -20,7 +20,7 @@ Abstract:
 
 #include "WslCoreNetworkingSupport.h"
 
-using namespace wsl::windows::common;
+using namespace lsw::windows::common;
 
 std::optional<LxssDynamicFunction<decltype(RegisterProxyChangeNotification)>> HttpProxyStateTracker::s_WinHttpRegisterProxyChangeNotification;
 std::optional<LxssDynamicFunction<decltype(UnregisterProxyChangeNotification)>> HttpProxyStateTracker::s_WinHttpUnregisterProxyChangeNotification;
@@ -95,7 +95,7 @@ auto CallbackStatusToString(DWORD internetStatus) noexcept
 void LogHttpProxySettings(const HttpProxySettings& settings) noexcept
 try
 {
-    WSL_LOG("OnProxyRequestComplete", TraceLoggingValue(settings.ToString().c_str(), "newProxySettings"));
+    LSW_LOG("OnProxyRequestComplete", TraceLoggingValue(settings.ToString().c_str(), "newProxySettings"));
 }
 CATCH_LOG()
 
@@ -103,12 +103,12 @@ HttpProxySettings::HttpProxySettings(const WINHTTP_PROXY_SETTINGS_EX& proxySetti
 {
     if (WI_IsFlagSet(proxySettings.ullFlags, WINHTTP_PROXY_TYPE_PROXY))
     {
-        Proxy = wsl::shared::string::WideToMultiByte(proxySettings.pcwszProxy);
-        SecureProxy = wsl::shared::string::WideToMultiByte(proxySettings.pcwszSecureProxy);
+        Proxy = lsw::shared::string::WideToMultiByte(proxySettings.pcwszProxy);
+        SecureProxy = lsw::shared::string::WideToMultiByte(proxySettings.pcwszSecureProxy);
 
         const auto proxyBypasses = wil::make_range(proxySettings.rgpcwszProxyBypasses, proxySettings.cProxyBypasses);
         std::transform(std::cbegin(proxyBypasses), std::cend(proxyBypasses), std::back_inserter(ProxyBypasses), [](const auto& proxyBypass) {
-            return wsl::shared::string::WideToMultiByte(proxyBypass);
+            return lsw::shared::string::WideToMultiByte(proxyBypass);
         });
 
         if (!ProxyBypasses.empty())
@@ -123,7 +123,7 @@ HttpProxySettings::HttpProxySettings(const WINHTTP_PROXY_SETTINGS_EX& proxySetti
 
     if (WI_IsFlagSet(proxySettings.ullFlags, WINHTTP_PROXY_TYPE_AUTO_PROXY_URL))
     {
-        PacUrl = wsl::shared::string::WideToMultiByte(proxySettings.pcwszAutoconfigUrl);
+        PacUrl = lsw::shared::string::WideToMultiByte(proxySettings.pcwszAutoconfigUrl);
     }
 }
 
@@ -152,7 +152,7 @@ try
         return;
     }
 
-    WSL_LOG(
+    LSW_LOG(
         "s_GetProxySettingsExCallback-CallbackInfo", TraceLoggingValue(CallbackStatusToString(internetStatus), "internetStatus"));
 
     // This is the last WinHttp callback for this request, received after the request handles were closed.
@@ -189,7 +189,7 @@ try
 
     if (SUCCEEDED_WIN32(error))
     {
-        WSL_LOG(
+        LSW_LOG(
             "s_GetProxySettingsExCallback-Results",
             TraceLoggingValue(proxySettings.pcwszProxy, "pcwszProxy"),
             TraceLoggingValue(proxySettings.pcwszSecureProxy, "pcwszSecureProxy"),
@@ -198,7 +198,7 @@ try
     }
     else
     {
-        WSL_LOG(
+        LSW_LOG(
             "WinHttpGetProxySettingsExCallbackFailed",
             TraceLoggingValue(error, "result"),
             TraceLoggingValue(executionStep, "executionStep"));
@@ -257,7 +257,7 @@ try
             LogHttpProxySettings(newProxySettings);
             m_proxySettings = std::move(newProxySettings);
 
-            // If there was a setting changes, and this is not the initial proxy query, notify the user to restart WSL to get new proxy changes.
+            // If there was a setting changes, and this is not the initial proxy query, notify the user to restart LSW to get new proxy changes.
             if (m_initialProxyQueryCompleted.is_signaled())
             {
                 notifications::DisplayProxyChangeNotification(m_localizedProxyChangeString);
@@ -286,7 +286,7 @@ CATCH_LOG()
 void CALLBACK HttpProxyStateTracker::s_OnProxyChange(_In_ ULONGLONG flags, _In_ void* pContext) noexcept
 try
 {
-    WSL_LOG("OnProxyChange", TraceLoggingValue(flags, "flags"));
+    LSW_LOG("OnProxyChange", TraceLoggingValue(flags, "flags"));
     const auto proxyStateTracking = static_cast<HttpProxyStateTracker*>(pContext);
 
     // Ensure this is a change notification.
@@ -299,7 +299,7 @@ try
 }
 CATCH_LOG()
 
-UnsupportedProxyReason HttpProxyStateTracker::IsUnsupportedProxy(LPCWSTR proxyString, wsl::core::NetworkingMode configuration) noexcept
+UnsupportedProxyReason HttpProxyStateTracker::IsUnsupportedProxy(LPCWSTR proxyString, lsw::core::NetworkingMode configuration) noexcept
 try
 {
     if (!proxyString)
@@ -339,7 +339,7 @@ try
     PCWSTR pStringEnd{}; // not used by us but still required for *ToAddressW
     if (SUCCEEDED_WIN32(RtlIpv6StringToAddressW(portRemoved.c_str(), &pStringEnd, &addrV6)))
     {
-        if (configuration != wsl::core::NetworkingMode::Mirrored)
+        if (configuration != lsw::core::NetworkingMode::Mirrored)
         {
             return UnsupportedProxyReason::Ipv6NotMirrored; // v6 is only supported in mirrored mode
         }
@@ -351,7 +351,7 @@ try
     }
 
     // v4 loopback is only supported in mirrored mode
-    if (configuration != wsl::core::NetworkingMode::Mirrored)
+    if (configuration != lsw::core::NetworkingMode::Mirrored)
     {
         in_addr addrV4{};
         if (SUCCEEDED_WIN32(RtlIpv4StringToAddressW(portRemoved.c_str(), true, &pStringEnd, &addrV4)))
@@ -363,7 +363,7 @@ try
             return UnsupportedProxyReason::Supported;
         }
 
-        if (wsl::shared::string::IsEqual(portRemoved, c_loopback, true) || wsl::shared::string::IsEqual(portRemoved, c_localhost, true))
+        if (lsw::shared::string::IsEqual(portRemoved, c_loopback, true) || lsw::shared::string::IsEqual(portRemoved, c_localhost, true))
         {
             return UnsupportedProxyReason::LoopbackNotMirrored;
         }
@@ -387,7 +387,7 @@ try
             computerName.resize(offset);
         }
 
-        if (wsl::shared::string::IsEqual(computerName, portRemoved, true))
+        if (lsw::shared::string::IsEqual(computerName, portRemoved, true))
         {
             return UnsupportedProxyReason::LoopbackNotMirrored;
         }
@@ -400,11 +400,11 @@ catch (...)
     return UnsupportedProxyReason::UnsupportedError;
 }
 
-void HttpProxyStateTracker::FilterProxySettingsByNetworkConfiguration(HttpProxySettings& settings, wsl::core::NetworkingMode mode) noexcept
+void HttpProxyStateTracker::FilterProxySettingsByNetworkConfiguration(HttpProxySettings& settings, lsw::core::NetworkingMode mode) noexcept
 try
 {
-    const auto proxySupportState = IsUnsupportedProxy(wsl::shared::string::MultiByteToWide(settings.Proxy).c_str(), mode);
-    const auto secureProxySupportState = IsUnsupportedProxy(wsl::shared::string::MultiByteToWide(settings.SecureProxy).c_str(), mode);
+    const auto proxySupportState = IsUnsupportedProxy(lsw::shared::string::MultiByteToWide(settings.Proxy).c_str(), mode);
+    const auto secureProxySupportState = IsUnsupportedProxy(lsw::shared::string::MultiByteToWide(settings.SecureProxy).c_str(), mode);
     if (proxySupportState != UnsupportedProxyReason::Supported)
     {
         settings.Proxy.clear();
@@ -427,9 +427,9 @@ try
 
     if (proxySupportState != UnsupportedProxyReason::Supported || secureProxySupportState != UnsupportedProxyReason::Supported)
     {
-        WSL_LOG(
+        LSW_LOG(
             "AutoProxy-DropUnsupportedSetting",
-            TraceLoggingValue(wsl::core::ToString(mode), "InvalidNetworkConfiguration"),
+            TraceLoggingValue(lsw::core::ToString(mode), "InvalidNetworkConfiguration"),
             TraceLoggingValue(ToString(proxySupportState), "DropHttpProxySetting"),
             TraceLoggingValue(ToString(secureProxySupportState), "DropHttpsProxySetting"));
     }
@@ -450,7 +450,7 @@ void HttpProxyStateTracker::QueryProxySettingsAsync()
         if (m_queryState == QueryState::Pending)
         {
             m_queryState = QueryState::PendingAndQueueAdditional;
-            WSL_LOG("Run another http proxy query after current completes");
+            LSW_LOG("Run another http proxy query after current completes");
             return;
         }
 
@@ -502,16 +502,16 @@ void HttpProxyStateTracker::QueryProxySettingsAsync()
     catch (...)
     {
         const auto hr = wil::ResultFromCaughtException();
-        WSL_LOG("QueryProxySettingsFailed", TraceLoggingHResult(hr, "result"), TraceLoggingValue(executionStep, "executionStep"));
+        LSW_LOG("QueryProxySettingsFailed", TraceLoggingHResult(hr, "result"), TraceLoggingValue(executionStep, "executionStep"));
 
         throw;
     }
 }
 
-HttpProxyStateTracker::HttpProxyStateTracker(int ProxyTimeout, HANDLE UserToken, wsl::core::NetworkingMode mode) :
+HttpProxyStateTracker::HttpProxyStateTracker(int ProxyTimeout, HANDLE UserToken, lsw::core::NetworkingMode mode) :
     m_networkMode{mode},
     m_initialQueryTimeout{ProxyTimeout},
-    m_localizedProxyChangeString{wsl::shared::Localization::MessageHttpProxyChangeDetected()}
+    m_localizedProxyChangeString{lsw::shared::Localization::MessageHttpProxyChangeDetected()}
 {
     THROW_IF_WIN32_BOOL_FALSE(::DuplicateTokenEx(UserToken, MAXIMUM_ALLOWED, nullptr, SecurityImpersonation, TokenImpersonation, &m_userToken));
     m_callbackQueue.submit([this] { QueryProxySettingsAsync(); });
@@ -549,7 +549,7 @@ std::optional<HttpProxySettings> HttpProxyStateTracker::WaitForInitialProxySetti
     return m_proxySettings;
 }
 
-void HttpProxyStateTracker::ConfigureNetworkingMode(wsl::core::NetworkingMode mode) noexcept
+void HttpProxyStateTracker::ConfigureNetworkingMode(lsw::core::NetworkingMode mode) noexcept
 {
     auto lock = m_proxySettingsLock.lock();
     // if we fallback to NAT mode need to strip bad settings

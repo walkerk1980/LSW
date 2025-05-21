@@ -45,7 +45,7 @@ void ClearSessionsAndBlockNewInstances();
 std::weak_ptr<LxssUserSessionImpl> CreateInstanceForCurrentUser();
 
 /// <summary>
-/// Set session creation policy. This is controlled by WSL enterprise policy keys.
+/// Set session creation policy. This is controlled by LSW enterprise policy keys.
 /// </summary>
 void SetSessionPolicy(_In_ bool enabled);
 

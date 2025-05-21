@@ -2,7 +2,7 @@
 
 #include "precomp.h"
 #include "GnsRpcServer.h"
-#include "wsldeps.h"
+#include "lswdeps.h"
 
 static constexpr PCWSTR c_SystemOnlySDDL =
     // Owner: System

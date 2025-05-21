@@ -35,8 +35,8 @@ Abstract:
 #include "util.h"
 #include "timezone.h"
 #include "binfmt.h"
-#include "wslpath.h"
-#include "wslinfo.h"
+#include "lswpath.h"
+#include "lswinfo.h"
 #include "drvfs.h"
 #include "plan9.h"
 #include "localhost.h"
@@ -58,7 +58,7 @@ static_assert(EUSERS == LX_INIT_TTY_LIMIT);
 #define SHELL_PATH "/bin/sh"
 #define USER_ENV "USER"
 
-using namespace wsl::shared;
+using namespace lsw::shared;
 
 typedef struct _CREATE_PROCESS_PARSED_COMMON
 {
@@ -100,13 +100,13 @@ constexpr passwd c_defaultPasswordEntry = {
 
 int CaptureCrash(int Argc, char** Argv);
 
-void CreateProcess(PCREATE_PROCESS_PARSED Parsed, const wsl::linux::WslDistributionConfig& Config);
+void CreateProcess(PCREATE_PROCESS_PARSED Parsed, const lsw::linux::WslDistributionConfig& Config);
 
-void CreateProcessCommon(PCREATE_PROCESS_PARSED_COMMON Common, int TtyFd, int ServiceSocketFd, const wsl::linux::WslDistributionConfig&);
+void CreateProcessCommon(PCREATE_PROCESS_PARSED_COMMON Common, int TtyFd, int ServiceSocketFd, const lsw::linux::WslDistributionConfig&);
 
 int CreateProcessParse(PCREATE_PROCESS_PARSED CreateProcessParsed, gsl::span<gsl::byte> Buffer, int MessageFd, int TtyFd);
 
-int CreateProcessParseCommon(PCREATE_PROCESS_PARSED_COMMON Parsed, gsl::span<gsl::byte> Buffer, const wsl::linux::WslDistributionConfig& Config);
+int CreateProcessParseCommon(PCREATE_PROCESS_PARSED_COMMON Parsed, gsl::span<gsl::byte> Buffer, const lsw::linux::WslDistributionConfig& Config);
 
 void CreateProcessParseFree(PCREATE_PROCESS_PARSED CreateProcessParsed);
 
@@ -114,25 +114,25 @@ void CreateProcessParseInitialize(PCREATE_PROCESS_PARSED CreateProcessParsed);
 
 int CreateProcessReplyToServer(PCREATE_PROCESS_PARSED CreateProcessParsed, pid_t CreateProcessPid, int MessageFd);
 
-void CreateWslSystemdUnits(const wsl::linux::WslDistributionConfig& Config);
+void CreateWslSystemdUnits(const lsw::linux::WslDistributionConfig& Config);
 
 int InitConnectToServer(int LxBusFd, bool WaitForServer);
 
 int InitCreateProcessUtilityVm(
     gsl::span<gsl::byte> Message,
     const LX_INIT_CREATE_PROCESS_UTILITY_VM& Header,
-    wsl::shared::SocketChannel& MessageFd,
-    const wsl::linux::WslDistributionConfig& Config);
+    lsw::shared::SocketChannel& MessageFd,
+    const lsw::linux::WslDistributionConfig& Config);
 
-int InitCreateSessionLeader(gsl::span<gsl::byte> Buffer, wsl::shared::SocketChannel& Channel, int LxBusFd, wsl::linux::WslDistributionConfig& Config);
+int InitCreateSessionLeader(gsl::span<gsl::byte> Buffer, lsw::shared::SocketChannel& Channel, int LxBusFd, lsw::linux::WslDistributionConfig& Config);
 
 void InitEntry(int Argc, char* Argv[]);
 
-void InitEntryWsl(wsl::linux::WslDistributionConfig& Config);
+void InitEntryWsl(lsw::linux::WslDistributionConfig& Config);
 
-void InitEntryUtilityVm(wsl::linux::WslDistributionConfig& Config);
+void InitEntryUtilityVm(lsw::linux::WslDistributionConfig& Config);
 
-void InitTerminateInstance(gsl::span<gsl::byte> Buffer, wsl::shared::SocketChannel& Channel, wsl::linux::WslDistributionConfig& Config);
+void InitTerminateInstance(gsl::span<gsl::byte> Buffer, lsw::shared::SocketChannel& Channel, lsw::linux::WslDistributionConfig& Config);
 
 void InstallSystemdUnit(const char* Path, const std::string& Name, const char* Content);
 
@@ -140,19 +140,19 @@ int GenerateSystemdUnits(int Argc, char** Argv);
 
 void HardenMirroredNetworkingSettingsAgainstSystemd();
 
-void PostProcessImportedDistribution(wsl::shared::MessageWriter<LX_MINI_INIT_IMPORT_RESULT>& Message, const char* ExtractedPath);
+void PostProcessImportedDistribution(lsw::shared::MessageWriter<LX_MINI_INIT_IMPORT_RESULT>& Message, const char* ExtractedPath);
 
 int SessionLeaderCreateProcess(gsl::span<gsl::byte> Buffer, int MessageFd, int TtyFd);
 
-void SessionLeaderEntry(int MessageFd, int TtyFd, const wsl::linux::WslDistributionConfig& Config);
+void SessionLeaderEntry(int MessageFd, int TtyFd, const lsw::linux::WslDistributionConfig& Config);
 
-void SessionLeaderEntryUtilityVm(wsl::shared::SocketChannel& Channel, const wsl::linux::WslDistributionConfig& Config);
+void SessionLeaderEntryUtilityVm(lsw::shared::SocketChannel& Channel, const lsw::linux::WslDistributionConfig& Config);
 
 unsigned int StartPlan9(int Argc, char** Argv);
 
 unsigned int StartGns(int Argc, char** Argv);
 
-void WaitForBootProcess(wsl::linux::WslDistributionConfig& Config);
+void WaitForBootProcess(lsw::linux::WslDistributionConfig& Config);
 
 wil::unique_fd UnmarshalConsoleFromServer(int MessageFd, LXBUS_IPC_CONSOLE_ID ConsoleId);
 
@@ -163,7 +163,7 @@ int WslEntryPoint(int Argc, char* Argv[])
     // checking the pid and Argc.
     //
     // N.B. Using the pid is not enough because this process might be running
-    // in a docker container. See: https://github.com/microsoft/WSL/issues/10883.
+    // in a docker container. See: https://github.com/microsoft/LSW/issues/10883.
     //
     // If not in init daemon mode, differentiate between various functionality by checking Argv[0].
     //
@@ -178,7 +178,7 @@ int WslEntryPoint(int Argc, char* Argv[])
     }
     else
     {
-        if (strcmp(BaseName, WSLPATH_NAME) == 0)
+        if (strcmp(BaseName, LSWPATH_NAME) == 0)
         {
             ExitCode = WslPathEntry(Argc, Argv);
         }
@@ -202,15 +202,15 @@ int WslEntryPoint(int Argc, char* Argv[])
         {
             ExitCode = StartPlan9(Argc, Argv);
         }
-        else if (strcmp(BaseName, WSLINFO_NAME) == 0)
+        else if (strcmp(BaseName, LSWINFO_NAME) == 0)
         {
             ExitCode = WslInfoEntry(Argc, Argv);
         }
-        else if (strcmp(BaseName, LX_INIT_WSL_CAPTURE_CRASH) == 0)
+        else if (strcmp(BaseName, LX_INIT_LSW_CAPTURE_CRASH) == 0)
         {
             ExitCode = CaptureCrash(Argc, Argv);
         }
-        else if (strcmp(BaseName, LX_INIT_WSL_GENERATOR) == 0)
+        else if (strcmp(BaseName, LX_INIT_LSW_GENERATOR) == 0)
         {
             ExitCode = GenerateSystemdUnits(Argc, Argv);
         }
@@ -220,7 +220,7 @@ int WslEntryPoint(int Argc, char* Argv[])
             if (Pid == 1 && strcmp(BaseName, "init") == 0 && Argc == 3 && strcmp(Argv[1], LX_INIT_IMPORT_MESSAGE_ARG) == 0)
                 try
                 {
-                    wsl::shared::MessageWriter<LX_MINI_INIT_IMPORT_RESULT> message;
+                    lsw::shared::MessageWriter<LX_MINI_INIT_IMPORT_RESULT> message;
                     PostProcessImportedDistribution(message, Argv[2]);
                     UtilWriteBuffer(STDOUT_FILENO, message.Span());
                     char buffer[1];
@@ -248,57 +248,57 @@ int GenerateSystemdUnits(int Argc, char** Argv)
     {
         const auto* installPath = Argv[1];
 
-        LOG_INFO("Generating WSL systemd units in {}", installPath);
+        LOG_INFO("Generating LSW systemd units in {}", installPath);
 
         bool enableGuiApps = true;
         bool protectBinfmt = true;
         bool interopEnabled = true;
-        wil::unique_file File{fopen("/etc/wsl.conf", "r")};
+        wil::unique_file File{fopen("/etc/lsw.conf", "r")};
         if (File)
         {
             std::vector<ConfigKey> ConfigKeys = {
-                ConfigKey(wsl::linux::c_ConfigEnableGuiAppsOption, enableGuiApps),
-                ConfigKey(wsl::linux::c_ConfigBootProtectBinfmtOption, protectBinfmt),
-                ConfigKey(wsl::linux::c_ConfigInteropEnabledOption, interopEnabled),
+                ConfigKey(lsw::linux::c_ConfigEnableGuiAppsOption, enableGuiApps),
+                ConfigKey(lsw::linux::c_ConfigBootProtectBinfmtOption, protectBinfmt),
+                ConfigKey(lsw::linux::c_ConfigInteropEnabledOption, interopEnabled),
 
             };
             ParseConfigFile(ConfigKeys, File.get(), CFG_SKIP_UNKNOWN_VALUES, STRING_TO_WSTRING(CONFIG_FILE));
             File.reset();
         }
 
-        // Only create the wslg unit if both enabled in wsl.conf, and if the wslg folder actually exists.
-        if (enableGuiApps && access("/mnt/wslg/runtime-dir", F_OK) == 0)
+        // Only create the lswg unit if both enabled in lsw.conf, and if the lswg folder actually exists.
+        if (enableGuiApps && access("/mnt/lswg/runtime-dir", F_OK) == 0)
         {
             THROW_LAST_ERROR_IF(UtilMkdirPath("/run/tmpfiles.d", 0755) < 0);
             const std::string tmpFilesConfig =
-                "# Note: This file is generated by WSL to prevent systemd-tmpfiles from removing /tmp/.X11-unix during boot.\n";
+                "# Note: This file is generated by LSW to prevent systemd-tmpfiles from removing /tmp/.X11-unix during boot.\n";
 
             THROW_LAST_ERROR_IF(WriteToFile("/run/tmpfiles.d/x11.conf", tmpFilesConfig.c_str()) < 0);
 
             // Note: It's not possible to use a mount unit because systemd will not mount /tmp/.X11-unix
             // if /proc/mount says it's already mounted.
 
-            constexpr auto* x11UnitContent = R"(# Note: This file is generated by WSL to prevent tmp.mount from hiding /tmp/.X11-unix
+            constexpr auto* x11UnitContent = R"(# Note: This file is generated by LSW to prevent tmp.mount from hiding /tmp/.X11-unix
 
 [Unit]
-Description=WSLg Remount Service
+Description=LSWg Remount Service
 DefaultDependencies=no
 After=systemd-tmpfiles-setup.service tmp.mount
-ConditionPathExists=/mnt/wslg/.X11-unix
+ConditionPathExists=/mnt/lswg/.X11-unix
 ConditionPathExists=!/tmp/.X11-unix/X0
 
 [Service]
 Type=oneshot
-ExecStart=/bin/mount -o bind,ro,X-mount.mkdir -t none /mnt/wslg/.X11-unix /tmp/.X11-unix)";
-            InstallSystemdUnit(installPath, "wslg", x11UnitContent);
+ExecStart=/bin/mount -o bind,ro,X-mount.mkdir -t none /mnt/lswg/.X11-unix /tmp/.X11-unix)";
+            InstallSystemdUnit(installPath, "lswg", x11UnitContent);
         }
 
         if (interopEnabled && protectBinfmt)
         {
-            // N.B. ExecStop is required to prevent distributions from removing the WSL binfmt entry on shutdown.
+            // N.B. ExecStop is required to prevent distributions from removing the LSW binfmt entry on shutdown.
             auto systemdBinfmtContent = std::format(
-                R"(# Note: This file is generated by WSL to prevent binfmt.d from overriding WSL's binfmt interpretor.
-# To disable this unit, add the following to /etc/wsl.conf:
+                R"(# Note: This file is generated by LSW to prevent binfmt.d from overriding LSW's binfmt interpretor.
+# To disable this unit, add the following to /etc/lsw.conf:
 # [boot]
 # protectBinfmt=false
 
@@ -337,9 +337,9 @@ try
 
     LOG_INFO("Capturing crash for pid: {}, executable: {}, signal: {}, port: {}", Argv[3], Argv[2], Argv[4], LX_INIT_UTILITY_VM_CRASH_DUMP_PORT);
 
-    wsl::shared::SocketChannel channel(UtilConnectVsock(LX_INIT_UTILITY_VM_CRASH_DUMP_PORT, true), "crash-dump");
+    lsw::shared::SocketChannel channel(UtilConnectVsock(LX_INIT_UTILITY_VM_CRASH_DUMP_PORT, true), "crash-dump");
 
-    wsl::shared::MessageWriter<LX_PROCESS_CRASH> message(LxProcessCrash);
+    lsw::shared::MessageWriter<LX_PROCESS_CRASH> message(LxProcessCrash);
     message.WriteString(Argv[2]);
     message->Timestamp = std::strtoull(Argv[1], nullptr, 10);
     message->Signal = std::strtoul(Argv[4], nullptr, 10);
@@ -373,7 +373,7 @@ try
 }
 CATCH_RETURN_ERRNO()
 
-void CreateProcess(PCREATE_PROCESS_PARSED Parsed, const wsl::linux::WslDistributionConfig& Config)
+void CreateProcess(PCREATE_PROCESS_PARSED Parsed, const lsw::linux::WslDistributionConfig& Config)
 
 /*++
 
@@ -418,7 +418,7 @@ Return Value:
     }
 
     //
-    // Read the eventfd data from the wsl service.
+    // Read the eventfd data from the lsw service.
     //
 
     BytesRead = TEMP_FAILURE_RETRY(read(Parsed->EventFd, &EventFdData, sizeof(EventFdData)));
@@ -436,7 +436,7 @@ Return Value:
     return;
 }
 
-void CreateProcessCommon(PCREATE_PROCESS_PARSED_COMMON Common, int TtyFd, int ServiceSocket, const wsl::linux::WslDistributionConfig& Config)
+void CreateProcessCommon(PCREATE_PROCESS_PARSED_COMMON Common, int TtyFd, int ServiceSocket, const lsw::linux::WslDistributionConfig& Config)
 
 /*++
 
@@ -467,11 +467,11 @@ try
     // Print any errors that occurred.
     //
 
-    for (const auto& e : wsl::shared::string::Split<char>(wil::ScopedWarningsCollector::ConsumeWarnings(), '\n'))
+    for (const auto& e : lsw::shared::string::Split<char>(wil::ScopedWarningsCollector::ConsumeWarnings(), '\n'))
     {
         if (!e.empty())
         {
-            fprintf(stderr, "wsl: %s\n", e.c_str());
+            fprintf(stderr, "lsw: %s\n", e.c_str());
         }
     }
 
@@ -494,7 +494,7 @@ try
     };
 
     AddEnvironmentVariable(NAME_ENV);
-    AddEnvironmentVariable(WSL_DISTRO_NAME_ENV);
+    AddEnvironmentVariable(LSW_DISTRO_NAME_ENV);
 
     //
     // Get the password entry for the user. (root if the distribution is being installed)
@@ -536,7 +536,7 @@ try
     {
         assert(ServiceSocket != -1);
 
-        wsl::shared::SocketChannel channel(wil::unique_fd{ServiceSocket}, "OOBE");
+        lsw::shared::SocketChannel channel(wil::unique_fd{ServiceSocket}, "OOBE");
 
         std::string OobeCommand{};
         int defaultUid = 0;
@@ -544,7 +544,7 @@ try
         std::vector<ConfigKey> keys = {ConfigKey("oobe.command", OobeCommand), ConfigKey("oobe.defaultUid", defaultUid, &defaultUidPresent)};
 
         {
-            wil::unique_file File{fopen(WSL_DISTRIBUTION_CONF, "r")};
+            wil::unique_file File{fopen(LSW_DISTRIBUTION_CONF, "r")};
             ParseConfigFile(keys, File.get(), CFG_SKIP_UNKNOWN_VALUES, STRING_TO_WSTRING(CONFIG_FILE));
         }
 
@@ -598,10 +598,10 @@ try
 
     if (Config.InitPid.has_value())
     {
-        wsl::shared::SocketChannel InteropChannel{UtilConnectToInteropServer(Config.InitPid.value()), "InteropClient"};
+        lsw::shared::SocketChannel InteropChannel{UtilConnectToInteropServer(Config.InitPid.value()), "InteropClient"};
         THROW_LAST_ERROR_IF(InteropChannel.Socket() < 0);
 
-        wsl::shared::MessageWriter<LX_INIT_CREATE_LOGIN_SESSION> CreateSession(LxInitMessageCreateLoginSession);
+        lsw::shared::MessageWriter<LX_INIT_CREATE_LOGIN_SESSION> CreateSession(LxInitMessageCreateLoginSession);
         CreateSession->Uid = PasswordEntry->pw_uid;
         CreateSession->Gid = PasswordEntry->pw_gid;
         CreateSession.WriteString(PasswordEntry->pw_name);
@@ -732,7 +732,7 @@ catch (...)
     FATAL_ERROR("Create process failed");
 }
 
-int CreateProcessParse(PCREATE_PROCESS_PARSED CreateProcessParsed, gsl::span<gsl::byte> Buffer, int MessageFd, int TtyFd, const wsl::linux::WslDistributionConfig& Config)
+int CreateProcessParse(PCREATE_PROCESS_PARSED CreateProcessParsed, gsl::span<gsl::byte> Buffer, int MessageFd, int TtyFd, const lsw::linux::WslDistributionConfig& Config)
 
 /*++
 
@@ -901,7 +901,7 @@ CreateProcessParseEnd:
     return Result;
 }
 
-int CreateProcessParseCommon(PCREATE_PROCESS_PARSED_COMMON Parsed, gsl::span<gsl::byte> Buffer, const wsl::linux::WslDistributionConfig& Config)
+int CreateProcessParseCommon(PCREATE_PROCESS_PARSED_COMMON Parsed, gsl::span<gsl::byte> Buffer, const lsw::linux::WslDistributionConfig& Config)
 
 /*++
 
@@ -939,7 +939,7 @@ try
     // N.B. Failure to translate the current working directory is non-fatal.
     //
 
-    auto* Path = wsl::shared::string::FromSpan(Buffer, Common->CurrentWorkingDirectoryOffset);
+    auto* Path = lsw::shared::string::FromSpan(Buffer, Common->CurrentWorkingDirectoryOffset);
     if ((*Path == '/') || (*Path == '~'))
     {
         Parsed->CurrentWorkingDirectory = Path;
@@ -949,7 +949,7 @@ try
         Parsed->CurrentWorkingDirectory = WslPathTranslate(const_cast<char*>(Path), TRANSLATE_FLAG_ABSOLUTE, TRANSLATE_MODE_UNIX);
         if (Parsed->CurrentWorkingDirectory.empty() && Config.AutoMount)
         {
-            EMIT_USER_WARNING(wsl::shared::Localization::MessageFailedToTranslate(Path));
+            EMIT_USER_WARNING(lsw::shared::Localization::MessageFailedToTranslate(Path));
         }
     }
 
@@ -960,19 +960,19 @@ try
     auto CommandLine = Buffer.subspan(Common->CommandLineOffset);
     for (unsigned short Index = 0; Index < Common->CommandLineCount; Index += 1)
     {
-        std::string_view Argument{wsl::shared::string::FromSpan(CommandLine)};
+        std::string_view Argument{lsw::shared::string::FromSpan(CommandLine)};
         Parsed->CommandLine.emplace_back(Argument.data());
         CommandLine = CommandLine.subspan(Argument.size() + 1);
     }
 
     //
     // If a username was provided, get the password entry for the specified username.
-    // If no username was provided use the one specified in /etc/wsl.conf.
+    // If no username was provided use the one specified in /etc/lsw.conf.
     // Otherwise, use the default UID from the registry.
     //
 
     struct passwd* PasswordEntry = nullptr;
-    auto Username = wsl::shared::string::FromSpan(Buffer, Common->UsernameOffset);
+    auto Username = lsw::shared::string::FromSpan(Buffer, Common->UsernameOffset);
     if (strlen(Username) != 0)
     {
         PasswordEntry = getpwnam(Username);
@@ -1001,7 +1001,7 @@ try
 
     Parsed->CommandLine.emplace_back(nullptr);
     Parsed->Environment = ConfigCreateEnvironmentBlock(Common, Config);
-    Parsed->Filename = wsl::shared::string::FromSpan(Buffer, Common->FilenameOffset);
+    Parsed->Filename = lsw::shared::string::FromSpan(Buffer, Common->FilenameOffset);
     Parsed->ShellOptions = static_cast<CREATE_PROCESS_SHELL_OPTIONS>(Common->ShellOptions);
     Parsed->Uid = PasswordEntry ? PasswordEntry->pw_uid : ROOT_UID; // If the default user was not found, fall back to root.
     Parsed->AllowOOBE = WI_IsFlagSet(Common->Flags, LxInitCreateProcessFlagAllowOOBE);
@@ -1173,7 +1173,7 @@ CreateProcessReplyToServerExit:
     return Result;
 }
 
-int InitCreateSessionLeader(gsl::span<gsl::byte> Buffer, wsl::shared::SocketChannel& Channel, int LxBusFd, wsl::linux::WslDistributionConfig& Config)
+int InitCreateSessionLeader(gsl::span<gsl::byte> Buffer, lsw::shared::SocketChannel& Channel, int LxBusFd, lsw::linux::WslDistributionConfig& Config)
 
 /*++
 
@@ -1187,7 +1187,7 @@ Arguments:
 
     Channel - Supplies a message channel
 
-    LxBusFd - Supplies an LxBus file descriptor (WSL1 only).
+    LxBusFd - Supplies an LxBus file descriptor (LSW1 only).
 
     Config - Supplies the distribution configuration.
 
@@ -1277,7 +1277,7 @@ try
         // service which port to use.
         //
         // N.B. If creating the socket fails, a message with invalid port number
-        //      should be sent to unblock the wsl service.
+        //      should be sent to unblock the lsw service.
         //
 
         wil::unique_fd ListenSocket{UtilListenVsockAnyPort(&SocketAddress, 1)};
@@ -1299,7 +1299,7 @@ try
         }
 
         // Note: The call to accept() must be done in the child because if accept() takes a long time, it can block the creation
-        // of other session leaders. See https://github.com/microsoft/WSL/issues/9114.
+        // of other session leaders. See https://github.com/microsoft/LSW/issues/9114.
 
         SessionLeader = UtilCreateChildProcess(
             "SessionLeader", [ListenSocket = std::move(ListenSocket), &Channel, &Config, Mask = Config.Umask, SocketAddress]() {
@@ -1308,7 +1308,7 @@ try
 
                 THROW_LAST_ERROR_IF(UtilRestoreBlockedSignals() < 0);
 
-                wsl::shared::SocketChannel channel{
+                lsw::shared::SocketChannel channel{
                     {UtilAcceptVsock(ListenSocket.get(), SocketAddress, SESSION_LEADER_ACCEPT_TIMEOUT_MS)}, "SessionLeader"};
                 if (channel.Socket() < 0)
                 {
@@ -1392,8 +1392,8 @@ Return Value:
 int InitCreateProcessUtilityVm(
     gsl::span<gsl::byte> Span,
     const LX_INIT_CREATE_PROCESS_UTILITY_VM& CreateProcess,
-    wsl::shared::SocketChannel& Channel,
-    const wsl::linux::WslDistributionConfig& Config)
+    lsw::shared::SocketChannel& Channel,
+    const lsw::linux::WslDistributionConfig& Config)
 
 /*++
 
@@ -1422,7 +1422,7 @@ Return Value:
     ssize_t BytesRead;
     ssize_t BytesWritten;
     pid_t ChildPid;
-    wsl::shared::SocketChannel ControlChannel;
+    lsw::shared::SocketChannel ControlChannel;
 
     LX_INIT_PROCESS_EXIT_STATUS ExitStatus;
     unsigned int Index;
@@ -1445,7 +1445,7 @@ Return Value:
     int StdIn = -1;
     wil::unique_pipe StdInPipe;
     wil::unique_pipe StdOutPipe;
-    wsl::shared::SocketChannel TerminalControlChannel;
+    lsw::shared::SocketChannel TerminalControlChannel;
 
     int TtyFd = -1;
     struct winsize WindowSize;
@@ -1464,7 +1464,7 @@ Return Value:
     // stderr, and the control channel.
     //
     // N.B. If creating the socket fails, a message with invalid port number
-    //      should be sent to unblock the wsl service.
+    //      should be sent to unblock the lsw service.
     //
 
     ListenSocket = UtilListenVsockAnyPort(&SocketAddress, Sockets.size());
@@ -1519,7 +1519,7 @@ Return Value:
     }
 
     //
-    // Accept connections from the wsl service.
+    // Accept connections from the lsw service.
     //
 
     for (auto& Socket : Sockets)
@@ -1717,7 +1717,7 @@ Return Value:
 
         if (InteropEnabled)
         {
-            Result = Parsed.Environment.AddVariableNoThrow(WSL_INTEROP_ENV, InteropServer.Path());
+            Result = Parsed.Environment.AddVariableNoThrow(LSW_INTEROP_ENV, InteropServer.Path());
             if (Result < 0)
             {
                 goto CreateProcessUtilityVmEnd;
@@ -1813,7 +1813,7 @@ Return Value:
     TerminalControlChannel = {{Sockets[3].get()}, "TerminalControl"};
 
     //
-    // This is required because sequence numbers can be reset during handover from wsl.exe to wslhost.exe.
+    // This is required because sequence numbers can be reset during handover from lsw.exe to lswhost.exe.
     //
 
     TerminalControlChannel.IgnoreSequenceNumbers();
@@ -2035,7 +2035,7 @@ Return Value:
         if (PollDescriptors[4].revents & POLLIN)
         {
 
-            wsl::shared::SocketChannel channel(InteropServer.Accept(), "InteropRelay");
+            lsw::shared::SocketChannel channel(InteropServer.Accept(), "InteropRelay");
             if (channel.Socket() < 0)
             {
                 continue;
@@ -2139,7 +2139,7 @@ Return Value:
         }
 
         //
-        // Process messages from wsl.exe / wslhost.exe.
+        // Process messages from lsw.exe / lswhost.exe.
         //
 
         if (PollDescriptors[6].revents & POLLIN)
@@ -2208,7 +2208,7 @@ CreateProcessUtilityVmEnd:
 
     //
     // The interop server needs to be manually reset so it deletes
-    // its interop socket. See https://github.com/microsoft/WSL/issues/7506.
+    // its interop socket. See https://github.com/microsoft/LSW/issues/7506.
     //
 
     InteropServer.Reset();
@@ -2257,7 +2257,7 @@ Return Value:
         auto config = ConfigInitializeCommon(g_SavedSignalActions);
 
         //
-        // Check if the binary is being run on WSL or in a Utility VM.
+        // Check if the binary is being run on LSW or in a Utility VM.
         //
 
         if (!UtilIsUtilityVm())
@@ -2278,7 +2278,7 @@ Return Value:
     return;
 }
 
-void InitEntryUtilityVm(wsl::linux::WslDistributionConfig& Config)
+void InitEntryUtilityVm(lsw::linux::WslDistributionConfig& Config)
 
 /*++
 
@@ -2304,40 +2304,40 @@ Return Value:
     // Set the close-on-exec flag on the socket file descriptor inherited from mini_init.
     //
 
-    wsl::shared::SocketChannel channel{wil::unique_fd{LX_INIT_UTILITY_VM_INIT_SOCKET_FD}, "init"};
+    lsw::shared::SocketChannel channel{wil::unique_fd{LX_INIT_UTILITY_VM_INIT_SOCKET_FD}, "init"};
     if (fcntl(channel.Socket(), F_SETFD, FD_CLOEXEC) < 0)
     {
         FATAL_ERROR("fcntl failed {}", errno);
         return;
     }
 
-    if (getenv(LX_WSL2_DISTRO_READ_ONLY_ENV) != nullptr)
+    if (getenv(LX_LSW2_DISTRO_READ_ONLY_ENV) != nullptr)
     {
-        EMIT_USER_WARNING(wsl::shared::Localization::MessageReadOnlyDistro());
-        unsetenv(LX_WSL2_DISTRO_READ_ONLY_ENV);
+        EMIT_USER_WARNING(lsw::shared::Localization::MessageReadOnlyDistro());
+        unsetenv(LX_LSW2_DISTRO_READ_ONLY_ENV);
     }
 
-    const auto Value = getenv(LX_WSL2_NETWORKING_MODE_ENV);
+    const auto Value = getenv(LX_LSW2_NETWORKING_MODE_ENV);
     if (Value != nullptr)
     {
         Config.NetworkingMode = static_cast<LX_MINI_INIT_NETWORKING_MODE>(std::atoi(Value));
-        unsetenv(LX_WSL2_NETWORKING_MODE_ENV);
+        unsetenv(LX_LSW2_NETWORKING_MODE_ENV);
     }
 
     //
-    // If the boot.systemd option is specified in /etc/wsl.conf, launch the distro init process as pid 1.
-    // WSL init and session leaders continue as children of the distro init process.
+    // If the boot.systemd option is specified in /etc/lsw.conf, launch the distro init process as pid 1.
+    // LSW init and session leaders continue as children of the distro init process.
     //
 
-    const auto pid = getenv(LX_WSL_PID_ENV);
+    const auto pid = getenv(LX_LSW_PID_ENV);
     assert(pid != nullptr);
-    unsetenv(LX_WSL_PID_ENV);
+    unsetenv(LX_LSW_PID_ENV);
 
     //
     // Send the create instance result to the service.
     //
 
-    wsl::shared::MessageWriter<LX_MINI_INIT_CREATE_INSTANCE_RESULT> message;
+    lsw::shared::MessageWriter<LX_MINI_INIT_CREATE_INSTANCE_RESULT> message;
     message->Pid = std::stoul(pid);
     message->Result = 0;
 
@@ -2350,11 +2350,11 @@ Return Value:
     channel.SendMessage<LX_MINI_INIT_CREATE_INSTANCE_RESULT>(message.Span());
 
     std::optional<pid_t> distroInitPid;
-    const auto distroInitPidString = getenv(LX_WSL2_DISTRO_INIT_PID);
+    const auto distroInitPidString = getenv(LX_LSW2_DISTRO_INIT_PID);
     if (distroInitPidString != nullptr)
     {
         distroInitPid = std::stoul(distroInitPidString);
-        unsetenv(LX_WSL2_DISTRO_INIT_PID);
+        unsetenv(LX_LSW2_DISTRO_INIT_PID);
     }
 
     std::vector<gsl::byte> Buffer;
@@ -2380,10 +2380,10 @@ Return Value:
 
             //
             // Wait to boot the distro init process until the first session leader has been created.
-            // This ensures that the entire boot is not done when a distro is trigger-started by accessing \\wsl.localhost.
+            // This ensures that the entire boot is not done when a distro is trigger-started by accessing \\lsw.localhost.
             //
 
-            auto Message = wsl::shared::socket::RecvMessage(BootStartReadSocket.get(), Buffer);
+            auto Message = lsw::shared::socket::RecvMessage(BootStartReadSocket.get(), Buffer);
             if (Message.empty())
             {
                 FATAL_ERROR("recv failed {}", errno);
@@ -2425,7 +2425,7 @@ Return Value:
             std::vector<const char*> Env;
             std::vector<std::string> Environment;
             InitializeStringVector(
-                Env, Environment, "container=wsl container_host_id=windows container_host_version_id=" WSL_PACKAGE_VERSION);
+                Env, Environment, "container=lsw container_host_id=windows container_host_version_id=" LSW_PACKAGE_VERSION);
 
             execvpe(INIT_PATH, const_cast<char**>(Argv), const_cast<char**>(Env.data()));
             LOG_ERROR("execvpe({}) failed {}", INIT_PATH, errno);
@@ -2433,7 +2433,7 @@ Return Value:
         }
 
         //
-        // Keep track of the new pid for WSL init.
+        // Keep track of the new pid for LSW init.
         //
 
         Config.InitPid = getpid();
@@ -2441,7 +2441,7 @@ Return Value:
 
     //
     // Loop waiting on the socket for requests from the Windows server.
-    // A zero-byte read means that the connection to the wsl has been closed and the init daemon should shut down.
+    // A zero-byte read means that the connection to the lsw has been closed and the init daemon should shut down.
     //
 
     wil::unique_fd SignalFd;
@@ -2593,14 +2593,14 @@ Return Value:
     return;
 }
 
-void InitEntryWsl(wsl::linux::WslDistributionConfig& Config)
+void InitEntryWsl(lsw::linux::WslDistributionConfig& Config)
 
 /*++
 
 Routine Description:
 
     This routine is the entry point for the init process when running inside
-    WSL.
+    LSW.
 
 Arguments:
 
@@ -2630,7 +2630,7 @@ Return Value:
         return;
     }
 
-    wsl::shared::SocketChannel Channel{wil::unique_fd{InitConnectToServer(LxBusFd.get(), true)}, "init"};
+    lsw::shared::SocketChannel Channel{wil::unique_fd{InitConnectToServer(LxBusFd.get(), true)}, "init"};
     if (Channel.Socket() < 0)
     {
         return;
@@ -2701,7 +2701,7 @@ Return Value:
     return;
 }
 
-void InitTerminateInstance(gsl::span<gsl::byte> Buffer, wsl::shared::SocketChannel& Channel, wsl::linux::WslDistributionConfig& Config)
+void InitTerminateInstance(gsl::span<gsl::byte> Buffer, lsw::shared::SocketChannel& Channel, lsw::linux::WslDistributionConfig& Config)
 
 /*++
 
@@ -2753,13 +2753,13 @@ try
 }
 CATCH_LOG();
 
-void CreateWslSystemdUnits(const wsl::linux::WslDistributionConfig& Config)
+void CreateWslSystemdUnits(const lsw::linux::WslDistributionConfig& Config)
 
 /*++
 
 Routine Description:
 
-    This method creates systemd unit files to protect WSL functionality from being disabled by systemd.
+    This method creates systemd unit files to protect LSW functionality from being disabled by systemd.
 
 Arguments:
 
@@ -2781,7 +2781,7 @@ try
     constexpr auto folder = "/run/systemd/system-generators";
 
     THROW_LAST_ERROR_IF(UtilMkdirPath(folder, 0755) < 0);
-    THROW_LAST_ERROR_IF(symlink("/init", std::format("{}/{}", folder, LX_INIT_WSL_GENERATOR).c_str()));
+    THROW_LAST_ERROR_IF(symlink("/init", std::format("{}/{}", folder, LX_INIT_LSW_GENERATOR).c_str()));
 }
 CATCH_LOG();
 
@@ -2810,10 +2810,10 @@ Return Value:
 try
 {
     const char* NetworkingConfigFileDirectory = "/run/sysctl.d";
-    const char* NetworkingConfigFileName = "wsl-networking.conf";
+    const char* NetworkingConfigFileName = "lsw-networking.conf";
     const std::string NetworkingConfigFilePath = std::format("{}/{}", NetworkingConfigFileDirectory, NetworkingConfigFileName);
     constexpr auto NetworkingConfig =
-        "# Note: This file is generated by WSL to prevent default .conf files applied by systemd from overwriting critical "
+        "# Note: This file is generated by LSW to prevent default .conf files applied by systemd from overwriting critical "
         "networking settings\n"
         "net.ipv4.conf.all.rp_filter=0\n"
         "net.ipv4.conf." LX_INIT_LOOPBACK_DEVICE_NAME ".rp_filter=0\n";
@@ -2823,7 +2823,7 @@ try
 }
 CATCH_LOG();
 
-int SessionLeaderCreateProcess(gsl::span<gsl::byte> Buffer, int MessageFd, int TtyFd, const wsl::linux::WslDistributionConfig& Config)
+int SessionLeaderCreateProcess(gsl::span<gsl::byte> Buffer, int MessageFd, int TtyFd, const lsw::linux::WslDistributionConfig& Config)
 
 /*++
 
@@ -2933,7 +2933,7 @@ Return Value:
     // the newly launched process access to the terminal. In cases where
     // multiple processes are being launched in the same session due to
     // piping commands together (e.g. bash.exe -c ls | bash.exe -c less)
-    // or calling bash.exe from within a running WSL instance (inception),
+    // or calling bash.exe from within a running LSW instance (inception),
     // there may be issues when this process terminates, as restoring the
     // foreground group does not happen by default. If the launcher is a
     // shell program like /bin/bash, then it typically assumes that the
@@ -3009,7 +3009,7 @@ Return Value:
     return;
 }
 
-void SessionLeaderEntryUtilityVm(wsl::shared::SocketChannel& channel, const wsl::linux::WslDistributionConfig& Config)
+void SessionLeaderEntryUtilityVm(lsw::shared::SocketChannel& channel, const lsw::linux::WslDistributionConfig& Config)
 
 /*++
 
@@ -3086,7 +3086,7 @@ Return Value:
     return;
 }
 
-void SessionLeaderEntry(int MessageFd, int TtyFd, const wsl::linux::WslDistributionConfig& Config)
+void SessionLeaderEntry(int MessageFd, int TtyFd, const lsw::linux::WslDistributionConfig& Config)
 
 /*++
 
@@ -3179,7 +3179,7 @@ Return Value:
     return;
 }
 
-bool StopPlan9Server(bool Force, wsl::linux::WslDistributionConfig& Config)
+bool StopPlan9Server(bool Force, lsw::linux::WslDistributionConfig& Config)
 {
     if (Config.Plan9ControlChannel.Socket() < 0)
     {
@@ -3315,7 +3315,7 @@ unsigned int StartGns(int Argc, char** Argv)
         return 1;
     }
 
-    wsl::shared::SocketChannel channel{std::move(Socket), "GNS"};
+    lsw::shared::SocketChannel channel{std::move(Socket), "GNS"};
 
     GnsEngine::NotificationRoutine readNotification;
     GnsEngine::StatusRoutine returnStatus;
@@ -3421,7 +3421,7 @@ unsigned int StartGns(int Argc, char** Argv)
 
             GNS_LOG_INFO("Returning LxGnsMessageResult [{} - {}]", Result, Error.c_str());
 
-            wsl::shared::MessageWriter<LX_GNS_RESULT> response(LX_GNS_RESULT::Type);
+            lsw::shared::MessageWriter<LX_GNS_RESULT> response(LX_GNS_RESULT::Type);
             response->Result = Result;
             if (!Error.empty())
             {
@@ -3442,7 +3442,7 @@ unsigned int StartGns(int Argc, char** Argv)
     return exitCode;
 }
 
-void WaitForBootProcess(wsl::linux::WslDistributionConfig& Config)
+void WaitForBootProcess(lsw::linux::WslDistributionConfig& Config)
 {
     if (!Config.BootStartWriteSocket)
     {
@@ -3472,7 +3472,7 @@ void WaitForBootProcess(wsl::linux::WslDistributionConfig& Config)
 
             signal(SIGCHLD, SIG_DFL);
             auto restoreDisposition = wil::scope_exit([]() { signal(SIGCHLD, SIG_IGN); });
-            wsl::shared::retry::RetryWithTimeout<void>(
+            lsw::shared::retry::RetryWithTimeout<void>(
                 [&]() {
                     std::string Output;
                     THROW_LAST_ERROR_IF(

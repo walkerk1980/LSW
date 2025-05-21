@@ -30,7 +30,7 @@ srwlock g_sessionLock;
 std::optional<std::vector<std::shared_ptr<LxssUserSessionImpl>>> g_sessions =
     std::make_optional<std::vector<std::shared_ptr<LxssUserSessionImpl>>>();
 
-std::optional<wsl::windows::service::PluginManager> g_pluginManager;
+std::optional<lsw::windows::service::PluginManager> g_pluginManager;
 
 extern unique_event g_networkingReady;
 extern bool g_lxcoreInitialized;
@@ -164,7 +164,7 @@ HRESULT LxssUserSessionFactory::CreateInstance(_In_ IUnknown* pUnkOuter, _In_ RE
 
     RETURN_HR_IF(CLASS_E_NOAGGREGATION, pUnkOuter != nullptr);
 
-    WSL_LOG("LxssUserSessionCreateInstanceBegin", TraceLoggingLevel(WINEVENT_LEVEL_VERBOSE));
+    LSW_LOG("LxssUserSessionCreateInstanceBegin", TraceLoggingLevel(WINEVENT_LEVEL_VERBOSE));
 
     // Wait for the network cleanup to be done before continuing.
     g_networkingReady.wait();
@@ -183,7 +183,7 @@ HRESULT LxssUserSessionFactory::CreateInstance(_In_ IUnknown* pUnkOuter, _In_ RE
         return result == CO_E_SERVER_STOPPING ? S_FALSE : result;
     }
 
-    WSL_LOG("LxssUserSessionCreateInstanceEnd", TraceLoggingLevel(WINEVENT_LEVEL_VERBOSE));
+    LSW_LOG("LxssUserSessionCreateInstanceEnd", TraceLoggingLevel(WINEVENT_LEVEL_VERBOSE));
 
     return S_OK;
 }
@@ -211,8 +211,8 @@ std::shared_ptr<LxssUserSessionImpl> FindSessionLockHeld(PSID User)
 std::weak_ptr<LxssUserSessionImpl> CreateInstanceForCurrentUser()
 {
     // Do not create sessions for localsystem.
-    const unique_handle userToken = wsl::windows::common::security::GetUserToken(TokenImpersonation);
-    THROW_HR_IF(WSL_E_LOCAL_SYSTEM_NOT_SUPPORTED, wsl::windows::common::security::IsTokenLocalSystem(userToken.get()));
+    const unique_handle userToken = lsw::windows::common::security::GetUserToken(TokenImpersonation);
+    THROW_HR_IF(LSW_E_LOCAL_SYSTEM_NOT_SUPPORTED, lsw::windows::common::security::IsTokenLocalSystem(userToken.get()));
 
     // Get the session ID and SID of the client process.
     DWORD sessionId{};
@@ -227,11 +227,11 @@ std::weak_ptr<LxssUserSessionImpl> CreateInstanceForCurrentUser()
         std::lock_guard sessionLock(g_sessionTerminationLock);
         auto lock = g_sessionLock.lock_exclusive();
 
-        // Do not allow session creation if WSL is disabled via policy.
+        // Do not allow session creation if LSW is disabled via policy.
         THROW_HR_IF(HRESULT_FROM_WIN32(ERROR_ACCESS_DISABLED_BY_POLICY), g_disabledByPolicy);
 
-        // Builds prior to Windows 10 require the WSL optional component.
-        THROW_HR_IF(WSL_E_WSL_OPTIONAL_COMPONENT_REQUIRED, !g_lxcoreInitialized && !wsl::windows::common::helpers::IsWindows11OrAbove());
+        // Builds prior to Windows 10 require the LSW optional component.
+        THROW_HR_IF(LSW_E_LSW_OPTIONAL_COMPONENT_REQUIRED, !g_lxcoreInitialized && !lsw::windows::common::helpers::IsWindows11OrAbove());
 
         userSession = FindSessionLockHeld(tokenInfo->User.Sid);
 

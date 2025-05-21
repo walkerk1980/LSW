@@ -20,7 +20,7 @@ constexpr auto c_sock_diag_poll_timeout = std::chrono::milliseconds(10);
 constexpr auto c_bpf_poll_timeout = std::chrono::milliseconds(500);
 
 GnsPortTracker::GnsPortTracker(
-    std::shared_ptr<wsl::shared::SocketChannel> hvSocketChannel, NetlinkChannel&& netlinkChannel, std::shared_ptr<SecCompDispatcher> seccompDispatcher) :
+    std::shared_ptr<lsw::shared::SocketChannel> hvSocketChannel, NetlinkChannel&& netlinkChannel, std::shared_ptr<SecCompDispatcher> seccompDispatcher) :
     m_hvSocketChannel(std::move(hvSocketChannel)), m_channel(std::move(netlinkChannel)), m_seccompDispatcher(seccompDispatcher)
 {
     m_networkNamespace = std::filesystem::read_symlink("/proc/self/ns/net").string();
@@ -68,7 +68,7 @@ int GnsPortTracker::ProcessSecCompNotification(seccomp_notif* notification)
 void GnsPortTracker::Run()
 {
     // This method consumes seccomp notifications and allows / disallows port allocations
-    // depending on wsl core's response.
+    // depending on lsw core's response.
     // After dealing with a notification it also looks at the bound ports list to check
     // for port deallocation
 

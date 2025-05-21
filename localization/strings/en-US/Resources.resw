@@ -118,17 +118,17 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="AppName" xml:space="preserve">
-    <value>Windows Subsystem for Linux</value>
+    <value>Linux Subsystem for Windows</value>
   </data>
   <data name="AppShortName" xml:space="preserve">
-    <value>WSL</value>
+    <value>LSW</value>
   </data>
   <data name="AppDescription" xml:space="preserve">
-    <value>Windows Subsystem for Linux lets developers run a GNU/Linux environment -- including most command-line tools, utilities, and applications -- directly on Windows, unmodified, without the overhead of a traditional virtual machine or dualboot setup.</value>
+    <value>Linux Subsystem for Windows lets developers run a GNU/Linux environment -- including most command-line tools, utilities, and applications -- directly on Windows, unmodified, without the overhead of a traditional virtual machine or dualboot setup.</value>
   </data>
   <data name="MessageDetachFailed" xml:space="preserve">
-    <value>The disk failed to detach: {}. For more details, please run 'dmesg' inside WSL2.
-To force WSL2 to stop and detach the disk, run 'wsl.exe {}'.</value>
+    <value>The disk failed to detach: {}. For more details, please run 'dmesg' inside LSW2.
+To force LSW2 to stop and detach the disk, run 'lsw.exe {}'.</value>
     <comment>{FixedPlaceholder="{}"}Command line arguments, file names and string inserts should not be translated</comment>
   </data>
   <data name="MessageDiskAlreadyAttached" xml:space="preserve">
@@ -136,7 +136,7 @@ To force WSL2 to stop and detach the disk, run 'wsl.exe {}'.</value>
     <comment>{FixedPlaceholder="{}"}Command line arguments, file names and string inserts should not be translated</comment>
   </data>
   <data name="MessageDiskAlreadyMounted" xml:space="preserve">
-    <value>That volume is already mounted inside WSL2.</value>
+    <value>That volume is already mounted inside LSW2.</value>
   </data>
   <data name="MessageDiskMountNameAlreadyExists" xml:space="preserve">
     <value>A disk with that name is already mounted; please unmount the disk or choose a new name and try again.</value>
@@ -145,20 +145,20 @@ To force WSL2 to stop and detach the disk, run 'wsl.exe {}'.</value>
     <value>The specified mount name contains an invalid '/' character. Please retry without the invalid character.</value>
   </data>
   <data name="MessageDiskMounted" xml:space="preserve">
-    <value>The disk was successfully mounted as '/mnt/wsl/{}'.
-Note: The location will be different if you have modified the automount.root setting in /etc/wsl.conf.
-To unmount and detach the disk, run 'wsl.exe {} {}'.</value>
+    <value>The disk was successfully mounted as '/mnt/lsw/{}'.
+Note: The location will be different if you have modified the automount.root setting in /etc/lsw.conf.
+To unmount and detach the disk, run 'lsw.exe {} {}'.</value>
     <comment>{FixedPlaceholder="{}"}Command line arguments, file names and string inserts should not be translated</comment>
   </data>
   <data name="MessageDiskMountFailed" xml:space="preserve">
     <value>The disk was attached but failed to mount: {}.
-For more details, run 'dmesg' inside WSL2.
-To detach the disk, run 'wsl.exe {} {}'.</value>
+For more details, run 'dmesg' inside LSW2.
+To detach the disk, run 'lsw.exe {} {}'.</value>
     <comment>{FixedPlaceholder="{}"}Command line arguments, file names and string inserts should not be translated</comment>
   </data>
   <data name="MessageDistributionListOnline" xml:space="preserve">
     <value>The following is a list of valid distributions that can be installed.
-Install using 'wsl.exe {} &lt;Distro&gt;'.
+Install using 'lsw.exe {} &lt;Distro&gt;'.
 </value>
     <comment>{FixedPlaceholder="{}"}Command line arguments, file names and string inserts should not be translated</comment>
   </data>
@@ -182,7 +182,7 @@ Install using 'wsl.exe {} &lt;Distro&gt;'.
     <value>Exporting the distribution failed.</value>
   </data>
   <data name="MessageFsUpdgadeNeeded" xml:space="preserve">
-    <value>Performing one-time upgrade of the Windows Subsystem for Linux file system for this distribution...</value>
+    <value>Performing one-time upgrade of the Linux Subsystem for Windows file system for this distribution...</value>
   </data>
   <data name="MessageHigherIntegrity" xml:space="preserve">
     <value>Cannot launch because another instance is running un-elevated.  Elevated and un-elevated instances are not permitted to run simultaneously.</value>
@@ -210,15 +210,15 @@ Install using 'wsl.exe {} &lt;Distro&gt;'.
     <comment>{FixedPlaceholder="{}"}Command line arguments, file names and string inserts should not be translated</comment>
   </data>
   <data name="MessageInstallContinue" xml:space="preserve">
-    <value>Windows Subsystem for Linux is resuming a previous installation...</value>
+    <value>Linux Subsystem for Windows is resuming a previous installation...</value>
   </data>
   <data name="MessageInvalidDistributionName" xml:space="preserve">
     <value>Invalid distribution name: '{}'.
-To get a list of valid distributions, use 'wsl.exe --list --online'.</value>
+To get a list of valid distributions, use 'lsw.exe --list --online'.</value>
     <comment>{FixedPlaceholder="{}"}{Locked="--list "}{Locked="--online'"}Command line arguments, file names and string inserts should not be translated</comment>
   </data>
   <data name="MessageInstanceTerminated" xml:space="preserve">
-    <value>The Windows Subsystem for Linux instance has terminated.</value>
+    <value>The Linux Subsystem for Windows instance has terminated.</value>
   </data>
   <data name="MessageInvalidCommandLine" xml:space="preserve">
     <value>Invalid command line argument: {}
@@ -248,11 +248,11 @@ Please use '{} --help' to get a list of supported arguments.</value>
     <value>Cannot launch because another instance is running elevated.  Elevated and un-elevated instances are not permitted to run simultaneously.</value>
   </data>
   <data name="MessageNoDefaultDistro" xml:space="preserve">
-    <value>Windows Subsystem for Linux has no installed distributions.
+    <value>Linux Subsystem for Windows has no installed distributions.
 You can resolve this by installing a distribution with the instructions below:
 
-Use 'wsl.exe --list --online' to list available distributions
-and 'wsl.exe --install &lt;Distro&gt;' to install.</value>
+Use 'lsw.exe --list --online' to list available distributions
+and 'lsw.exe --install &lt;Distro&gt;' to install.</value>
     <comment>{Locked="--list "}{Locked="--online'"}{Locked="--install "}Command line arguments, file names and string inserts should not be translated</comment>
   </data>
   <data name="MessageNoRunningDistro" xml:space="preserve">
@@ -263,7 +263,7 @@ and 'wsl.exe --install &lt;Distro&gt;' to install.</value>
     <comment>{FixedPlaceholder="{}"}Command line arguments, file names and string inserts should not be translated</comment>
   </data>
   <data name="MessageRegisteredDistrosHeader" xml:space="preserve">
-    <value>Windows Subsystem for Linux Distributions:</value>
+    <value>Linux Subsystem for Windows Distributions:</value>
   </data>
   <data name="MessageStatusDefaultDistro" xml:space="preserve">
     <value>Default Distribution: {}</value>
@@ -280,7 +280,7 @@ and 'wsl.exe --install &lt;Distro&gt;' to install.</value>
     <value>User not found.</value>
   </data>
   <data name="MessageVmModeConversionInfo" xml:space="preserve">
-    <value>For information on key differences with WSL 2 please visit https://aka.ms/wsl2</value>
+    <value>For information on key differences with LSW 2 please visit https://aka.ms/lsw2</value>
   </data>
   <data name="MessageConversionStart" xml:space="preserve">
     <value>Conversion in progress, this may take a few minutes.</value>
@@ -289,12 +289,12 @@ and 'wsl.exe --install &lt;Distro&gt;' to install.</value>
     <value>The distribution is already the requested version.</value>
   </data>
   <data name="MessageVmModeNotSupported" xml:space="preserve">
-    <value>The Legacy distribution does not support WSL 2.</value>
+    <value>The Legacy distribution does not support LSW 2.</value>
   </data>
   <data name="MessageEnableVirtualization" xml:space="preserve">
-    <value>WSL2 is not supported with your current machine configuration.
+    <value>LSW2 is not supported with your current machine configuration.
 Please enable the "Virtual Machine Platform" optional component and ensure virtualization is enabled in the BIOS.
-Enable "Virtual Machine Platform" by running: wsl.exe --install --no-distribution
+Enable "Virtual Machine Platform" by running: lsw.exe --install --no-distribution
 For information please visit https://aka.ms/enablevirtualization</value>
     <comment>{Locked="--install "}{Locked="--no-distribution
 "}Command line arguments, file names and string inserts should not be translated</comment>
@@ -303,15 +303,15 @@ For information please visit https://aka.ms/enablevirtualization</value>
     <value>Too many virtual hard disks or physical disks are attached.</value>
   </data>
   <data name="MessageUserVhdAlreadyAttached" xml:space="preserve">
-    <value>VHD already mounted via wsl.exe --mount, please unmount the disk before launching.</value>
+    <value>VHD already mounted via lsw.exe --mount, please unmount the disk before launching.</value>
     <comment>{Locked="--mount,"}Command line arguments, file names and string inserts should not be translated</comment>
   </data>
   <data name="MessageWsl1NotSupported" xml:space="preserve">
-    <value>WSL1 is not supported with your current machine configuration.
-Please enable the "Windows Subsystem for Linux" optional component to use WSL1.</value>
+    <value>LSW1 is not supported with your current machine configuration.
+Please enable the "Linux Subsystem for Windows" optional component to use LSW1.</value>
   </data>
   <data name="MessageWsl2Needed" xml:space="preserve">
-    <value>This operation is only supported by WSL2.</value>
+    <value>This operation is only supported by LSW2.</value>
   </data>
   <data name="MessageWslInfoUsage" xml:space="preserve">
     <value>Usage:
@@ -322,7 +322,7 @@ Please enable the "Windows Subsystem for Linux" optional component to use WSL1.<
         Display the path to the MSAL proxy application.
 
     --version
-        Display the version of the WSL package.
+        Display the version of the LSW package.
 
     -n
         Do not print a newline.</value>
@@ -336,13 +336,13 @@ Please enable the "Windows Subsystem for Linux" optional component to use WSL1.<
     -a
         Force result to absolute path format.
     -u
-        Translate from a Windows path to a WSL path (default).
+        Translate from a Windows path to a LSW path (default).
     -w
-        Translate from a WSL path to a Windows path.
+        Translate from a LSW path to a Windows path.
     -m
-        Translate from a WSL path to a Windows path, with '/' instead of '\\'
+        Translate from a LSW path to a Windows path, with '/' instead of '\\'
 
-Example: wslpath 'c:\\users'</value>
+Example: lswpath 'c:\\users'</value>
     <comment>{Locked="-a
 "}{Locked="-u
 "}{Locked="-w
@@ -350,7 +350,7 @@ Example: wslpath 'c:\\users'</value>
 "}Command line arguments and file names should not be translated</comment>
   </data>
   <data name="MessageWslconfigUsage" xml:space="preserve">
-    <value>Performs administrative operations on Windows Subsystem for Linux
+    <value>Performs administrative operations on Linux Subsystem for Windows
 
 Usage:
     /l, /list [Option]
@@ -374,11 +374,11 @@ Usage:
     <value>Copyright (c) Microsoft Corporation. All rights reserved.
 For privacy information about this product please visit https://aka.ms/privacy.
 
-Usage: wsl.exe [Argument] [Options...] [CommandLine]
+Usage: lsw.exe [Argument] [Options...] [CommandLine]
 
 Arguments for running Linux binaries:
 
-    If no command line is provided, wsl.exe launches the default shell.
+    If no command line is provided, lsw.exe launches the default shell.
 
     --exec, -e &lt;CommandLine&gt;
         Execute the specified command without using the default Linux shell.
@@ -408,21 +408,21 @@ Options:
     --system
         Launches a shell for the system distribution.
 
-Arguments for managing Windows Subsystem for Linux:
+Arguments for managing Linux Subsystem for Windows:
 
     --help
         Display usage information.
 
     --debug-shell
-        Open a WSL2 debug shell for diagnostics purposes.
+        Open a LSW2 debug shell for diagnostics purposes.
 
     --install [Distro] [Options...]
-        Install a Windows Subsystem for Linux distribution.
-        For a list of valid distributions, use 'wsl.exe --list --online'.
+        Install a Linux Subsystem for Windows distribution.
+        For a list of valid distributions, use 'lsw.exe --list --online'.
 
         Options:
-            --enable-wsl1
-                Enable WSL1 support.
+            --enable-lsw1
+                Enable LSW1 support.
 
             --fixed-vhd
                 Create a fixed-size disk to store the distribution.
@@ -471,14 +471,14 @@ Arguments for managing Windows Subsystem for Linux:
                 Resize the disk of the distribution to the specified size.
 
     --mount &lt;Disk&gt;
-        Attaches and mounts a physical or virtual disk in all WSL 2 distributions.
+        Attaches and mounts a physical or virtual disk in all LSW 2 distributions.
 
         Options:
             --vhd
                 Specifies that &lt;Disk&gt; refers to a virtual hard disk.
 
             --bare
-                Attach the disk to WSL2, but don't mount it.
+                Attach the disk to LSW2, but don't mount it.
 
             --name &lt;Name&gt;
                 Mount the disk using a custom name for the mountpoint.
@@ -496,25 +496,25 @@ Arguments for managing Windows Subsystem for Linux:
         Changes the default install version for new distributions.
 
     --shutdown
-        Immediately terminates all running distributions and the WSL 2
+        Immediately terminates all running distributions and the LSW 2
         lightweight utility virtual machine.
 
         Options:
             --force
-                Terminate the WSL 2 virtual machine even if an operation is in progress. Can cause data loss.
+                Terminate the LSW 2 virtual machine even if an operation is in progress. Can cause data loss.
 
     --status
-        Show the status of Windows Subsystem for Linux.
+        Show the status of Linux Subsystem for Windows.
 
     --unmount [Disk]
-        Unmounts and detaches a disk from all WSL2 distributions.
+        Unmounts and detaches a disk from all LSW2 distributions.
         Unmounts and detaches all disks if called without argument.
 
     --uninstall
-        Uninstalls the Windows Subsystem for Linux package from this machine.
+        Uninstalls the Linux Subsystem for Windows package from this machine.
 
     --update
-        Update the Windows Subsystem for Linux package.
+        Update the Linux Subsystem for Windows package.
 
         Options:
             --pre-release
@@ -523,7 +523,7 @@ Arguments for managing Windows Subsystem for Linux:
     --version, -v
         Display version information.
 
-Arguments for managing distributions in Windows Subsystem for Linux:
+Arguments for managing distributions in Linux Subsystem for Windows:
 
     --export &lt;Distro&gt; &lt;FileName&gt; [Options]
         Exports the distribution to a tar file.
@@ -567,7 +567,7 @@ Arguments for managing distributions in Windows Subsystem for Linux:
                 Show detailed information about all distributions.
 
             --online, -o
-                Displays a list of available distributions for install with 'wsl.exe --install'.
+                Displays a list of available distributions for install with 'lsw.exe --install'.
 
     --set-default, -s &lt;Distro&gt;
         Sets the distribution as the default.
@@ -583,7 +583,7 @@ Arguments for managing distributions in Windows Subsystem for Linux:
   <comment>{Locked="--exec,"}{Locked="--shell-type "}{Locked="--cd "}{Locked="--distribution,"}{Locked="--distribution-id "}{Locked="--user,"}{Locked="--system
 "}{Locked="--help
 "}{Locked="--debug-shell
-"}{Locked="--install "}{Locked="--list "}{Locked="--online'"}{Locked="--enable-wsl1
+"}{Locked="--install "}{Locked="--list "}{Locked="--online'"}{Locked="--enable-lsw1
 "}{Locked="--fixed-vhd
 "}{Locked="--from-file "}{Locked="--legacy
 "}{Locked="--location "}{Locked="--name "}{Locked="--no-distribution
@@ -602,9 +602,9 @@ Arguments for managing distributions in Windows Subsystem for Linux:
 "}{Locked="--quiet,"}{Locked="--verbose,"}{Locked="--online,"}{Locked="--install'"}{Locked="--set-default,"}{Locked="--set-version "}{Locked="--terminate,"}{Locked="--unregister "}Command line arguments, file names and string inserts should not be translated</comment>
   </data>
   <data name="MessagePackageVersions" xml:space="preserve">
-    <value>WSL version: {}
+    <value>LSW version: {}
 Kernel version: {}
-WSLg version: {}
+LSWg version: {}
 MSRDC version: {}
 Direct3D version: {}
 DXCore version: {}
@@ -633,7 +633,7 @@ Build time: {}</value>
     <value>Copyright (c) Microsoft Corporation. All rights reserved.
 For privacy information about this product please visit https://aka.ms/privacy.
 
-Usage: wslg.exe [Argument] [Options...] [CommandLine]
+Usage: lswg.exe [Argument] [Options...] [CommandLine]
 
 Arguments:
     --cd &lt;Directory&gt;
@@ -673,7 +673,7 @@ Arguments:
     <value>Import in progress, this may take a few minutes.</value>
   </data>
   <data name="GuiApplicationsDisabled" xml:space="preserve">
-    <value>GUI application support is disabled via {} or /etc/wsl.conf.</value>
+    <value>GUI application support is disabled via {} or /etc/lsw.conf.</value>
     <comment>{FixedPlaceholder="{}"}Command line arguments, file names and string inserts should not be translated</comment>
   </data>
   <data name="MessageCheckingForUpdates" xml:space="preserve">
@@ -683,19 +683,19 @@ Arguments:
     <value>This distribution is only available from the Microsoft Store.</value>
   </data>
   <data name="MessageWslMountNotSupportedOnArm" xml:space="preserve">
-    <value>wsl.exe --mount on ARM64 requires Windows version 27653 or newer.</value>
+    <value>lsw.exe --mount on ARM64 requires Windows version 27653 or newer.</value>
     <comment>{Locked="--mount "}Command line arguments, file names and string inserts should not be translated</comment>
   </data>
   <data name="MessageUpdateNotNeeded" xml:space="preserve">
-    <value>The most recent version of Windows Subsystem for Linux is already installed.</value>
+    <value>The most recent version of Linux Subsystem for Windows is already installed.</value>
   </data>
   <data name="MessageUpdatingToVersion" xml:space="preserve">
-    <value>Updating Windows Subsystem for Linux to version: {}.</value>
+    <value>Updating Linux Subsystem for Windows to version: {}.</value>
     <comment>{FixedPlaceholder="{}"}Command line arguments, file names and string inserts should not be translated</comment>
   </data>
   <data name="MessageWslOptionalComponentRequired" xml:space="preserve">
-    <value>This application requires the Windows Subsystem for Linux Optional Component.
-Install it by running: wsl.exe --install --no-distribution
+    <value>This application requires the Linux Subsystem for Windows Optional Component.
+Install it by running: lsw.exe --install --no-distribution
 The system may need to be restarted so the changes can take effect.</value>
      <comment>{Locked="--install "}{Locked="--no-distribution
 "}Command line arguments, file names and string inserts should not be translated</comment>
@@ -708,14 +708,14 @@ The system may need to be restarted so the changes can take effect.</value>
     <comment>{FixedPlaceholder="{}"}Command line arguments, file names and string inserts should not be translated</comment>
   </data>
   <data name="MessageVmSwitchNotSet" xml:space="preserve">
-    <value>Bridged networking requires wsl2.vmSwitch to be set.</value>
+    <value>Bridged networking requires lsw2.vmSwitch to be set.</value>
   </data>
   <data name="MessageCouldFetchDistributionList" xml:space="preserve">
     <value>Failed to fetch the list distribution from '{}'. {}</value>
     <comment>{FixedPlaceholder="{}"}Command line arguments, file names and string inserts should not be translated</comment>
   </data>
   <data name="MessageFailedToAttachDisk" xml:space="preserve">
-    <value>Failed to attach disk '{}' to WSL2: {}</value>
+    <value>Failed to attach disk '{}' to LSW2: {}</value>
     <comment>{FixedPlaceholder="{}"}Command line arguments, file names and string inserts should not be translated</comment>
   </data>
   <data name="MessageFailedToResizeDisk" xml:space="preserve">
@@ -728,13 +728,13 @@ The system may need to be restarted so the changes can take effect.</value>
     <value>No value found.</value>
   </data>
   <data name="MessageOsNotSupported" xml:space="preserve">
-    <value>Windows version {} does not support the packaged version of Windows Subsystem for Linux.
+    <value>Windows version {} does not support the packaged version of Linux Subsystem for Windows.
 Install the required update via Windows update or via: {}
-For information please visit https://aka.ms/wslinstall</value>
+For information please visit https://aka.ms/lswinstall</value>
     <comment>{FixedPlaceholder="{}"}Command line arguments, file names and string inserts should not be translated</comment>
   </data>
   <data name="MessageAdministratorAccessRequiredForDebugShell" xml:space="preserve">
-    <value>Running the debug shell requires running wsl.exe as Administrator.</value>
+    <value>Running the debug shell requires running lsw.exe as Administrator.</value>
   </data>
   <data name="MessageInstallProcessFailed" xml:space="preserve">
     <value>The installation process for distribution '{}' failed with exit code: {}.</value>
@@ -785,7 +785,7 @@ For information please visit https://aka.ms/wslinstall</value>
     <comment>{FixedPlaceholder="{}"}Command line arguments, file names and string inserts should not be translated</comment>
   </data>
   <data name="MessageWarningDuringStartup" xml:space="preserve">
-    <value>Errors occurred during WSL startup</value>
+    <value>Errors occurred during LSW startup</value>
   </data>
   <data name="MessageOpenEventViewer" xml:space="preserve">
     <value>Open EventViewer</value>
@@ -830,12 +830,12 @@ For information please visit https://aka.ms/wslinstall</value>
     <comment>{FixedPlaceholder="{}"}Command line arguments, file names and string inserts should not be translated</comment>
   </data>
   <data name="MessageDistributionInstalled" xml:space="preserve">
-    <value>Distribution successfully installed. It can be launched via 'wsl.exe -d {}'</value>
+    <value>Distribution successfully installed. It can be launched via 'lsw.exe -d {}'</value>
     <comment>{FixedPlaceholder="{}"}Command line arguments, file names and string inserts should not be translated</comment>
   </data>
   <data name="MessageInvalidNumberString" xml:space="preserve">
-    <value>Invalid memory string '{}' for .wslconfig entry '{}' in {}:{}</value>
-    <comment>{FixedPlaceholder="{}"}{Locked=".wslconfig"}Command line arguments, file names and string inserts should not be translated</comment>
+    <value>Invalid memory string '{}' for .lswconfig entry '{}' in {}:{}</value>
+    <comment>{FixedPlaceholder="{}"}{Locked=".lswconfig"}Command line arguments, file names and string inserts should not be translated</comment>
   </data>
   <data name="MessagedFailedToCreateSwapVhd" xml:space="preserve">
     <value>Failed to create the swap disk in '{}': {}</value>
@@ -874,22 +874,22 @@ Falling back to NAT networking.</value>
     <value>DNS Tunneling is not supported</value>
   </data>
   <data name="MessageLocalhostForwardingNotSupportedMirroredMode" xml:space="preserve">
-    <value>The wsl2.localhostForwarding setting has no effect when using mirrored networking mode</value>
+    <value>The lsw2.localhostForwarding setting has no effect when using mirrored networking mode</value>
   </data>
   <data name="MessageHttpProxyChangeDetected" xml:space="preserve">
-    <value>An Http Proxy change has been detected on the host. Please restart WSL to apply the change.</value>
+    <value>An Http Proxy change has been detected on the host. Please restart LSW to apply the change.</value>
   </data>
   <data name="MessageProxyLocalhostSettingsDropped" xml:space="preserve">
-    <value>A localhost proxy configuration was detected but not mirrored into WSL. WSL in NAT mode does not support localhost proxies.</value>
+    <value>A localhost proxy configuration was detected but not mirrored into LSW. LSW in NAT mode does not support localhost proxies.</value>
   </data>
   <data name="MessageProxyV6SettingsDropped" xml:space="preserve">
-    <value>An IPv6 proxy configuration was detected but not mirrored into WSL. WSL in NAT mode does not support IPv6.</value>
+    <value>An IPv6 proxy configuration was detected but not mirrored into LSW. LSW in NAT mode does not support IPv6.</value>
   </data>
   <data name="MessageProxyLoopbackV6SettingsDropped" xml:space="preserve">
-    <value>A localhost IPv6 proxy configuration was detected but not mirrored into WSL. WSL does not support localhost IPv6 proxies.</value>
+    <value>A localhost IPv6 proxy configuration was detected but not mirrored into LSW. LSW does not support localhost IPv6 proxies.</value>
   </data>
   <data name="MessageProxyUnexpectedSettingsDropped" xml:space="preserve">
-    <value>An unexpected error occurred while attempting to resolve proxy settings, proxy settings were not mirrored into WSL.</value>
+    <value>An unexpected error occurred while attempting to resolve proxy settings, proxy settings were not mirrored into LSW.</value>
   </data>
   <data name="MessageRegistryError" xml:space="preserve">
     <value>An error occurred accessing the registry. Path: '{}'. Error: {}</value>
@@ -900,7 +900,7 @@ Falling back to NAT networking.</value>
     <comment>{FixedPlaceholder="{}"}Command line arguments, file names and string inserts should not be translated</comment>
   </data>
   <data name="MessageVirtualMachinePlatformNotInstalled" xml:space="preserve">
-    <value>Failed to start virtual networking - please install the optional component Virtual Machine Platform by running: wsl.exe --install --no-distribution</value>
+    <value>Failed to start virtual networking - please install the optional component Virtual Machine Platform by running: lsw.exe --install --no-distribution</value>
     <comment>{Locked="--install "}{Locked="--no-distribution"}Command line arguments, file names and string inserts should not be translated</comment>
   </data>
   <data name="MessageNetworkInitializationFailedFallback2" xml:space="preserve">
@@ -920,29 +920,29 @@ Falling back to NAT networking.</value>
     <comment>{FixedPlaceholder="{}"}Command line arguments, file names and string inserts should not be translated</comment>
   </data>
   <data name="MessagePluginRequiresUpdate" xml:space="preserve">
-    <value>The plugin '{}' requires a newer version of WSL. Please run: wsl.exe --update</value>
+    <value>The plugin '{}' requires a newer version of LSW. Please run: lsw.exe --update</value>
     <comment>{FixedPlaceholder="{}"}{Locked="--update"}Command line arguments, file names and string inserts should not be translated</comment>
   </data>
   <data name="MessageSettingOverridenByPolicy" xml:space="preserve">
-    <value>The .wslconfig setting '{}' is disabled by the computer policy.</value>
-    <comment>{FixedPlaceholder="{}"}{Locked=".wslconfig"}Command line arguments, file names and string inserts should not be translated</comment>
+    <value>The .lswconfig setting '{}' is disabled by the computer policy.</value>
+    <comment>{FixedPlaceholder="{}"}{Locked=".lswconfig"}Command line arguments, file names and string inserts should not be translated</comment>
   </data>
   <data name="MessageDebugShellDisabled" xml:space="preserve">
     <value>The debug shell is disabled by the computer policy.</value>
   </data>
-  <data name="MessageWSLMountDisabled" xml:space="preserve">
-    <value>wsl.exe --mount is disabled by the computer policy.</value>
+  <data name="MessageLSWMountDisabled" xml:space="preserve">
+    <value>lsw.exe --mount is disabled by the computer policy.</value>
     <comment>{Locked="--mount "}Command line arguments, file names and string inserts should not be translated</comment>
   </data>
-  <data name="MessageWSL1Disabled" xml:space="preserve">
-    <value>WSL1 is disabled by the computer policy.</value>
+  <data name="MessageLSW1Disabled" xml:space="preserve">
+    <value>LSW1 is disabled by the computer policy.</value>
   </data>
-  <data name="MessageUpgradeToWSL2" xml:space="preserve">
-    <value>Please run 'wsl.exe --set-version {} 2' to upgrade to WSL2.</value>
+  <data name="MessageUpgradeToLSW2" xml:space="preserve">
+    <value>Please run 'lsw.exe --set-version {} 2' to upgrade to LSW2.</value>
     <comment>{FixedPlaceholder="{}"}{Locked="--set-version "}Command line arguments, file names and string inserts should not be translated</comment>
   </data>
   <data name="MessageFinishMsiInstallation" xml:space="preserve">
-    <value>WSL is finishing an upgrade...</value>
+    <value>LSW is finishing an upgrade...</value>
   </data>
   <data name="MessageUpdateFailed" xml:space="preserve">
     <value>Update failed (exit code: {}).</value>
@@ -965,7 +965,7 @@ Falling back to NAT networking.</value>
     <comment>{FixedPlaceholder="{}"}Command line arguments, file names and string inserts should not be translated</comment>
   </data>
   <data name="MessageMissingOptionalComponents" xml:space="preserve">
-    <value>Optional components needed to run WSL are not installed.</value>
+    <value>Optional components needed to run LSW are not installed.</value>
   </data>
   <data name="MessageInstallMissingOptionalComponents" xml:space="preserve">
     <value>Install missing components.</value>
@@ -977,7 +977,7 @@ Falling back to NAT networking.</value>
     <value>Press any key to exit...</value>
   </data>
   <data name="MessageNewWslVersionAvailable" xml:space="preserve">
-    <value>A new version of Windows Subsystem for Linux is available.</value>
+    <value>A new version of Linux Subsystem for Windows is available.</value>
   </data>
   <data name="MessageUpdateToVersion" xml:space="preserve">
     <value>Update to version {} or view its release notes below.</value>
@@ -990,7 +990,7 @@ Falling back to NAT networking.</value>
     <value>See Docs</value>
   </data>
   <data name="MessageVhdInUse" xml:space="preserve">
-    <value>The operation could not be completed because the vhdx is currently in use. To force WSL to stop use: wsl.exe --shutdown</value>
+    <value>The operation could not be completed because the vhdx is currently in use. To force LSW to stop use: lsw.exe --shutdown</value>
     <comment>{Locked="--shutdown"}Command line arguments, file names and string inserts should not be translated</comment>
   </data>
   <data name="MessageInvalidBoolean" xml:space="preserve">
@@ -998,10 +998,10 @@ Falling back to NAT networking.</value>
     <comment>{FixedPlaceholder="{}"}Command line arguments, file names and string inserts should not be translated</comment>
   </data>
   <data name="MessageSparseVhdWsl2Only" xml:space="preserve">
-    <value>Sparse vhdx is supported on WSL2 only.</value>
+    <value>Sparse vhdx is supported on LSW2 only.</value>
   </data>
   <data name="MessageLocalSystemNotSupported" xml:space="preserve">
-    <value>Running WSL as local system is not supported.</value>
+    <value>Running LSW as local system is not supported.</value>
   </data>
   <data name="MessagePerformanceTip" xml:space="preserve">
     <value>Performance Tip:</value>
@@ -1016,10 +1016,10 @@ Falling back to NAT networking.</value>
   <data name="MessageDontShowAgain" xml:space="preserve">
     <value>Don't Show Again</value>
   </data>
-  <data name="MessageWSL2Crashed" xml:space="preserve">
-    <value>The WSL2 Virtual Machine crashed.</value>
+  <data name="MessageLSW2Crashed" xml:space="preserve">
+    <value>The LSW2 Virtual Machine crashed.</value>
   </data>
-  <data name="MessageWSL2CrashedStackTrace" xml:space="preserve">
+  <data name="MessageLSW2CrashedStackTrace" xml:space="preserve">
     <value>The stack trace has been saved in: {}</value>
     <comment>{FixedPlaceholder="{}"}Command line arguments, file names and string inserts should not be translated</comment>
   </data>
@@ -1059,11 +1059,11 @@ Attempting web download...</value>
     <value>No default distribution has been configured. Please provide a distribution to install.</value>
   </data>
   <data name="MessageConfigVirtio9pDisabled" xml:space="preserve">
-    <value>wsl2.virtio9p is disabled, falling back to 9p with vsock transport.</value>
+    <value>lsw2.virtio9p is disabled, falling back to 9p with vsock transport.</value>
   </data>
   <data name="MessageInstallationCorrupted" xml:space="preserve">
-    <value>WSL installation appears to be corrupted (Error code: {}).
-Press any key to repair WSL, or CTRL-C to cancel.
+    <value>LSW installation appears to be corrupted (Error code: {}).
+Press any key to repair LSW, or CTRL-C to cancel.
 This prompt will time out in 60 seconds.</value>
     <comment>{FixedPlaceholder="{}"}Command line arguments, file names and string inserts should not be translated</comment>
   </data>
@@ -1085,14 +1085,14 @@ Error code: {}</value>
     <comment>{FixedPlaceholder="{}"}Command line arguments, file names and string inserts should not be translated</comment>
   </data>
   <data name="MessageTooManyProcessors" xml:space="preserve">
-    <value>wsl2.processors cannot exceed the number of logical processors on the system ({} &gt; {})</value>
+    <value>lsw2.processors cannot exceed the number of logical processors on the system ({} &gt; {})</value>
     <comment>{FixedPlaceholder="{}"}Command line arguments, file names and string inserts should not be translated</comment>
   </data>
   <data name="MessageFailedToQueryNetworkingMode" xml:space="preserve">
     <value>Failed to query networking mode</value>
   </data>
   <data name="MessageMismatchedKernelModulesError" xml:space="preserve">
-    <value>Customised kernel modules were supplied without a specifying a customised kernel. Please see https://aka.ms/wslcustomkernel for more information.</value>
+    <value>Customised kernel modules were supplied without a specifying a customised kernel. Please see https://aka.ms/lswcustomkernel for more information.</value>
   </data>
   <data name="MessageDnsTunnelingDisabled" xml:space="preserve">
     <value>Due to a current compatibility issue with Global Secure Access Client, DNS Tunneling is disabled.</value>
@@ -1100,7 +1100,7 @@ Error code: {}</value>
   <data name="MessageSparseVhdDisabled" xml:space="preserve">
     <value>Sparse VHD support is currently disabled due to potential data corruption.
 To force a distribution to use a sparse vhd, please run:
-wsl.exe --manage &lt;DistributionName&gt; --set-sparse --allow-unsafe</value>
+lsw.exe --manage &lt;DistributionName&gt; --set-sparse --allow-unsafe</value>
     <comment>{Locked="--manage "}{Locked="--set-sparse "}{Locked="--allow-unsafe"}Command line arguments, file names and string inserts should not be translated</comment>
   </data>
   <data name="MessageDrvfsMountFailed" xml:space="preserve">
@@ -1112,7 +1112,7 @@ wsl.exe --manage &lt;DistributionName&gt; --set-sparse --allow-unsafe</value>
   </data>
   <data name="MessageReadOnlyDistro" xml:space="preserve">
     <value>An error occurred mounting the distribution disk, it was mounted read-only as a fallback.
-See recovery instructions on: https://aka.ms/wsldiskmountrecovery</value>
+See recovery instructions on: https://aka.ms/lswdiskmountrecovery</value>
   </data>
     <data name="MessageFailedToTranslate" xml:space="preserve">
     <value>Failed to translate '{}'</value>
@@ -1125,17 +1125,17 @@ See recovery instructions on: https://aka.ms/wsldiskmountrecovery</value>
     <value>About</value>
   </data>
   <data name="Settings_About.Header" xml:space="preserve">
-    <value>About Windows Subsystem for Linux Settings</value>
+    <value>About Linux Subsystem for Windows Settings</value>
   </data>
   <data name="Settings_About.Description" xml:space="preserve">
     <value>© Microsoft. All rights reserved.</value>
   </data>
   <data name="Settings_AppDisplayName" xml:space="preserve">
-    <value>Windows Subsystem for Linux Settings</value>
+    <value>Linux Subsystem for Windows Settings</value>
   </data>
   <data name="Settings_AppDescription" xml:space="preserve">
-    <value>Windows Subsystem for Linux Settings lets developers manage the .wslconfig file using a GUI-based application.</value>
-    <comment>{Locked=".wslconfig"}Command line arguments, file names and string inserts should not be translated</comment>
+    <value>Linux Subsystem for Windows Settings lets developers manage the .lswconfig file using a GUI-based application.</value>
+    <comment>{Locked=".lswconfig"}Command line arguments, file names and string inserts should not be translated</comment>
   </data>
   <data name="Settings_AutoMemoryReclaim.Header" xml:space="preserve">
     <value>Auto memory reclaim</value>
@@ -1153,26 +1153,26 @@ See recovery instructions on: https://aka.ms/wsldiskmountrecovery</value>
     <value>Auto Proxy enabled</value>
   </data>
   <data name="Settings_AutoProxy.Description" xml:space="preserve">
-    <value>Enables WSL to use Windows' HTTP proxy information.</value>
+    <value>Enables LSW to use Windows' HTTP proxy information.</value>
   </data>
   <data name="Settings_AutoProxyToggleSwitch.AutomationProperties.Name" xml:space="preserve">
     <value>Auto Proxy enabled.</value>
   </data>
   <data name="Settings_AutoProxyToggleSwitch.AutomationProperties.HelpText" xml:space="preserve">
-    <value>Enables WSL to use Windows' HTTP proxy information.</value>
+    <value>Enables LSW to use Windows' HTTP proxy information.</value>
   </data>
   <data name="Settings_BestEffortDNS.Header" xml:space="preserve">
     <value>Use best effort DNS parsing</value>
   </data>
   <data name="Settings_BestEffortDNS.Description" xml:space="preserve">
-    <value>Only applicable when wsl2.dnsTunneling is set to true. When set to true, Windows will extract the question from the DNS request and attempt to resolve it, ignoring the unknown records.</value>
-    <comment>{Locked="wsl2.dnsTunneling"}.wslconfig property key names should not be translated</comment>
+    <value>Only applicable when lsw2.dnsTunneling is set to true. When set to true, Windows will extract the question from the DNS request and attempt to resolve it, ignoring the unknown records.</value>
+    <comment>{Locked="lsw2.dnsTunneling"}.lswconfig property key names should not be translated</comment>
   </data>
   <data name="Settings_BestEffortDNSToggleSwitch.AutomationProperties.Name" xml:space="preserve">
     <value>Use best effort DNS parsing.</value>
   </data>
   <data name="Settings_BestEffortDNSToggleSwitch.AutomationProperties.HelpText" xml:space="preserve">
-    <value>Only applicable when wsl2.dnsTunneling is set to true. When set to true, Windows will extract the question from the DNS request and attempt to resolve it, ignoring the unknown records.</value>
+    <value>Only applicable when lsw2.dnsTunneling is set to true. When set to true, Windows will extract the question from the DNS request and attempt to resolve it, ignoring the unknown records.</value>
   </data>
   <data name="Settings_CustomKernelPath.Header" xml:space="preserve">
     <value>Custom kernel</value>
@@ -1211,36 +1211,36 @@ See recovery instructions on: https://aka.ms/wsldiskmountrecovery</value>
     <value>Browse distros</value>
   </data>
   <data name="Settings_CustomSystemDistroPathDescription.Text" xml:space="preserve">
-    <value>Specify a path to a VHD which will load as a custom system distro, primarily used to power GUI apps in WSL. [Learn more about system distros here].</value>
+    <value>Specify a path to a VHD which will load as a custom system distro, primarily used to power GUI apps in LSW. [Learn more about system distros here].</value>
     <comment>{Locked="["}{Locked="]"}The text in between the delimiters [ ] is made into an hyperlink in code, and the delimiters are removed</comment>
   </data>
   <data name="Settings_CustomSystemDistroPathDescription.NavigateUri" xml:space="preserve">
-    <value>https://aka.ms/wslgsystemdistro</value>
-    <comment>{Locked}Uri to the Microsoft WSLg architecture devblog</comment>
+    <value>https://aka.ms/lswgsystemdistro</value>
+    <comment>{Locked}Uri to the Microsoft LSWg architecture devblog</comment>
   </data>
   <data name="Settings_CustomSystemDistroPathTextBox.AutomationProperties.Name" xml:space="preserve">
     <value>Custom system distro</value>
   </data>
   <data name="Settings_CustomSystemDistroPathTextBox.AutomationProperties.HelpText" xml:space="preserve">
-    <value>Specify a path to a VHD which will load as a custom system distro, primarily used to power GUI apps in WSL.</value>
+    <value>Specify a path to a VHD which will load as a custom system distro, primarily used to power GUI apps in LSW.</value>
   </data>
   <data name="Settings_DebugConsole.Header" xml:space="preserve">
     <value>Enable debug console</value>
   </data>
   <data name="Settings_DebugConsole.Description" xml:space="preserve">
-    <value>Boolean to turn on an output console window that shows the contents of dmesg upon start of a WSL 2 distro instance.</value>
+    <value>Boolean to turn on an output console window that shows the contents of dmesg upon start of a LSW 2 distro instance.</value>
   </data>
   <data name="Settings_DebugConsoleToggleSwitch.AutomationProperties.Name" xml:space="preserve">
     <value>Enable debug console.</value>
   </data>
   <data name="Settings_DebugConsoleToggleSwitch.AutomationProperties.HelpText" xml:space="preserve">
-    <value>Boolean to turn on an output console window that shows the contents of diagnostic messages upon start of a WSL 2 distro instance.</value>
+    <value>Boolean to turn on an output console window that shows the contents of diagnostic messages upon start of a LSW 2 distro instance.</value>
   </data>
   <data name="Settings_DefaultVHDSize.Header" xml:space="preserve">
     <value>Default VHD Size</value>
   </data>
   <data name="Settings_DefaultVHDSize.Description" xml:space="preserve">
-    <value>The default max size for the expandable WSL virtual hard disk (VHD) for newly created distributions only.</value>
+    <value>The default max size for the expandable LSW virtual hard disk (VHD) for newly created distributions only.</value>
   </data>
   <data name="Settings_DefaultVHDSizeResetButton.Content" xml:space="preserve">
     <value>Reset size</value>
@@ -1249,7 +1249,7 @@ See recovery instructions on: https://aka.ms/wsldiskmountrecovery</value>
     <value>Default VHD Size</value>
   </data>
   <data name="Settings_DefaultVHDSizeTextBox.AutomationProperties.HelpText" xml:space="preserve">
-    <value>The default max size, specified in megabytes, for the expandable WSL virtual hard disk (VHD) for newly created distributions only.</value>
+    <value>The default max size, specified in megabytes, for the expandable LSW virtual hard disk (VHD) for newly created distributions only.</value>
   </data>
   <data name="Settings_DeveloperPageTitle.Text" xml:space="preserve">
     <value>Developer</value>
@@ -1258,39 +1258,39 @@ See recovery instructions on: https://aka.ms/wsldiskmountrecovery</value>
     <value>Documentation</value>
   </data>
   <data name="Settings_DocumentationLink.NavigateUri" xml:space="preserve">
-    <value>https://aka.ms/wsldocs</value>
-    <comment>{Locked}Uri to Microsoft WSL documentation</comment>
+    <value>https://aka.ms/lswdocs</value>
+    <comment>{Locked}Uri to Microsoft LSW documentation</comment>
   </data>
   <data name="Settings_DrvFSMode.Header" xml:space="preserve">
     <value>Change DrvFS mode</value>
   </data>
   <data name="Settings_DrvFSMode.Description" xml:space="preserve">
-    <value>Changes cross-OS file access implementation in WSL.</value>
+    <value>Changes cross-OS file access implementation in LSW.</value>
   </data>
   <data name="Settings_DNSProxy.Header" xml:space="preserve">
     <value>DNS Proxy enabled</value>
   </data>
   <data name="Settings_DNSProxy.Description" xml:space="preserve">
-    <value>Only applicable when wsl2.networkingMode is set to NAT. Boolean to inform WSL to configure the DNS Server in Linux to the NAT on the host. Setting to false will mirror DNS servers from Windows to Linux.</value>
-    <comment>{Locked="wsl2.networkingMode"}.wslconfig property key names should not be translated</comment>
+    <value>Only applicable when lsw2.networkingMode is set to NAT. Boolean to inform LSW to configure the DNS Server in Linux to the NAT on the host. Setting to false will mirror DNS servers from Windows to Linux.</value>
+    <comment>{Locked="lsw2.networkingMode"}.lswconfig property key names should not be translated</comment>
   </data>
   <data name="Settings_DNSProxyToggleSwitch.AutomationProperties.Name" xml:space="preserve">
     <value>DNS Proxy enabled.</value>
   </data>
   <data name="Settings_DNSProxyToggleSwitch.AutomationProperties.HelpText" xml:space="preserve">
-    <value>Only applicable when wsl2.networkingMode is set to NAT. Boolean to inform WSL to configure the DNS Server in Linux to the NAT on the host. Setting to false will mirror DNS servers from Windows to Linux.</value>
+    <value>Only applicable when lsw2.networkingMode is set to NAT. Boolean to inform LSW to configure the DNS Server in Linux to the NAT on the host. Setting to false will mirror DNS servers from Windows to Linux.</value>
   </data>
   <data name="Settings_DNSTunneling.Header" xml:space="preserve">
     <value>DNS Tunneling enabled</value>
   </data>
   <data name="Settings_DNSTunneling.Description" xml:space="preserve">
-    <value>Changes how DNS requests are proxied from WSL to Windows.</value>
+    <value>Changes how DNS requests are proxied from LSW to Windows.</value>
   </data>
   <data name="Settings_DNSTunnelingToggleSwitch.AutomationProperties.Name" xml:space="preserve">
     <value>DNS Tunneling enabled.</value>
   </data>
   <data name="Settings_DNSTunnelingToggleSwitch.AutomationProperties.HelpText" xml:space="preserve">
-    <value>Changes how DNS requests are proxied from WSL to Windows.</value>
+    <value>Changes how DNS requests are proxied from LSW to Windows.</value>
   </data>
   <data name="Settings_FileSystemPageTitle.Text" xml:space="preserve">
     <value>File System</value>
@@ -1299,17 +1299,17 @@ See recovery instructions on: https://aka.ms/wsldiskmountrecovery</value>
     <value>Enable GUI applications</value>
   </data>
   <data name="Settings_GUIApplicationsDescription.Text" xml:space="preserve">
-    <value>Boolean to turn on or off support for GUI applications ([WSLg]) in WSL.</value>
+    <value>Boolean to turn on or off support for GUI applications ([LSWg]) in LSW.</value>
   </data>
   <data name="Settings_GUIApplicationsDescription.NavigateUri" xml:space="preserve">
-    <value>https://aka.ms/wslgproject</value>
-    <comment>{Locked}Uri to the Microsoft GitHub WSLg project</comment>
+    <value>https://aka.ms/lswgproject</value>
+    <comment>{Locked}Uri to the Microsoft GitHub LSWg project</comment>
   </data>
   <data name="Settings_GUIApplicationsToggleSwitch.AutomationProperties.Name" xml:space="preserve">
     <value>Enable GUI applications.</value>
   </data>
   <data name="Settings_GUIApplicationsToggleSwitch.AutomationProperties.HelpText" xml:space="preserve">
-    <value>Boolean to turn on or off support for GUI applications (known as WSL g) in WSL.</value>
+    <value>Boolean to turn on or off support for GUI applications (known as LSW g) in LSW.</value>
   </data>
   <data name="Settings_HWPerfCounters.Header" xml:space="preserve">
     <value>Enable hardware performance counters</value>
@@ -1327,33 +1327,33 @@ See recovery instructions on: https://aka.ms/wsldiskmountrecovery</value>
     <value>Hyper-V Firewall enabled</value>
   </data>
   <data name="Settings_HyperVFirewall.Description" xml:space="preserve">
-    <value>Enables Hyper-V firewall which allows the Windows Firewall rules, as well as rules specific to Hyper-V traffic, to filter WSL network traffic.</value>
+    <value>Enables Hyper-V firewall which allows the Windows Firewall rules, as well as rules specific to Hyper-V traffic, to filter LSW network traffic.</value>
   </data>
   <data name="Settings_HyperVFirewallToggleSwitch.AutomationProperties.Name" xml:space="preserve">
     <value>Hyper-V Firewall enabled.</value>
   </data>
   <data name="Settings_HyperVFirewallToggleSwitch.AutomationProperties.HelpText" xml:space="preserve">
-    <value>Enables Hyper-V firewall which allows the Windows Firewall rules, as well as rules specific to Hyper-V traffic, to filter WSL network traffic.</value>
+    <value>Enables Hyper-V firewall which allows the Windows Firewall rules, as well as rules specific to Hyper-V traffic, to filter LSW network traffic.</value>
   </data>
   <data name="Settings_HostAddressLoopback.Header" xml:space="preserve">
     <value>Host Address Loopback</value>
   </data>
   <data name="Settings_HostAddressLoopback.Description" xml:space="preserve">
-    <value>Only applicable when wsl2.networkingMode is set to mirrored. When set to True, will allow the Container to connect to the Host, or the Host to connect to the Container, by an IP address that's assigned to the Host. Note that the 127.0.0.1 loopback address can always be used - this option allows for all additionally assigned local IP addresses to be used as well.</value>
-    <comment>{Locked="wsl2.networkingMode"}.wslconfig property key names should not be translated</comment>
+    <value>Only applicable when lsw2.networkingMode is set to mirrored. When set to True, will allow the Container to connect to the Host, or the Host to connect to the Container, by an IP address that's assigned to the Host. Note that the 127.0.0.1 loopback address can always be used - this option allows for all additionally assigned local IP addresses to be used as well.</value>
+    <comment>{Locked="lsw2.networkingMode"}.lswconfig property key names should not be translated</comment>
   </data>
   <data name="Settings_HostAddressLoopbackToggleSwitch.AutomationProperties.Name" xml:space="preserve">
     <value>Host Address Loopback.</value>
   </data>
   <data name="Settings_HostAddressLoopbackToggleSwitch.AutomationProperties.HelpText" xml:space="preserve">
-    <value>Only applicable when wsl2.networkingMode is set to mirrored. When set to True, will allow the Container to connect to the Host, or the Host to connect to the Container, by an IP address that's assigned to the Host. Note that the 127.0.0.1 loopback address can always be used - this option allows for all additionally assigned local IP addresses to be used as well.</value>
+    <value>Only applicable when lsw2.networkingMode is set to mirrored. When set to True, will allow the Container to connect to the Host, or the Host to connect to the Container, by an IP address that's assigned to the Host. Note that the 127.0.0.1 loopback address can always be used - this option allows for all additionally assigned local IP addresses to be used as well.</value>
   </data>
   <data name="Settings_IgnoredPorts.Header" xml:space="preserve">
     <value>Ignored ports</value>
   </data>
   <data name="Settings_IgnoredPorts.Description" xml:space="preserve">
-    <value>Only applicable when wsl2.networkingMode is set to mirrored. Specifies which ports Linux applications can bind to that will not be automatically forwarded or considered in Windows. Should be formatted in a comma separated list, e.g: 3000,9000,9090.</value>
-    <comment>{Locked="wsl2.networkingMode"}.wslconfig property key names should not be translated</comment>
+    <value>Only applicable when lsw2.networkingMode is set to mirrored. Specifies which ports Linux applications can bind to that will not be automatically forwarded or considered in Windows. Should be formatted in a comma separated list, e.g: 3000,9000,9090.</value>
+    <comment>{Locked="lsw2.networkingMode"}.lswconfig property key names should not be translated</comment>
   </data>
   <data name="Settings_IgnoredPortsResetButton.Content" xml:space="preserve">
     <value>Reset ports</value>
@@ -1362,14 +1362,14 @@ See recovery instructions on: https://aka.ms/wsldiskmountrecovery</value>
     <value>Ignored ports</value>
   </data>
   <data name="Settings_IgnoredPortsTextBox.AutomationProperties.HelpText" xml:space="preserve">
-    <value>Only applicable when wsl2.networkingMode is set to mirrored. Specifies which ports Linux applications can bind to that will not be automatically forwarded or considered in Windows. Should be formatted in a comma separated list, for example, 3000, 9000, 9090.</value>
+    <value>Only applicable when lsw2.networkingMode is set to mirrored. Specifies which ports Linux applications can bind to that will not be automatically forwarded or considered in Windows. Should be formatted in a comma separated list, for example, 3000, 9000, 9090.</value>
   </data>
   <data name="Settings_InitialAutoProxyTimeout.Header" xml:space="preserve">
     <value>Initial Auto Proxy timeout</value>
   </data>
   <data name="Settings_InitialAutoProxyTimeout.Description" xml:space="preserve">
-    <value>Only applicable when wsl2.autoProxy is set to true. Configures how long (in milliseconds) WSL will wait for retrieving HTTP proxy information when starting a WSL container. If proxy settings are resolved after this time, the WSL instance must be restarted to use the retrieved proxy settings.</value>
-    <comment>{Locked="wsl2.autoProxy"}.wslconfig property key names should not be translated</comment>
+    <value>Only applicable when lsw2.autoProxy is set to true. Configures how long (in milliseconds) LSW will wait for retrieving HTTP proxy information when starting a LSW container. If proxy settings are resolved after this time, the LSW instance must be restarted to use the retrieved proxy settings.</value>
+    <comment>{Locked="lsw2.autoProxy"}.lswconfig property key names should not be translated</comment>
   </data>
   <data name="Settings_InitialAutoProxyTimeoutResetButton.Content" xml:space="preserve">
     <value>Reset timeout</value>
@@ -1378,7 +1378,7 @@ See recovery instructions on: https://aka.ms/wsldiskmountrecovery</value>
     <value>Initial Auto Proxy timeout</value>
   </data>
   <data name="Settings_InitialAutoProxyTimeoutTextBox.AutomationProperties.HelpText" xml:space="preserve">
-    <value>Only applicable when wsl2.autoProxy is set to true. Configures how long, in milliseconds, WSL will wait for retrieving HTTP proxy information when starting a WSL container. If proxy settings are resolved after this time, the WSL instance must be restarted to use the retrieved proxy settings.</value>
+    <value>Only applicable when lsw2.autoProxy is set to true. Configures how long, in milliseconds, LSW will wait for retrieving HTTP proxy information when starting a LSW container. If proxy settings are resolved after this time, the LSW instance must be restarted to use the retrieved proxy settings.</value>
   </data>
   <data name="Settings_KernelCommandLine.Header" xml:space="preserve">
     <value>Kernel Command Line</value>
@@ -1390,13 +1390,13 @@ See recovery instructions on: https://aka.ms/wsldiskmountrecovery</value>
     <value>Enable localhost forwarding</value>
   </data>
   <data name="Settings_LocalhostForwarding.Description" xml:space="preserve">
-    <value>Boolean specifying if ports bound to wildcard or localhost in the WSL 2 VM should be connectable from the host via localhost:port.</value>
+    <value>Boolean specifying if ports bound to wildcard or localhost in the LSW 2 VM should be connectable from the host via localhost:port.</value>
   </data>
   <data name="Settings_LocalhostForwardingToggleSwitch.AutomationProperties.Name" xml:space="preserve">
     <value>Enable localhost forwarding.</value>
   </data>
   <data name="Settings_LocalhostForwardingToggleSwitch.AutomationProperties.HelpText" xml:space="preserve">
-    <value>Boolean specifying if ports bound to wildcard or localhost in the WSL 2 VM should be connectable from the host via localhost, colon, port.</value>
+    <value>Boolean specifying if ports bound to wildcard or localhost in the LSW 2 VM should be connectable from the host via localhost, colon, port.</value>
   </data>
   <data name="Settings_MegabyteStringFormat" xml:space="preserve">
     <value>{0} MB</value>
@@ -1408,7 +1408,7 @@ See recovery instructions on: https://aka.ms/wsldiskmountrecovery</value>
     <value>Memory Size</value>
   </data>
   <data name="Settings_MemorySize.Description" xml:space="preserve">
-    <value>How much memory to assign to the WSL 2 VM.</value>
+    <value>How much memory to assign to the LSW 2 VM.</value>
   </data>
   <data name="Settings_MemorySizeResetButton.Content" xml:space="preserve">
     <value>Reset size</value>
@@ -1417,7 +1417,7 @@ See recovery instructions on: https://aka.ms/wsldiskmountrecovery</value>
     <value>Memory Size</value>
   </data>
   <data name="Settings_MemorySizeTextBox.AutomationProperties.HelpText" xml:space="preserve">
-    <value>How much memory, specified in megabytes, to assign to the WSL 2 VM.</value>
+    <value>How much memory, specified in megabytes, to assign to the LSW 2 VM.</value>
   </data>
   <data name="Settings_MillisecondsStringFormat" xml:space="preserve">
     <value>{0} milliseconds</value>
@@ -1426,25 +1426,25 @@ See recovery instructions on: https://aka.ms/wsldiskmountrecovery</value>
     <value>Enable nested virtualization</value>
   </data>
   <data name="Settings_NestedVirtualization.Description" xml:space="preserve">
-    <value>Boolean to turn on or off nested virtualization, enabling other nested VMs to run inside WSL 2.</value>
+    <value>Boolean to turn on or off nested virtualization, enabling other nested VMs to run inside LSW 2.</value>
   </data>
   <data name="Settings_NestedVirtualizationToggleSwitch.AutomationProperties.Name" xml:space="preserve">
     <value>Enable nested virtualization.</value>
   </data>
   <data name="Settings_NestedVirtualizationToggleSwitch.AutomationProperties.HelpText" xml:space="preserve">
-    <value>Boolean to turn on or off nested virtualization, enabling other nested VM's to run inside WSL 2.</value>
+    <value>Boolean to turn on or off nested virtualization, enabling other nested VM's to run inside LSW 2.</value>
   </data>
   <data name="Settings_NetworkingMode.Header" xml:space="preserve">
     <value>Networking mode</value>
   </data>
   <data name="Settings_NetworkingMode.Description" xml:space="preserve">
-    <value>Specifies the networking mode for WSL.</value>
+    <value>Specifies the networking mode for LSW.</value>
   </data>
   <data name="Settings_NetworkingModeComboBox.AutomationProperties.Name" xml:space="preserve">
     <value>Networking mode.</value>
   </data>
   <data name="Settings_NetworkingModeComboBox.AutomationProperties.HelpText" xml:space="preserve">
-    <value>Specifies the networking mode for WSL.</value>
+    <value>Specifies the networking mode for LSW.</value>
   </data>
   <data name="Settings_NetworkingPageTitle.Text" xml:space="preserve">
     <value>Networking</value>
@@ -1467,14 +1467,14 @@ See recovery instructions on: https://aka.ms/wsldiskmountrecovery</value>
     <value>Access your Linux files with File Explorer</value>
   </data>
   <data name="Settings_OOBECrossOSFileAccess_LinuxFromFileExplorerSample.Text" xml:space="preserve">
-    <value>You can view your Linux files from File Explorer by navigating to '\\wsl.localhost\' or clicking on the ‘Linux’ icon.</value>
-    <comment>{Locked="\\wsl.localhost\"}Url addresses should not be translated.</comment>
+    <value>You can view your Linux files from File Explorer by navigating to '\\lsw.localhost\' or clicking on the ‘Linux’ icon.</value>
+    <comment>{Locked="\\lsw.localhost\"}Url addresses should not be translated.</comment>
   </data>
-  <data name="Settings_OOBECrossOSFileAccess_LaunchWindowsFromWSLTitle.Text" xml:space="preserve">
-    <value>Launch Windows files and programs from WSL</value>
+  <data name="Settings_OOBECrossOSFileAccess_LaunchWindowsFromLSWTitle.Text" xml:space="preserve">
+    <value>Launch Windows files and programs from LSW</value>
   </data>
-  <data name="Settings_OOBECrossOSFileAccess_LaunchWindowsFromWSLSample.Text" xml:space="preserve">
-    <value>Even while using WSL you can run your Windows executables directly from bash. Try running
+  <data name="Settings_OOBECrossOSFileAccess_LaunchWindowsFromLSWSample.Text" xml:space="preserve">
+    <value>Even while using LSW you can run your Windows executables directly from bash. Try running
 'powershell.exe /c start .' to open up File Explorer in your current folder.</value>
     <comment>{Locked="/c start ."}Command line arguments and file names should not be translated</comment>
   </data>
@@ -1493,106 +1493,106 @@ See recovery instructions on: https://aka.ms/wsldiskmountrecovery</value>
     <value>Mirrored Mode Networking</value>
   </data>
   <data name="Settings_OOBECrossOSFileAccess_MirroredModeNetworkingSample.Text" xml:space="preserve">
-    <value>WSL also includes a new networking mode, called mirrored mode which adds advanced capabilities like IPv6 support and the ability to access your networking applications in your local area network.</value>
+    <value>LSW also includes a new networking mode, called mirrored mode which adds advanced capabilities like IPv6 support and the ability to access your networking applications in your local area network.</value>
   </data>
   <data name="Settings_OOBECrossOSFileAccessLink.Content" xml:space="preserve">
     <value>Learn More About Cross OS File Access</value>
   </data>
   <data name="Settings_OOBECrossOSFileAccessLink.NavigateUri" xml:space="preserve">
-    <value>https://aka.ms/wslfilesystems</value>
+    <value>https://aka.ms/lswfilesystems</value>
     <comment>{Locked}Uri to the Working across Windows and Linux file systems documentation</comment>
   </data>
   <data name="Settings_OOBEDisplayName" xml:space="preserve">
-    <value>Welcome to Windows Subsystem for Linux</value>
+    <value>Welcome to Linux Subsystem for Windows</value>
   </data>
   <data name="Settings_OOBEDistroManagement.Description" xml:space="preserve">
-   <value>WSL is a great way to try out different Linux distributions.</value>
+   <value>LSW is a great way to try out different Linux distributions.</value>
   </data>
   <data name="Settings_OOBEDistroManagement.Title" xml:space="preserve">
     <value>Distro Management</value>
   </data>
-  <data name="Settings_OOBEDistroManagementBasicWSLCommandsLink.Content" xml:space="preserve">
-    <value>Learn more about basic WSL commands</value>
+  <data name="Settings_OOBEDistroManagementBasicLSWCommandsLink.Content" xml:space="preserve">
+    <value>Learn more about basic LSW commands</value>
   </data>
-  <data name="Settings_OOBEDistroManagementBasicWSLCommandsLink.NavigateUri" xml:space="preserve">
-    <value>https://aka.ms/wslcommands</value>
-    <comment>{Locked}Uri to the basic WSL commands documentation</comment>
+  <data name="Settings_OOBEDistroManagementBasicLSWCommandsLink.NavigateUri" xml:space="preserve">
+    <value>https://aka.ms/lswcommands</value>
+    <comment>{Locked}Uri to the basic LSW commands documentation</comment>
   </data>
   <data name="Settings_OOBEDistroManagementImportCustomDistroLink.Content" xml:space="preserve">
     <value>Learn more about importing any Linux distribution</value>
   </data>
   <data name="Settings_OOBEDistroManagementImportCustomDistroLink.NavigateUri" xml:space="preserve">
-    <value>https://aka.ms/wslcustomdistro</value>
-    <comment>{Locked}Uri to the import any linux distribution to use with WSL documentation</comment>
+    <value>https://aka.ms/lswcustomdistro</value>
+    <comment>{Locked}Uri to the import any linux distribution to use with LSW documentation</comment>
   </data>
   <data name="Settings_OOBEDistroManagement_InstallableDistrosTitle.Text" xml:space="preserve">
-    <value>List Installable WSL Distros Command</value>
+    <value>List Installable LSW Distros Command</value>
   </data>
   <data name="Settings_OOBEDistroManagement_InstallableDistrosSample.Text" xml:space="preserve">
-    <value>'wsl.exe -l -o'</value>
+    <value>'lsw.exe -l -o'</value>
     <comment>{Locked="-l -o"}Command line arguments and file names should not be translated</comment>
   </data>
   <data name="Settings_OOBEDistroManagement_InstallNamedDistrosTitle.Text" xml:space="preserve">
-    <value>Install a Named WSL Distro Command</value>
+    <value>Install a Named LSW Distro Command</value>
   </data>
   <data name="Settings_OOBEDistroManagement_InstallNamedDistrosSample.Text" xml:space="preserve">
-    <value>'wsl.exe --install &lt;DistroName&gt;'</value>
+    <value>'lsw.exe --install &lt;DistroName&gt;'</value>
     <comment>{Locked="--install "}Command line arguments, file names and string inserts should not be translated</comment>
   </data>
   <data name="Settings_OOBEDistroManagement_AvailableDistrosTitle.Text" xml:space="preserve">
-    <value>List Available WSL Distros Command</value>
+    <value>List Available LSW Distros Command</value>
   </data>
   <data name="Settings_OOBEDistroManagement_AvailableDistrosSample.Text" xml:space="preserve">
-    <value>'wsl.exe -l'</value>
+    <value>'lsw.exe -l'</value>
     <comment>{Locked="-l"}Command line arguments and file names should not be translated</comment>
   </data>
   <data name="Settings_OOBEDockerDesktopIntegration.Description" xml:space="preserve">
-    <value>Docker Desktop works great with WSL to help you develop with Linux containers.
+    <value>Docker Desktop works great with LSW to help you develop with Linux containers.
 
-Some of the benefits of using Docker Desktop with WSL are:
+Some of the benefits of using Docker Desktop with LSW are:
 
-• You can run Docker commands in WSL or in Windows, using the same Docker daemon and images.
-• You can share files and folders between Windows and Linux seamlessly, using the automatic mount of Windows drives in WSL.
-• You can use your preferred Windows tools and editors to work on Linux code and files, and vice versa, thanks to the interoperability of WSL.</value>
+• You can run Docker commands in LSW or in Windows, using the same Docker daemon and images.
+• You can share files and folders between Windows and Linux seamlessly, using the automatic mount of Windows drives in LSW.
+• You can use your preferred Windows tools and editors to work on Linux code and files, and vice versa, thanks to the interoperability of LSW.</value>
  </data>
   <data name="Settings_OOBEDockerDesktopIntegration.Title" xml:space="preserve">
     <value>Docker Desktop Integration</value>
   </data>
   <data name="Settings_OOBEDockerDesktopIntegrationLink.Content" xml:space="preserve">
-    <value>Learn More About Using WSL with Docker</value>
+    <value>Learn More About Using LSW with Docker</value>
   </data>
   <data name="Settings_OOBEDockerDesktopIntegrationLink.NavigateUri" xml:space="preserve">
-    <value>https://aka.ms/wsldocker</value>
-    <comment>{Locked}Uri to the Docker remote containers on WSL 2 documentation</comment>
+    <value>https://aka.ms/lswdocker</value>
+    <comment>{Locked}Uri to the Docker remote containers on LSW 2 documentation</comment>
   </data>
   <data name="Settings_OOBEGeneral.Description" xml:space="preserve">
-    <value>The Windows Subsystem for Linux (WSL) lets you run your favorite Linux tools, utilities, applications, and workflows directly on Windows.
+    <value>The Linux Subsystem for Windows (LSW) lets you run your favorite Linux tools, utilities, applications, and workflows directly on Windows.
 
 Take a moment to preview some of the community’s favorite features or view our comprehensive documentation.</value>
   </data>
   <data name="Settings_OOBEGeneral.Title" xml:space="preserve">
-    <value>Welcome to WSL</value>
+    <value>Welcome to LSW</value>
   </data>
   <data name="Settings_OOBEGeneral_BestPracticesSetupLink.Content" xml:space="preserve">
     <value>Best Practices for Setup</value>
   </data>
   <data name="Settings_OOBEGeneral_BestPracticesSetupLink.NavigateUri" xml:space="preserve">
-    <value>https://aka.ms/wslsetup</value>
+    <value>https://aka.ms/lswsetup</value>
     <comment>{Locked}Uri to the Best Practices for Setup Documentation</comment>
   </data>
   <data name="Settings_OOBEGeneral_GettingStartedLinuxLink.Content" xml:space="preserve">
     <value>Getting Started with Linux</value>
   </data>
   <data name="Settings_OOBEGeneral_GettingStartedLinuxLink.NavigateUri" xml:space="preserve">
-    <value>https://aka.ms/wslgettingstarted</value>
+    <value>https://aka.ms/lswgettingstarted</value>
     <comment>{Locked}Uri to the Getting Started with Linux Documentation</comment>
   </data>
-  <data name="Settings_OOBEGeneral_WSLDocumentationLink.Content" xml:space="preserve">
-    <value>Windows Subsystem for Linux (WSL) Documentation</value>
+  <data name="Settings_OOBEGeneral_LSWDocumentationLink.Content" xml:space="preserve">
+    <value>Linux Subsystem for Windows (LSW) Documentation</value>
   </data>
-  <data name="Settings_OOBEGeneral_WSLDocumentationLink.NavigateUri" xml:space="preserve">
-    <value>https://aka.ms/wsldocs</value>
-    <comment>{Locked}Uri to the Microsoft WSL Documentation</comment>
+  <data name="Settings_OOBEGeneral_LSWDocumentationLink.NavigateUri" xml:space="preserve">
+    <value>https://aka.ms/lswdocs</value>
+    <comment>{Locked}Uri to the Microsoft LSW Documentation</comment>
   </data>
   <data name="Settings_OOBEGUIApps.Description" xml:space="preserve">
     <value>You can use graphical based Linux applications with native Windows interactions like alt-tab, start menu launching, task bar pinning, and cut &amp; paste support.</value>
@@ -1601,9 +1601,9 @@ Take a moment to preview some of the community’s favorite features or view our
     <value>GUI Apps</value>
   </data>
   <data name="Settings_OOBEGPUAcceleration.Description" xml:space="preserve">
-    <value>WSL can leverage your Windows GPU for Machine Learning workflows
+    <value>LSW can leverage your Windows GPU for Machine Learning workflows
 
-Linux binaries running in WSL can automatically use your GPU in Windows to speed up their performance. You just need to install and run those workflows the same way that you would on a regular Linux machine. There are lots of different ways to get started from running CUDA in a docker container if you have a NVIDIA graphics card, to running PyTorch or TensorFlow with DirectML on your AMD, Intel, or NVIDIA graphics card. See our getting started guide below to learn more.</value>
+Linux binaries running in LSW can automatically use your GPU in Windows to speed up their performance. You just need to install and run those workflows the same way that you would on a regular Linux machine. There are lots of different ways to get started from running CUDA in a docker container if you have a NVIDIA graphics card, to running PyTorch or TensorFlow with DirectML on your AMD, Intel, or NVIDIA graphics card. See our getting started guide below to learn more.</value>
   </data>
   <data name="Settings_OOBEGPUAcceleration.Title" xml:space="preserve">
     <value>GPU Acceleration</value>
@@ -1612,15 +1612,15 @@ Linux binaries running in WSL can automatically use your GPU in Windows to speed
     <value>Learn More About GPU Acceleration</value>
   </data>
   <data name="Settings_OOBEGPUAccelerationLink.NavigateUri" xml:space="preserve">
-    <value>https://aka.ms/wslgpu</value>
-    <comment>{Locked}Uri to the GPU acceleration for ML in WSL documentation</comment>
+    <value>https://aka.ms/lswgpu</value>
+    <comment>{Locked}Uri to the GPU acceleration for ML in LSW documentation</comment>
   </data>
   <data name="Settings_OOBEGUIAppsLink.Content" xml:space="preserve">
-    <value>Learn More About WSL GUI Apps</value>
+    <value>Learn More About LSW GUI Apps</value>
   </data>
   <data name="Settings_OOBEGUIAppsLink.NavigateUri" xml:space="preserve">
-    <value>https://aka.ms/wslguiapps</value>
-    <comment>{Locked}Uri to the Run GUI apps on the WSL documentation</comment>
+    <value>https://aka.ms/lswguiapps</value>
+    <comment>{Locked}Uri to the Run GUI apps on the LSW documentation</comment>
   </data>
   <data name="Settings_OOBEGUIApps_AppsListDescription.Text" xml:space="preserve">
     <value>Here’s a list of apps to try (You can install all of these in Ubuntu by typing 'sudo apt install &lt;The App Name&gt;')
@@ -1642,44 +1642,44 @@ Linux binaries running in WSL can automatically use your GPU in Windows to speed
     <value>Learn More About Networking Applications</value>
   </data>
   <data name="Settings_OOBENetworkingIntegrationLinuxNetworkingAppsLink.NavigateUri" xml:space="preserve">
-    <value>https://aka.ms/wslnetworking</value>
-    <comment>{Locked}Uri to the Accessing network applications with WSL documentation</comment>
+    <value>https://aka.ms/lswnetworking</value>
+    <comment>{Locked}Uri to the Accessing network applications with LSW documentation</comment>
   </data>
   <data name="Settings_OOBENetworkingIntegrationMirroredModeLink.Content" xml:space="preserve">
     <value>Learn More About Mirrored Mode Networking</value>
   </data>
   <data name="Settings_OOBENetworkingIntegrationMirroredModeLink.NavigateUri" xml:space="preserve">
-    <value>https://aka.ms/wslmirroredmode</value>
-    <comment>{Locked}Uri to the WSL Mirrored Mode networking documentation</comment>
+    <value>https://aka.ms/lswmirroredmode</value>
+    <comment>{Locked}Uri to the LSW Mirrored Mode networking documentation</comment>
   </data>
   <data name="Settings_OOBEVSCodeIntegration.Description" xml:space="preserve">
-   <value>You can use WSL as your full-time development environment directly from VS Code.</value>
+   <value>You can use LSW as your full-time development environment directly from VS Code.</value>
   </data>
   <data name="Settings_OOBEVSCodeIntegration.Title" xml:space="preserve">
     <value>VS Code Integration</value>
   </data>
   <data name="Settings_OOBEVSCodeIntegrationLink.Content" xml:space="preserve">
-    <value>Learn More About Using WSL with VS Code</value>
+    <value>Learn More About Using LSW with VS Code</value>
   </data>
   <data name="Settings_OOBEVSCodeIntegrationLink.NavigateUri" xml:space="preserve">
-    <value>https://aka.ms/wslvscode</value>
-    <comment>{Locked}Uri to the using Visual Studio Code with WSL documentation</comment>
+    <value>https://aka.ms/lswvscode</value>
+    <comment>{Locked}Uri to the using Visual Studio Code with LSW documentation</comment>
   </data>
   <data name="Settings_OOBEVSCodeIntegration_VSCodeInstallTitle.Text" xml:space="preserve">
     <value>How to install</value>
   </data>
   <data name="Settings_OOBEVSCodeIntegration_VSCodeInstallSample.Text" xml:space="preserve">
-    <value>After you’ve installed VS Code, you can install the Remote WSL extension from Windows Terminal:
+    <value>After you’ve installed VS Code, you can install the Remote LSW extension from Windows Terminal:
 
-'code –install-extension ms-vscode-remote.remote-wsl'</value>
+'code –install-extension ms-vscode-remote.remote-lsw'</value>
   </data>
   <data name="Settings_OOBEVSCodeIntegration_VSCodeOpenProjectTitle.Text" xml:space="preserve">
-    <value>Open a WSL Project in Visual Studio Code</value>
+    <value>Open a LSW Project in Visual Studio Code</value>
   </data>
   <data name="Settings_OOBEVSCodeIntegration_VSCodeOpenProjectSample.Text" xml:space="preserve">
-    <value>To open a project in VS Code from your WSL distribution, open the distribution’s command line and run 'code .' to open a project file.
+    <value>To open a project in VS Code from your LSW distribution, open the distribution’s command line and run 'code .' to open a project file.
 
-You can also access more VS Code Remote options through the command palette within VS Code itself. Hit “SHIFT+CTRL+P” on your keyboard to open the command palette and type ‘Remote-WSL’ to see a list of the VS Code Remote options available, allowing you to reopen the folder in a remote session, specify which distribution you want to open, and more.</value>
+You can also access more VS Code Remote options through the command palette within VS Code itself. Hit “SHIFT+CTRL+P” on your keyboard to open the command palette and type ‘Remote-LSW’ to see a list of the VS Code Remote options available, allowing you to reopen the folder in a remote session, specify which distribution you want to open, and more.</value>
   </data>
   <data name="Settings_OOBE_HowToUse.Text" xml:space="preserve">
     <value>How to use</value>
@@ -1691,7 +1691,7 @@ You can also access more VS Code Remote options through the command palette with
     <value>Enable page reporting</value>
   </data>
   <data name="Settings_PageReporting.Description" xml:space="preserve">
-    <value>Default true setting enables Windows to reclaim unused memory allocated to WSL 2 virtual machine.</value>
+    <value>Default true setting enables Windows to reclaim unused memory allocated to LSW 2 virtual machine.</value>
   </data>
   <data name="Settings_PrivacyPolicyLink.Content" xml:space="preserve">
     <value>Privacy Statement</value>
@@ -1704,7 +1704,7 @@ You can also access more VS Code Remote options through the command palette with
     <value>Processor Count</value>
   </data>
   <data name="Settings_ProcCount.Description" xml:space="preserve">
-    <value>How many logical processors to assign to the WSL 2 VM.</value>
+    <value>How many logical processors to assign to the LSW 2 VM.</value>
   </data>
   <data name="Settings_ProcCountResetButton.Content" xml:space="preserve">
     <value>Reset count</value>
@@ -1713,7 +1713,7 @@ You can also access more VS Code Remote options through the command palette with
     <value>Processor Count</value>
   </data>
   <data name="Settings_ProcCountTextBox.AutomationProperties.HelpText" xml:space="preserve">
-    <value>How many logical processors to assign to the WSL 2 VM.</value>
+    <value>How many logical processors to assign to the LSW 2 VM.</value>
   </data>
   <data name="Settings_RelatedLinks.Text" xml:space="preserve">
     <value>Related links</value>
@@ -1722,20 +1722,20 @@ You can also access more VS Code Remote options through the command palette with
     <value>Release notes</value>
   </data>
   <data name="Settings_ReleaseNotesLink.NavigateUri" xml:space="preserve">
-    <value>https://aka.ms/wslreleases</value>
-    <comment>{Locked}Uri to Microsoft WSL release notes</comment>
+    <value>https://aka.ms/lswreleases</value>
+    <comment>{Locked}Uri to Microsoft LSW release notes</comment>
   </data>
   <data name="Settings_SafeMode.Header" xml:space="preserve">
     <value>Enable safe mode</value>
   </data>
   <data name="Settings_SafeMode.Description" xml:space="preserve">
-    <value>Run WSL in "Safe Mode" which disables many features and is intended to be used to recover distributions that are in bad states.</value>
+    <value>Run LSW in "Safe Mode" which disables many features and is intended to be used to recover distributions that are in bad states.</value>
   </data>
   <data name="Settings_SafeModeToggleSwitch.AutomationProperties.Name" xml:space="preserve">
     <value>Enable safe mode.</value>
   </data>
   <data name="Settings_SafeModeToggleSwitch.AutomationProperties.HelpText" xml:space="preserve">
-    <value>Run WSL in "Safe Mode" which disables many features and is intended to be used to recover distributions that are in bad states.</value>
+    <value>Run LSW in "Safe Mode" which disables many features and is intended to be used to recover distributions that are in bad states.</value>
   </data>
   <data name="Settings_Shell_About.Content" xml:space="preserve">
     <value>About</value>
@@ -1761,8 +1761,8 @@ You can also access more VS Code Remote options through the command palette with
   <data name="Settings_Shell_GUIApps.Content" xml:space="preserve">
     <value>GUI Apps</value>
   </data>
-  <data name="Settings_Shell_LaunchWSL.Content" xml:space="preserve">
-    <value>Launch wsl.exe</value>
+  <data name="Settings_Shell_LaunchLSW.Content" xml:space="preserve">
+    <value>Launch lsw.exe</value>
   </data>
   <data name="Settings_Shell_MemAndProc.Content" xml:space="preserve">
     <value>Memory and processor</value>
@@ -1774,7 +1774,7 @@ You can also access more VS Code Remote options through the command palette with
     <value>Networking Integration</value>
   </data>
   <data name="Settings_Shell_OOBE.Content" xml:space="preserve">
-    <value>Welcome to WSL</value>
+    <value>Welcome to LSW</value>
   </data>
   <data name="Settings_Shell_OptionalFeatures.Content" xml:space="preserve">
     <value>Optional Features</value>
@@ -1795,8 +1795,8 @@ You can also access more VS Code Remote options through the command palette with
     <value>Issues</value>
   </data>
   <data name="Settings_IssuesLink.NavigateUri" xml:space="preserve">
-    <value>https://aka.ms/wslproject</value>
-    <comment>{Locked}Uri to Microsoft WSL issues</comment>
+    <value>https://aka.ms/lswproject</value>
+    <comment>{Locked}Uri to Microsoft LSW issues</comment>
   </data>
   <data name="Settings_SparseVHD.Header" xml:space="preserve">
     <value>Enable sparse VHD by default</value>
@@ -1829,7 +1829,7 @@ You can also access more VS Code Remote options through the command palette with
     <value>Swap Size</value>
   </data>
   <data name="Settings_SwapSize.Description" xml:space="preserve">
-    <value>How much swap space to add to the WSL 2 VM, 0 for no swap file. Swap storage is disk-based RAM used when memory demand exceeds limit on hardware device.</value>
+    <value>How much swap space to add to the LSW 2 VM, 0 for no swap file. Swap storage is disk-based RAM used when memory demand exceeds limit on hardware device.</value>
   </data>
   <data name="Settings_SwapSizeResetButton.Content" xml:space="preserve">
     <value>Reset size</value>
@@ -1838,7 +1838,7 @@ You can also access more VS Code Remote options through the command palette with
     <value>Swap Size</value>
   </data>
   <data name="Settings_SwapSizeTextBox.AutomationProperties.HelpText" xml:space="preserve">
-    <value>How much swap space, specified in megabytes, to add to the WSL 2 VM. 0 for no swap file. Swap storage is disk-based RAM used when memory demand exceeds limit on hardware device.</value>
+    <value>How much swap space, specified in megabytes, to add to the LSW 2 VM. 0 for no swap file. Swap storage is disk-based RAM used when memory demand exceeds limit on hardware device.</value>
   </data>
   <data name="Settings_Virtio.Header" xml:space="preserve">
     <value>Enable VirtIO</value>

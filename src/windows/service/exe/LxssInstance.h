@@ -119,7 +119,7 @@ public:
     /// <summary>
     /// Returns information about the distribution.
     /// </summary>
-    const WSLDistributionInformation* DistributionInformation() const noexcept override;
+    const LSWDistributionInformation* DistributionInformation() const noexcept override;
 
 protected:
     /// <summary>
@@ -136,7 +136,7 @@ protected:
     /// <summary>
     /// Initializes mount points to be passed during instance creation.
     /// </summary>
-    std::vector<wsl::windows::common::filesystem::unique_lxss_addmount> _InitializeMounts() const;
+    std::vector<lsw::windows::common::filesystem::unique_lxss_addmount> _InitializeMounts() const;
 
     /// <summary>
     /// Server port for listening and accepting of new connections.
@@ -227,7 +227,7 @@ private:
     /// <summary>
     /// Class for querying host dns information.
     /// </summary>
-    wsl::core::networking::HostDnsInfo m_dnsInfo;
+    lsw::core::networking::HostDnsInfo m_dnsInfo;
 
     /// <summary>
     /// Settings for updating /etc/resolv.conf.
@@ -254,7 +254,7 @@ private:
     /// <summary>
     /// Specifies information about the distro.
     /// </summary>
-    WSLDistributionInformation m_distributionInfo{};
+    LSWDistributionInformation m_distributionInfo{};
 
     /// <summary>
     /// This job object contains all pico processes within the instance.
@@ -264,7 +264,7 @@ private:
     /// <summary>
     /// Handle for network state change notifications.
     /// </summary>
-    wsl::core::networking::unique_notify_handle m_networkNotificationHandle;
+    lsw::core::networking::unique_notify_handle m_networkNotificationHandle;
 
     /// <summary>
     /// Lifetime manager ID for registering NT client termination callbacks.
@@ -289,7 +289,7 @@ private:
     /// <summary>
     /// The authentication IDs used for the Plan 9 redirector connection target.
     /// </summary>
-    wsl::windows::common::redirector::ConnectionTargetManager m_redirectorConnectionTargets;
+    lsw::windows::common::redirector::ConnectionTargetManager m_redirectorConnectionTargets;
 
     std::thread m_oobeThread;
     wil::unique_event m_destroyingEvent{wil::EventOptions::ManualReset};

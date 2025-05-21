@@ -31,15 +31,15 @@ public partial class MemAndProcViewModel : WslConfigSettingViewModel
 
     protected override void InitializeConfigSettings()
     {
-        var wslConfigService = App.GetService<IWslConfigService>();
-        _procCount = wslConfigService.GetWslConfigSetting(WslConfigEntry.ProcessorCount);
-        _memorySize = wslConfigService.GetWslConfigSetting(WslConfigEntry.MemorySizeBytes);
-        _swapSize = wslConfigService.GetWslConfigSetting(WslConfigEntry.SwapSizeBytes);
-        _swapFilePath = wslConfigService.GetWslConfigSetting(WslConfigEntry.SwapFilePath);
+        var lswConfigService = App.GetService<IWslConfigService>();
+        _procCount = lswConfigService.GetWslConfigSetting(WslConfigEntry.ProcessorCount);
+        _memorySize = lswConfigService.GetWslConfigSetting(WslConfigEntry.MemorySizeBytes);
+        _swapSize = lswConfigService.GetWslConfigSetting(WslConfigEntry.SwapSizeBytes);
+        _swapFilePath = lswConfigService.GetWslConfigSetting(WslConfigEntry.SwapFilePath);
 
-        _defaultProcCount = wslConfigService.GetWslConfigSetting(WslConfigEntry.ProcessorCount, true).Int32Value;
-        _defaultMemorySize = wslConfigService.GetWslConfigSetting(WslConfigEntry.MemorySizeBytes, true).UInt64Value;
-        _defaultSwapSize = wslConfigService.GetWslConfigSetting(WslConfigEntry.SwapSizeBytes, true).UInt64Value;
+        _defaultProcCount = lswConfigService.GetWslConfigSetting(WslConfigEntry.ProcessorCount, true).Int32Value;
+        _defaultMemorySize = lswConfigService.GetWslConfigSetting(WslConfigEntry.MemorySizeBytes, true).UInt64Value;
+        _defaultSwapSize = lswConfigService.GetWslConfigSetting(WslConfigEntry.SwapSizeBytes, true).UInt64Value;
     }
 
     public string ProcCount

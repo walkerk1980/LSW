@@ -1,10 +1,10 @@
 # Relay
 
-Relay is a WSL2 linux process creating by a [session leader](session-leader.md). Its job is to create a linux process on behalf of the user, and relay its output back to Windows. 
+Relay is a LSW2 linux process creating by a [session leader](session-leader.md). Its job is to create a linux process on behalf of the user, and relay its output back to Windows. 
 
 ## Creating a user process
 
-A relay is created when a `LxInitMessageCreateProcessUtilityVm` message is sent to a [session leader](session-leader.md). Once created, the `relay` creates multiple `hvsocket` channels with [wslservice.exe](wslservice.exe.md).
+A relay is created when a `LxInitMessageCreateProcessUtilityVm` message is sent to a [session leader](session-leader.md). Once created, the `relay` creates multiple `hvsocket` channels with [lswservice.exe](lswservice.exe.md).
 
 These channels are used to:
 

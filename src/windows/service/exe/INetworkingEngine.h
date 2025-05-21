@@ -3,7 +3,7 @@
 #pragma once
 #include "WslCoreNetworkEndpointSettings.h"
 
-namespace wsl::core {
+namespace lsw::core {
 
 class INetworkingEngine
 {
@@ -14,4 +14,4 @@ public:
     virtual void FillInitialConfiguration(LX_MINI_INIT_NETWORKING_CONFIGURATION& message) = 0;
     virtual void StartPortTracker(wil::unique_socket&& socket) = 0;
 };
-} // namespace wsl::core
+} // namespace lsw::core

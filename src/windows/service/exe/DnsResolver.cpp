@@ -4,7 +4,7 @@
 #include "precomp.h"
 #include "DnsResolver.h"
 
-using wsl::core::networking::DnsResolver;
+using lsw::core::networking::DnsResolver;
 
 static constexpr auto c_dnsModuleName = L"dnsapi.dll";
 
@@ -72,7 +72,7 @@ DnsResolver::DnsResolver(wil::unique_socket&& dnsHvsocket, DnsResolverFlags flag
     {
         ResolveExternalInterfaceConstraintIndex();
 
-        WSL_LOG(
+        LSW_LOG(
             "DnsResolver::DnsResolver",
             TraceLoggingValue(m_externalInterfaceConstraintName.c_str(), "m_externalInterfaceConstraintName"),
             TraceLoggingValue(m_externalInterfaceConstraintIndex, "m_externalInterfaceConstraintIndex"));
@@ -121,7 +121,7 @@ try
     }
 
     // Add telemetry with DNS tunneling statistics, before shutting down
-    WSL_LOG(
+    LSW_LOG(
         "DnsTunnelingStatistics",
         TraceLoggingValue(m_totalUdpQueries.load(), "totalUdpQueries"),
         TraceLoggingValue(m_successfulUdpQueries.load(), "successfulUdpQueries"),
@@ -142,7 +142,7 @@ CATCH_LOG()
 void DnsResolver::Stop() noexcept
 try
 {
-    WSL_LOG("DnsResolver::Stop");
+    LSW_LOG("DnsResolver::Stop");
 
     // Scoped m_dnsLock
     {
@@ -195,7 +195,7 @@ try
         return;
     }
 
-    WSL_LOG_DEBUG(
+    LSW_LOG_DEBUG(
         "DnsResolver::ProcessDnsRequest - received new DNS request",
         TraceLoggingValue(dnsBuffer.size(), "DNS buffer size"),
         TraceLoggingValue(dnsClientIdentifier.Protocol == IPPROTO_UDP ? "UDP" : "TCP", "Protocol"),
@@ -203,7 +203,7 @@ try
         TraceLoggingValue(!m_externalInterfaceConstraintName.empty(), "Is ExternalInterfaceConstraint configured"),
         TraceLoggingValue(m_externalInterfaceConstraintIndex, "m_externalInterfaceConstraintIndex"));
 
-    // If the external interface constraint is configured but it is *not* present/up, WSL should be net-blind, so we avoid making DNS requests.
+    // If the external interface constraint is configured but it is *not* present/up, LSW should be net-blind, so we avoid making DNS requests.
     if (!m_externalInterfaceConstraintName.empty() && m_externalInterfaceConstraintIndex == 0)
     {
         return;
@@ -259,7 +259,7 @@ try
     {
         m_failedDnsQueryRawCalls++;
 
-        WSL_LOG(
+        LSW_LOG(
             "ProcessDnsRequestFailed",
             TraceLoggingValue(requestId, "requestId"),
             TraceLoggingValue(result, "result"),
@@ -288,7 +288,7 @@ try
 
     if (queryResults != nullptr)
     {
-        WSL_LOG(
+        LSW_LOG(
             "DnsResolver::HandleDnsQueryCompletion",
             TraceLoggingValue(queryContext->m_id, "queryContext->m_id"),
             TraceLoggingValue(queryResults->queryStatus, "queryResults->queryStatus"),
@@ -314,7 +314,7 @@ try
     }
     else
     {
-        WSL_LOG(
+        LSW_LOG(
             "DnsResolver::HandleDnsQueryCompletion - received a NULL queryResults",
             TraceLoggingValue(queryContext->m_id, "queryContext->m_id"));
         m_queriesWithNullResult++;
@@ -326,7 +326,7 @@ try
         std::vector<gsl::byte> dnsResponse(queryResults->queryRawResponseSize);
         CopyMemory(dnsResponse.data(), queryResults->queryRawResponse, queryResults->queryRawResponseSize);
 
-        WSL_LOG_DEBUG(
+        LSW_LOG_DEBUG(
             "DnsResolver::HandleDnsQueryCompletion - received new DNS response",
             TraceLoggingValue(dnsResponse.size(), "DNS buffer size"),
             TraceLoggingValue(queryContext->m_dnsClientIdentifier.Protocol == IPPROTO_UDP ? "UDP" : "TCP", "Protocol"),
@@ -372,7 +372,7 @@ try
     const auto setInterfaceIndex = wil::scope_exit([&] {
         if (interfaceIndex != m_externalInterfaceConstraintIndex)
         {
-            WSL_LOG(
+            LSW_LOG(
                 "DnsResolver::ResolveExternalInterfaceConstraintIndex - setting m_externalInterfaceConstraintIndex to new value",
                 TraceLoggingValue(m_externalInterfaceConstraintIndex, "old interface index"),
                 TraceLoggingValue(interfaceIndex, "new interface index"));

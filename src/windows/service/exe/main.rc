@@ -8,21 +8,21 @@ Module Name:
 
 Abstract:
 
-    This file contains resources for wslservice.
+    This file contains resources for lswservice.
 
 --*/
 
 #include <windows.h>
 #include "resource.h"
-#include "wslversioninfo.h"
+#include "lswversioninfo.h"
 
-#define VER_INTERNALNAME_STR "wslservice.exe"
-#define VER_ORIGINALFILENAME_STR "wslservice.exe"
+#define VER_INTERNALNAME_STR "lswservice.exe"
+#define VER_ORIGINALFILENAME_STR "lswservice.exe"
 
 #define VER_FILETYPE VFT_APP
 #define VER_FILESUBTYPE VFT2_UNKNOWN
-#define VER_FILEDESCRIPTION_STR "Windows Subsystem for Linux Service"
-ID_ICON ICON PRELOAD DISCARDABLE "..\..\..\Images\wsl.ico"
+#define VER_FILEDESCRIPTION_STR "Linux Subsystem for Windows Service"
+ID_ICON ICON PRELOAD DISCARDABLE "..\..\..\Images\lsw.ico"
 
 
 #include <common.ver>

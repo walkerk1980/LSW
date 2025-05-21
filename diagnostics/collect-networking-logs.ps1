@@ -11,7 +11,7 @@ function Collect-WindowsNetworkState {
         $ReproStep
     )
 
-    # Collect host networking state relevant for WSL
+    # Collect host networking state relevant for LSW
     # Using a try/catch for commands below, as some of them do not exist on all OS versions
 
     try
@@ -124,22 +124,22 @@ function Collect-WindowsNetworkState {
 $folder = "WslNetworkingLogs-" + (Get-Date -Format "yyyy-MM-dd_HH-mm-ss")
 mkdir -p $folder
 
-$logProfile = "$folder/wsl_networking.wprp"
+$logProfile = "$folder/lsw_networking.wprp"
 $networkingBashScript = "$folder/networking.sh"
 
 # Detect the super user first.
 # Actually it's not definite that the super user is named "root". Instead, a user with uid=0 is what we are looking for. See #11693.
-$superUser = & wsl.exe -- id -nu 0  # user name of the super user.
+$superUser = & lsw.exe -- id -nu 0  # user name of the super user.
 
 # Copy/Download supporting files
-if (Test-Path "$PSScriptRoot/wsl_networking.wprp")
+if (Test-Path "$PSScriptRoot/lsw_networking.wprp")
 {
-    Copy-Item "$PSScriptRoot/wsl_networking.wprp" $logProfile
+    Copy-Item "$PSScriptRoot/lsw_networking.wprp" $logProfile
 }
 else
 {
-    Write-Host -ForegroundColor Yellow "wsl_networking.wprp not found in the current directory. Downloading it from GitHub."
-    Invoke-WebRequest -UseBasicParsing "https://raw.githubusercontent.com/microsoft/WSL/master/diagnostics/wsl_networking.wprp" -OutFile $logProfile
+    Write-Host -ForegroundColor Yellow "lsw_networking.wprp not found in the current directory. Downloading it from GitHub."
+    Invoke-WebRequest -UseBasicParsing "https://raw.githubusercontent.com/microsoft/LSW/master/diagnostics/lsw_networking.wprp" -OutFile $logProfile
 }
 
 if (Test-Path "$PSScriptRoot/networking.sh")
@@ -149,30 +149,30 @@ if (Test-Path "$PSScriptRoot/networking.sh")
 else
 {
     Write-Host -ForegroundColor Yellow "networking.sh not found in the current directory. Downloading it from GitHub."
-    Invoke-WebRequest -UseBasicParsing "https://raw.githubusercontent.com/microsoft/WSL/master/diagnostics/networking.sh" -OutFile $networkingBashScript
+    Invoke-WebRequest -UseBasicParsing "https://raw.githubusercontent.com/microsoft/LSW/master/diagnostics/networking.sh" -OutFile $networkingBashScript
 }
 
-# Retrieve WSL version and wslconfig file
+# Retrieve LSW version and lswconfig file
 get-appxpackage MicrosoftCorporationII.WindowsSubsystemforLinux > $folder/appxpackage.txt
 
-$wslconfig = "$env:USERPROFILE/.wslconfig"
-if (Test-Path $wslconfig)
+$lswconfig = "$env:USERPROFILE/.lswconfig"
+if (Test-Path $lswconfig)
 {
-    Copy-Item $wslconfig $folder
+    Copy-Item $lswconfig $folder
 }
 
 # Collect Linux & Windows network state before the repro
-& wsl.exe -u $superUser -e $networkingBashScript 2>&1 > $folder/linux_network_configuration_before.log
+& lsw.exe -u $superUser -e $networkingBashScript 2>&1 > $folder/linux_network_configuration_before.log
 
 Collect-WindowsNetworkState "before_repro"
 
 if ($RestartWslReproMode)
 {
-    # The WSL HNS network is created once per boot. Resetting it to collect network creation logs.
-    # Note: The below HNS command applies only to WSL in NAT mode
-    Get-HnsNetwork | Where-Object {$_.Name -eq 'WSL' -Or $_.Name -eq 'WSL (Hyper-V firewall)'} | Remove-HnsNetwork
+    # The LSW HNS network is created once per boot. Resetting it to collect network creation logs.
+    # Note: The below HNS command applies only to LSW in NAT mode
+    Get-HnsNetwork | Where-Object {$_.Name -eq 'LSW' -Or $_.Name -eq 'LSW (Hyper-V firewall)'} | Remove-HnsNetwork
 
-    # Stop WSL.
+    # Stop LSW.
     net.exe stop WslService
     if(-not $?)
     {
@@ -206,7 +206,7 @@ netsh wfp capture start file="$folder/wfpdiag.cab"
 $tcpdumpProcess = $null
 try
 {
-    $tcpdumpProcess = Start-Process wsl.exe -ArgumentList "-u $superUser tcpdump -n -i any -e -vvv > $folder/tcpdump.log" -PassThru
+    $tcpdumpProcess = Start-Process lsw.exe -ArgumentList "-u $superUser tcpdump -n -i any -e -vvv > $folder/tcpdump.log" -PassThru
 }
 catch {}
 
@@ -262,7 +262,7 @@ finally
 {
     try
     {
-        wsl.exe -u $superUser killall tcpdump
+        lsw.exe -u $superUser killall tcpdump
         if ($tcpdumpProcess -ne $null)
         {
             Wait-Process -InputObject $tcpdumpProcess -Timeout 10
@@ -276,7 +276,7 @@ finally
 }
 
 # Collect Linux & Windows network state after the repro
-& wsl.exe -u $superUser -e $networkingBashScript 2>&1 > $folder/linux_network_configuration_after.log
+& lsw.exe -u $superUser -e $networkingBashScript 2>&1 > $folder/linux_network_configuration_after.log
 
 Collect-WindowsNetworkState "after_repro"
 
@@ -288,7 +288,7 @@ try
 }
 catch {}
 
-# Collect the old Tcpip6 registry values - as they can break WSL if DisabledComponents is set to 0xff
+# Collect the old Tcpip6 registry values - as they can break LSW if DisabledComponents is set to 0xff
 # see https://learn.microsoft.com/en-us/troubleshoot/windows-server/networking/configure-ipv6-in-windows
 try
 {

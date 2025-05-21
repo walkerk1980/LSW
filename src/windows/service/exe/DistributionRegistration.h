@@ -14,7 +14,7 @@ Abstract:
 
 #pragma once
 
-namespace wsl::windows::service {
+namespace lsw::windows::service {
 
 template <typename T>
 struct DistributionProperty
@@ -114,4 +114,4 @@ namespace Property {
 
 } // namespace Property
 
-} // namespace wsl::windows::service
+} // namespace lsw::windows::service

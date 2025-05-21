@@ -45,21 +45,21 @@ public partial class NetworkingViewModel : WslConfigSettingViewModel
 
     protected override void InitializeConfigSettings()
     {
-        var wslConfigService = App.GetService<IWslConfigService>();
-        _networkingMode = wslConfigService.GetWslConfigSetting(WslConfigEntry.NetworkingMode);
-        _hyperVFirewall = wslConfigService.GetWslConfigSetting(WslConfigEntry.FirewallEnabled);
-        _ignoredPorts = wslConfigService.GetWslConfigSetting(WslConfigEntry.IgnoredPorts);
-        _localhostForwarding = wslConfigService.GetWslConfigSetting(WslConfigEntry.LocalhostForwardingEnabled);
-        _hostAddressLoopback = wslConfigService.GetWslConfigSetting(WslConfigEntry.HostAddressLoopbackEnabled);
-        _autoProxy = wslConfigService.GetWslConfigSetting(WslConfigEntry.AutoProxyEnabled);
-        _initialAutoProxyTimeout = wslConfigService.GetWslConfigSetting(WslConfigEntry.InitialAutoProxyTimeout);
-        _dNSProxy = wslConfigService.GetWslConfigSetting(WslConfigEntry.DNSProxyEnabled);
-        _dNSTunneling = wslConfigService.GetWslConfigSetting(WslConfigEntry.DNSTunellingEnabled);
-        _bestEffortDNS = wslConfigService.GetWslConfigSetting(WslConfigEntry.BestEffortDNSParsingEnabled);
+        var lswConfigService = App.GetService<IWslConfigService>();
+        _networkingMode = lswConfigService.GetWslConfigSetting(WslConfigEntry.NetworkingMode);
+        _hyperVFirewall = lswConfigService.GetWslConfigSetting(WslConfigEntry.FirewallEnabled);
+        _ignoredPorts = lswConfigService.GetWslConfigSetting(WslConfigEntry.IgnoredPorts);
+        _localhostForwarding = lswConfigService.GetWslConfigSetting(WslConfigEntry.LocalhostForwardingEnabled);
+        _hostAddressLoopback = lswConfigService.GetWslConfigSetting(WslConfigEntry.HostAddressLoopbackEnabled);
+        _autoProxy = lswConfigService.GetWslConfigSetting(WslConfigEntry.AutoProxyEnabled);
+        _initialAutoProxyTimeout = lswConfigService.GetWslConfigSetting(WslConfigEntry.InitialAutoProxyTimeout);
+        _dNSProxy = lswConfigService.GetWslConfigSetting(WslConfigEntry.DNSProxyEnabled);
+        _dNSTunneling = lswConfigService.GetWslConfigSetting(WslConfigEntry.DNSTunellingEnabled);
+        _bestEffortDNS = lswConfigService.GetWslConfigSetting(WslConfigEntry.BestEffortDNSParsingEnabled);
 
-        string defaultIgnoredPorts = wslConfigService.GetWslConfigSetting(WslConfigEntry.IgnoredPorts, true).StringValue;
+        string defaultIgnoredPorts = lswConfigService.GetWslConfigSetting(WslConfigEntry.IgnoredPorts, true).StringValue;
         _defaultIgnoredPorts = defaultIgnoredPorts == null ? String.Empty : defaultIgnoredPorts;
-        _defaultInitialAutoProxyTimeout = wslConfigService.GetWslConfigSetting(WslConfigEntry.InitialAutoProxyTimeout, true).Int32Value;
+        _defaultInitialAutoProxyTimeout = lswConfigService.GetWslConfigSetting(WslConfigEntry.InitialAutoProxyTimeout, true).Int32Value;
     }
 
     public List<ComboBoxItem> NetworkingModes

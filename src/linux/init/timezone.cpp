@@ -19,7 +19,7 @@ Abstract:
 #define TIMEZONE_LOCALTIME_FILE ETC_FOLDER "localtime"
 #define TIMEZONE_SETTING_FILE ETC_FOLDER "timezone"
 
-void UpdateTimezone(std::string_view Timezone, const wsl::linux::WslDistributionConfig& Config)
+void UpdateTimezone(std::string_view Timezone, const lsw::linux::WslDistributionConfig& Config)
 
 /*++
 
@@ -109,7 +109,7 @@ try
 }
 CATCH_LOG()
 
-void UpdateTimezone(gsl::span<gsl::byte> Buffer, const wsl::linux::WslDistributionConfig& Config)
+void UpdateTimezone(gsl::span<gsl::byte> Buffer, const lsw::linux::WslDistributionConfig& Config)
 
 /*++
 
@@ -138,5 +138,5 @@ Return Value:
         return;
     }
 
-    UpdateTimezone(wsl::shared::string::FromSpan(Buffer, TimezoneInfo->TimezoneOffset), Config);
+    UpdateTimezone(lsw::shared::string::FromSpan(Buffer, TimezoneInfo->TimezoneOffset), Config);
 }

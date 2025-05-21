@@ -1,2 +1,2 @@
-add_idl(wslinstalleridl wslinstallerservice.idl "")
-set_target_properties(wslinstalleridl PROPERTIES FOLDER windows)
+add_idl(lswinstalleridl lswinstallerservice.idl "")
+set_target_properties(lswinstalleridl PROPERTIES FOLDER windows)

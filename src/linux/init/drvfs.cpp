@@ -41,7 +41,7 @@ int MountFilesystem(const char* FsType, const char* Source, const char* Target, 
 
 int MountWithRetry(const char* Source, const char* Target, const char* FsType, const char* Options, int* ExitCode = nullptr);
 
-std::pair<std::string, std::string> ConvertDrvfsMountOptionsToPlan9(std::string_view Options, const wsl::linux::WslDistributionConfig& Config)
+std::pair<std::string, std::string> ConvertDrvfsMountOptionsToPlan9(std::string_view Options, const lsw::linux::WslDistributionConfig& Config)
 
 /*++
 
@@ -61,7 +61,7 @@ Return Value:
 --*/
 
 {
-    using wsl::shared::string::StartsWith;
+    using lsw::shared::string::StartsWith;
 
     std::string Plan9Options{};
     std::string StandardOptions{};
@@ -116,7 +116,7 @@ Return Value:
 --*/
 
 {
-    const char* envFlag = getenv(WSL_DRVFS_ELEVATED_ENV);
+    const char* envFlag = getenv(LSW_DRVFS_ELEVATED_ENV);
     if (envFlag != nullptr)
     {
         if (strcmp(envFlag, "0") == 0)
@@ -128,7 +128,7 @@ Return Value:
             return true;
         }
 
-        LOG_ERROR("Unexpected value for {}: '{}'", WSL_DRVFS_ELEVATED_ENV, envFlag);
+        LOG_ERROR("Unexpected value for {}: '{}'", LSW_DRVFS_ELEVATED_ENV, envFlag);
     }
 
     //
@@ -136,7 +136,7 @@ Return Value:
     // be established, use the non-admin DrvFs port.
     //
 
-    wsl::shared::SocketChannel channel{UtilConnectToInteropServer(), "InteropClientDrvfs"};
+    lsw::shared::SocketChannel channel{UtilConnectToInteropServer(), "InteropClientDrvfs"};
     if (channel.Socket() < 0)
     {
         return false;
@@ -250,7 +250,7 @@ try
     try
     {
         bool PrintWarning = true;
-        wsl::shared::retry::RetryWithTimeout<void>(
+        lsw::shared::retry::RetryWithTimeout<void>(
             [&]() { THROW_LAST_ERROR_IF(mountutil::MountFilesystem(Source, Target, FsType, Options) < 0); },
             std::chrono::milliseconds{100},
             std::chrono::seconds{2},
@@ -303,7 +303,7 @@ try
 }
 CATCH_RETURN_ERRNO()
 
-int MountDrvfs(const char* Source, const char* Target, const char* Options, std::optional<bool> Admin, const wsl::linux::WslDistributionConfig& Config, int* ExitCode)
+int MountDrvfs(const char* Source, const char* Target, const char* Options, std::optional<bool> Admin, const lsw::linux::WslDistributionConfig& Config, int* ExitCode)
 
 /*++
 
@@ -337,9 +337,9 @@ try
     }
 
     // Use virtiofs if the source of the mount is the root of a drive, otherwise use 9p.
-    if (WSL_USE_VIRTIO_FS(Config))
+    if (LSW_USE_VIRTIO_FS(Config))
     {
-        if (wsl::shared::string::IsDriveRoot(Source))
+        if (lsw::shared::string::IsDriveRoot(Source))
         {
             return MountVirtioFs(Source, Target, Options, Admin, Config, ExitCode);
         }
@@ -440,11 +440,11 @@ Return Value:
     }
 
     int ExitCode = c_exitCodeMountFail;
-    MountDrvfs(Argv[1], Argv[2], Options, {}, wsl::linux::WslDistributionConfig{CONFIG_FILE}, &ExitCode);
+    MountDrvfs(Argv[1], Argv[2], Options, {}, lsw::linux::WslDistributionConfig{CONFIG_FILE}, &ExitCode);
     return ExitCode;
 }
 
-int MountPlan9Filesystem(const char* Source, const char* Target, const char* Options, bool Admin, const wsl::linux::WslDistributionConfig& Config, int* ExitCode)
+int MountPlan9Filesystem(const char* Source, const char* Target, const char* Options, bool Admin, const lsw::linux::WslDistributionConfig& Config, int* ExitCode)
 
 /*++
 
@@ -472,7 +472,7 @@ Return Value:
 
 {
     std::string MountOptions;
-    if (WSL_USE_VIRTIO_9P(Config))
+    if (LSW_USE_VIRTIO_9P(Config))
     {
         Source = Admin ? LX_INIT_DRVFS_ADMIN_VIRTIO_TAG : LX_INIT_DRVFS_VIRTIO_TAG;
         MountOptions = std::format("msize=262144,trans=virtio,{}", Options);
@@ -493,7 +493,7 @@ Return Value:
     }
 }
 
-int MountVirtioFs(const char* Source, const char* Target, const char* Options, std::optional<bool> Admin, const wsl::linux::WslDistributionConfig& Config, int* ExitCode)
+int MountVirtioFs(const char* Source, const char* Target, const char* Options, std::optional<bool> Admin, const lsw::linux::WslDistributionConfig& Config, int* ExitCode)
 
 /*++
 
@@ -523,7 +523,7 @@ Return Value:
 
 try
 {
-    assert(wsl::shared::string::IsDriveRoot(Source));
+    assert(lsw::shared::string::IsDriveRoot(Source));
 
     //
     // Check whether to use the elevated or non-elevated virtiofs server.
@@ -547,16 +547,16 @@ try
     // Construct a request to add a virtiofs share.
     //
 
-    wsl::shared::MessageWriter<LX_INIT_ADD_VIRTIOFS_SHARE_MESSAGE> AddShare(LxInitMessageAddVirtioFsDevice);
+    lsw::shared::MessageWriter<LX_INIT_ADD_VIRTIOFS_SHARE_MESSAGE> AddShare(LxInitMessageAddVirtioFsDevice);
     AddShare->Admin = Admin.value();
     AddShare.WriteString(AddShare->PathOffset, Source);
     AddShare.WriteString(AddShare->OptionsOffset, Plan9Options);
 
     //
-    // Connect to the wsl service to add the virtiofs share.
+    // Connect to the lsw service to add the virtiofs share.
     //
 
-    wsl::shared::SocketChannel Channel{UtilConnectVsock(LX_INIT_UTILITY_VM_VIRTIOFS_PORT, true), "VirtoFs"};
+    lsw::shared::SocketChannel Channel{UtilConnectVsock(LX_INIT_UTILITY_VM_VIRTIOFS_PORT, true), "VirtoFs"};
     if (Channel.Socket() < 0)
     {
         return -1;
@@ -575,7 +575,7 @@ try
     // Perform the mount operation.
     //
 
-    auto* Tag = wsl::shared::string::FromSpan(ResponseSpan, Response.TagOffset);
+    auto* Tag = lsw::shared::string::FromSpan(ResponseSpan, Response.TagOffset);
     return MountWithRetry(Tag, Target, VIRTIO_FS_TYPE, MountOptions.c_str(), ExitCode);
 }
 CATCH_RETURN_ERRNO()
@@ -607,7 +607,7 @@ Return Value:
 
 try
 {
-    wsl::shared::MessageWriter<LX_INIT_REMOUNT_VIRTIOFS_SHARE_MESSAGE> RemountShare(LxInitMessageRemountVirtioFsDevice);
+    lsw::shared::MessageWriter<LX_INIT_REMOUNT_VIRTIOFS_SHARE_MESSAGE> RemountShare(LxInitMessageRemountVirtioFsDevice);
     RemountShare->Admin = Admin;
     RemountShare.WriteString(RemountShare->TagOffset, Tag);
 
@@ -615,7 +615,7 @@ try
     // Connect to the host and send the remount request.
     //
 
-    wsl::shared::SocketChannel Channel{UtilConnectVsock(LX_INIT_UTILITY_VM_VIRTIOFS_PORT, true), "RemountVirtioFs"};
+    lsw::shared::SocketChannel Channel{UtilConnectVsock(LX_INIT_UTILITY_VM_VIRTIOFS_PORT, true), "RemountVirtioFs"};
     if (Channel.Socket() < 0)
     {
         return -1;
@@ -629,7 +629,7 @@ try
         return -1;
     }
 
-    Tag = wsl::shared::string::FromSpan(ResponseSpan, Response.TagOffset);
+    Tag = lsw::shared::string::FromSpan(ResponseSpan, Response.TagOffset);
     return MountWithRetry(Tag, Target, VIRTIO_FS_TYPE, Options);
 }
 CATCH_RETURN_ERRNO()

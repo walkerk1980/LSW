@@ -3,12 +3,12 @@
 set -ue
 
 if [ $(whoami) != "root" ]; then
-  echo "This script must be run as root in the system distro (via wsl.exe -u root --system)"
+  echo "This script must be run as root in the system distro (via lsw.exe -u root --system)"
   exit 1
 fi
 
 ts=$(date +%F_%H-%M-%S)
-target="/mnt/c/wsl-init-dump-$ts"
+target="/mnt/c/lsw-init-dump-$ts"
 
 mkdir -p "$target"
 

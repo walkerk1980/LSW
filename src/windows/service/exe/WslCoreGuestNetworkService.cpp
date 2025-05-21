@@ -16,17 +16,17 @@ static constexpr auto c_dnsPortNumber = 53;
 static constexpr auto c_mdnsPortNumber = 5353;
 static constexpr auto c_llmnrPortNumber = 5355;
 
-using namespace wsl::shared;
+using namespace lsw::shared;
 
 constexpr IN_ADDR c_ipv4LoopbackAddr = IN4ADDR_LOOPBACK_INIT;
 
-std::optional<LxssDynamicFunction<decltype(HcnReserveGuestNetworkServicePortRange)>> wsl::core::networking::GuestNetworkService::m_allocatePortRange;
-std::optional<LxssDynamicFunction<decltype(HcnReserveGuestNetworkServicePort)>> wsl::core::networking::GuestNetworkService::m_allocatePort;
-std::optional<LxssDynamicFunction<decltype(HcnReleaseGuestNetworkServicePortReservationHandle)>> wsl::core::networking::GuestNetworkService::m_releasePort;
+std::optional<LxssDynamicFunction<decltype(HcnReserveGuestNetworkServicePortRange)>> lsw::core::networking::GuestNetworkService::m_allocatePortRange;
+std::optional<LxssDynamicFunction<decltype(HcnReserveGuestNetworkServicePort)>> lsw::core::networking::GuestNetworkService::m_allocatePort;
+std::optional<LxssDynamicFunction<decltype(HcnReleaseGuestNetworkServicePortReservationHandle)>> lsw::core::networking::GuestNetworkService::m_releasePort;
 
-wsl::core::networking::GuestNetworkService::GuestNetworkService() noexcept
+lsw::core::networking::GuestNetworkService::GuestNetworkService() noexcept
 {
-    if (wsl::core::networking::IsFlowSteeringSupportedByHns())
+    if (lsw::core::networking::IsFlowSteeringSupportedByHns())
     {
 
         static std::once_flag flag;
@@ -42,11 +42,11 @@ wsl::core::networking::GuestNetworkService::GuestNetworkService() noexcept
     }
 }
 
-void wsl::core::networking::GuestNetworkService::CreateGuestNetworkService(
+void lsw::core::networking::GuestNetworkService::CreateGuestNetworkService(
     const bool firewallEnabled, const std::set<uint16_t>& IgnoredPorts, const GUID& VmId, const UUID& ServerUuid, HCN_NOTIFICATION_CALLBACK Callback, void* CallbackContext)
 {
     // we must first enable mirrored networking - which must by done by indirectly issuing a query with these special flags
-    wsl::core::networking::EnumerateMirroredNetworksAndHyperVFirewall(firewallEnabled);
+    lsw::core::networking::EnumerateMirroredNetworksAndHyperVFirewall(firewallEnabled);
 
     m_ignoredPorts = IgnoredPorts;
     // Always allow binds for 53. This is a workaround to unblock Docker Desktop and needs to be revisited in the future.
@@ -64,7 +64,7 @@ void wsl::core::networking::GuestNetworkService::CreateGuestNetworkService(
 
     wil::unique_cotaskmem_string error;
     const auto result = ::HcnCreateGuestNetworkService(VmId, ToJsonW(request).c_str(), &m_service, &error);
-    WSL_LOG(
+    LSW_LOG(
         "GuestNetworkService::CreateGuestNetworkService [HcnCreateGuestNetworkService]",
         TraceLoggingValue(request.VirtualMachineId, "virtualMachineId"),
         TraceLoggingValue(request.MirrorHostNetworking, "mirrorHostNetworking"),
@@ -81,7 +81,7 @@ void wsl::core::networking::GuestNetworkService::CreateGuestNetworkService(
     SetGuestNetworkServiceState(hns::GuestNetworkServiceState::Bootstrapping);
 }
 
-void wsl::core::networking::GuestNetworkService::SetGuestNetworkServiceState(_In_ hns::GuestNetworkServiceState State) const
+void lsw::core::networking::GuestNetworkService::SetGuestNetworkServiceState(_In_ hns::GuestNetworkServiceState State) const
 {
     hns::ModifyGuestNetworkServiceSettingRequest modifyRequest{};
     modifyRequest.RequestType = hns::ModifyRequestType::Update;
@@ -89,13 +89,13 @@ void wsl::core::networking::GuestNetworkService::SetGuestNetworkServiceState(_In
     modifyRequest.Settings.State = State;
 
     const auto result = ::HcnModifyGuestNetworkService(m_service.get(), ToJsonW(modifyRequest).c_str(), nullptr);
-    WSL_LOG(
+    LSW_LOG(
         "GuestNetworkService::SetGuestNetworkServiceState [HcnModifyGuestNetworkService]",
         TraceLoggingValue(JsonEnumToString(modifyRequest.Settings.State).c_str(), "state"));
     THROW_IF_FAILED(result);
 }
 
-std::pair<uint16_t, uint16_t> wsl::core::networking::GuestNetworkService::AllocateEphemeralPortRange()
+std::pair<uint16_t, uint16_t> lsw::core::networking::GuestNetworkService::AllocateEphemeralPortRange()
 {
     FAIL_FAST_IF(!IsFlowSteeringSupportedByHns());
 
@@ -115,13 +115,13 @@ std::pair<uint16_t, uint16_t> wsl::core::networking::GuestNetworkService::Alloca
 
     WI_ASSERT(m_reservedPortRange.endingPort - m_reservedPortRange.startingPort == c_ephemeralPortRangeSize);
 
-    // setting the port to zero as we do not expect any bind requests to be sent to wslcore for ports in this range
+    // setting the port to zero as we do not expect any bind requests to be sent to lswcore for ports in this range
     m_reservedPorts.emplace(std::make_pair(HCN_PORT_PROTOCOL_TCP, static_cast<uint16_t>(0)), HcnPortReservation{port, 1});
 
     // ownership of the port was transferred successfully
     releasePortOnError.release();
 
-    WSL_LOG(
+    LSW_LOG(
         "GuestNetworkService::AllocateEphemeralPortRange",
         TraceLoggingValue(m_reservedPortRange.startingPort, "startingPort"),
         TraceLoggingValue(m_reservedPortRange.endingPort, "endingPort"));
@@ -129,7 +129,7 @@ std::pair<uint16_t, uint16_t> wsl::core::networking::GuestNetworkService::Alloca
     return std::make_pair(m_reservedPortRange.startingPort, m_reservedPortRange.endingPort);
 }
 
-bool wsl::core::networking::GuestNetworkService::IsPortAllocationLoopbackException(const SOCKADDR_INET& Address) noexcept
+bool lsw::core::networking::GuestNetworkService::IsPortAllocationLoopbackException(const SOCKADDR_INET& Address) noexcept
 {
     // Out of IPv4 loopback address range 127.0.0.0/8, only 127.0.0.1 is used by host<->guest loopback networking scenarios.
     // FSE needs to be aware of binds using address 127.0.0.1, but can ignore binds for other IPv4 loopback addresses.
@@ -143,7 +143,7 @@ bool wsl::core::networking::GuestNetworkService::IsPortAllocationLoopbackExcepti
     return (Address.si_family == AF_INET && IN4_IS_ADDR_LOOPBACK(&Address.Ipv4.sin_addr) && !IN4_ADDR_EQUAL(&Address.Ipv4.sin_addr, &c_ipv4LoopbackAddr));
 }
 
-bool wsl::core::networking::GuestNetworkService::IsPortAllocationMulticast(const SOCKADDR_INET& Address, _In_ int Protocol) noexcept
+bool lsw::core::networking::GuestNetworkService::IsPortAllocationMulticast(const SOCKADDR_INET& Address, _In_ int Protocol) noexcept
 {
     const auto PortNumber = SS_PORT(&Address);
 
@@ -166,7 +166,7 @@ bool wsl::core::networking::GuestNetworkService::IsPortAllocationMulticast(const
     return false;
 }
 
-int wsl::core::networking::GuestNetworkService::OnPortAllocationRequest(const SOCKADDR_INET& Address, _In_ int Protocol, _In_ bool Allocate) noexcept
+int lsw::core::networking::GuestNetworkService::OnPortAllocationRequest(const SOCKADDR_INET& Address, _In_ int Protocol, _In_ bool Allocate) noexcept
 try
 {
     // The Linux and Windows constants conveniently have the same values for TCP & UDP.
@@ -175,11 +175,11 @@ try
     auto HnsProtocol = Protocol == IPPROTO_TCP ? HCN_PORT_PROTOCOL_TCP : HCN_PORT_PROTOCOL_UDP;
 
     const auto PortNumber = SS_PORT(&Address);
-    const auto StringAddress = wsl::windows::common::string::SockAddrInetToString(Address);
+    const auto StringAddress = lsw::windows::common::string::SockAddrInetToString(Address);
 
     if (IsPortAllocationLoopbackException(Address))
     {
-        WSL_LOG(
+        LSW_LOG(
             "GuestNetworkService::OnPortAllocationRequest - allowing port allocation for loopback without asking FSE",
             TraceLoggingValue(StringAddress.c_str(), "IP address"),
             TraceLoggingValue(Protocol == IPPROTO_TCP ? "TCP" : "UDP", "protocol"),
@@ -192,7 +192,7 @@ try
     if (m_ignoredPorts.find(PortNumber) != m_ignoredPorts.end())
     {
 
-        WSL_LOG(
+        LSW_LOG(
             "GuestNetworkService::OnPortAllocationRequest - allowing port allocation for ignored port without asking FSE",
             TraceLoggingValue(StringAddress.c_str(), "IP address"),
             TraceLoggingValue(Protocol == IPPROTO_TCP ? "TCP" : "UDP", "protocol"),
@@ -206,7 +206,7 @@ try
 
     if (PortNumber >= m_reservedPortRange.startingPort && PortNumber <= m_reservedPortRange.endingPort)
     {
-        WSL_LOG(
+        LSW_LOG(
             "GuestNetworkService::OnPortAllocationRequest",
             TraceLoggingValue(
                 "Guest attempted to allocate a port but it was already allocated through port reservations", "status"),
@@ -223,7 +223,7 @@ try
         if (it != m_reservedPorts.end())
         {
             it->second.ReferenceCount++;
-            WSL_LOG(
+            LSW_LOG(
                 "GuestNetworkService::OnPortAllocationRequest - incremented reference",
                 TraceLoggingValue(PortNumber, "Port"),
                 TraceLoggingValue(Address.si_family, "Family"),
@@ -254,7 +254,7 @@ try
         // if the port was reserved, we successfully handed over ownership
         releasePortOnError.release();
 
-        WSL_LOG(
+        LSW_LOG(
             "GuestNetworkService::OnPortAllocationRequest [HcnReserveGuestNetworkServicePort]",
             TraceLoggingValue(HnsProtocol == HCN_PORT_PROTOCOL_TCP ? "TCP" : "UDP", "protocol"),
             TraceLoggingValue(PortNumber, "portNumber"),
@@ -273,7 +273,7 @@ try
         {
             result = m_releasePort.value()(it->second.Handle);
             m_reservedPorts.erase(it);
-            WSL_LOG(
+            LSW_LOG(
                 "GuestNetworkService::OnPortAllocationRequest - released port",
                 TraceLoggingValue(PortNumber, "Port"),
                 TraceLoggingValue(Address.si_family, "Family"),
@@ -283,7 +283,7 @@ try
         else
         {
             it->second.ReferenceCount--;
-            WSL_LOG(
+            LSW_LOG(
                 "GuestNetworkService::OnPortAllocationRequest - decremented reference",
                 TraceLoggingValue(PortNumber, "Port"),
                 TraceLoggingValue(Address.si_family, "Family"),
@@ -302,7 +302,7 @@ catch (...)
     return -LX_ENOBUFS;
 }
 
-void wsl::core::networking::GuestNetworkService::Stop() noexcept
+void lsw::core::networking::GuestNetworkService::Stop() noexcept
 {
     if (m_releasePort)
     {

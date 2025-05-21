@@ -8,7 +8,7 @@ Module Name:
 
 Abstract:
 
-    This file contains the entrypoint of the WSL init implementation.
+    This file contains the entrypoint of the LSW init implementation.
 
 --*/
 
@@ -69,7 +69,7 @@ Abstract:
 #define BINFMT_PATH PROCFS_PATH "/sys/fs/binfmt_misc"
 #define CHRONY_CONF_PATH ETC_PATH "/chrony.conf"
 #define CHRONYD_PATH "/sbin/chronyd"
-#define CROSS_DISTRO_SHARE_PATH "/mnt/wsl"
+#define CROSS_DISTRO_SHARE_PATH "/mnt/lsw"
 #define DEVFS_PATH "/dev"
 #define DEVNULL_PATH DEVFS_PATH "/null"
 #define DHCLIENT_CONF_PATH "/dhclient.conf"
@@ -95,7 +95,7 @@ Abstract:
 #define SYSFS_PATH "/sys"
 #define SYSTEM_DISTRO_PATH "/system"
 #define SYSTEM_DISTRO_VHD_PATH "/systemvhd"
-#define WSLG_PATH "/wslg"
+#define LSWG_PATH "/lswg"
 
 #define syscall_arg(_n) (offsetof(struct seccomp_data, args[_n]))
 #define syscall_nr (offsetof(struct seccomp_data, nr))
@@ -192,13 +192,13 @@ int MountInit(const char* Target);
 
 int MountPlan9(const char* Name, const char* Target, bool ReadOnly, std::optional<int> BufferSize = {});
 
-int ProcessMessage(wsl::shared::SocketChannel& channel, LX_MESSAGE_TYPE Type, gsl::span<gsl::byte> Buffer, VmConfiguration& Config);
+int ProcessMessage(lsw::shared::SocketChannel& channel, LX_MESSAGE_TYPE Type, gsl::span<gsl::byte> Buffer, VmConfiguration& Config);
 
 wil::unique_fd RegisterSeccompHook();
 
-int ReportMountStatus(wsl::shared::SocketChannel& Channel, int Result, LX_MINI_MOUNT_STEP Step);
+int ReportMountStatus(lsw::shared::SocketChannel& Channel, int Result, LX_MINI_MOUNT_STEP Step);
 
-int SendCapabilities(wsl::shared::SocketChannel& Channel);
+int SendCapabilities(lsw::shared::SocketChannel& Channel);
 
 int SetCloseOnExec(int Fd, bool Enable);
 
@@ -553,7 +553,7 @@ Return Value:
     // N.B. mkdtemp requires a template string that ends in "XXXXXX".
     //
 
-    Path += "/wslXXXXXX";
+    Path += "/lswXXXXXX";
 
     if (mkdtemp(Path.data()) == NULL)
     {
@@ -583,7 +583,7 @@ Return Value:
 --*/
 
 {
-    std::string content = wsl::shared::string::ReadFile<char, char>(std::format("/sys/block/{}/dev", BlockDeviceName).c_str());
+    std::string content = lsw::shared::string::ReadFile<char, char>(std::format("/sys/block/{}/dev", BlockDeviceName).c_str());
     auto separator = content.find(':');
 
     if (separator == 0 || separator - 1 >= content.size() || separator == std::string::npos)
@@ -689,7 +689,7 @@ try
     // Wait for the block device to be available.
     //
 
-    wsl::shared::retry::RetryWithTimeout<void>(
+    lsw::shared::retry::RetryWithTimeout<void>(
         [&]() { THROW_LAST_ERROR_IF(!wil::unique_fd{open(BlockDevice, O_RDONLY)}); },
         c_defaultRetryPeriod,
         c_defaultRetryTimeout,
@@ -756,14 +756,14 @@ CATCH_RETURN_ERRNO()
 
 void EnableCrashDumpCollection()
 {
-    if (symlink("/init", "/" LX_INIT_WSL_CAPTURE_CRASH) < 0)
+    if (symlink("/init", "/" LX_INIT_LSW_CAPTURE_CRASH) < 0)
     {
-        LOG_ERROR("symlink({}, {}) failed {}", "/init", "/" LX_INIT_WSL_CAPTURE_CRASH, errno);
+        LOG_ERROR("symlink({}, {}) failed {}", "/init", "/" LX_INIT_LSW_CAPTURE_CRASH, errno);
         return;
     }
 
     // If the first character is a pipe, then the kernel will interperet this path as a command.
-    constexpr auto core_pattern = "|/" LX_INIT_WSL_CAPTURE_CRASH " %t %E %p %s";
+    constexpr auto core_pattern = "|/" LX_INIT_LSW_CAPTURE_CRASH " %t %E %p %s";
     WriteToFile("/proc/sys/kernel/core_pattern", core_pattern);
 }
 
@@ -959,7 +959,7 @@ Return Value:
     //
 
     std::string Path = std::format("{}{}/block", SCSI_DEVICE_PREFIX, Lun);
-    return wsl::shared::retry::RetryWithTimeout<std::string>(
+    return lsw::shared::retry::RetryWithTimeout<std::string>(
         [&]() {
             wil::unique_dir Dir{opendir(Path.c_str())};
             THROW_LAST_ERROR_IF(!Dir);
@@ -1710,7 +1710,7 @@ Arguments:
         environment variable.
 
     InstallPath - Supplies the Windows path for the location where the lifted
-        WSL package is installed. If this value is a non-empty string, it is
+        LSW package is installed. If this value is a non-empty string, it is
         passed to init as an environment variable.
 
     UserProfile - Supplies the Windows path for user profile of the VM owner.
@@ -1772,7 +1772,7 @@ try
     bool readOnly = false;
     try
     {
-        AddTemporaryMount(LX_WSL2_CROSS_DISTRO_ENV, CROSS_DISTRO_SHARE_PATH, (MS_MOVE | MS_REC));
+        AddTemporaryMount(LX_LSW2_CROSS_DISTRO_ENV, CROSS_DISTRO_SHARE_PATH, (MS_MOVE | MS_REC));
     }
     catch (...)
     {
@@ -1792,19 +1792,19 @@ try
         THROW_LAST_ERROR_IF(UtilMountOverlayFs(tmpfsTarget.c_str(), Target) < 0);
         THROW_LAST_ERROR_IF(mount(tmpfsTarget.c_str(), Target, NULL, MS_BIND, NULL) < 0);
 
-        AddTemporaryMount(LX_WSL2_CROSS_DISTRO_ENV, CROSS_DISTRO_SHARE_PATH, (MS_MOVE | MS_REC));
+        AddTemporaryMount(LX_LSW2_CROSS_DISTRO_ENV, CROSS_DISTRO_SHARE_PATH, (MS_MOVE | MS_REC));
         readOnly = true;
-        AddEnvironmentVariable(LX_WSL2_DISTRO_READ_ONLY_ENV, "1");
+        AddEnvironmentVariable(LX_LSW2_DISTRO_READ_ONLY_ENV, "1");
     }
 
     //
-    // If GUI support is enabled, move the WSLg shared mount to a temporary
+    // If GUI support is enabled, move the LSWg shared mount to a temporary
     // location. This mount will be moved by the distro init.
     //
 
     if (EnableGuiApps)
     {
-        AddTemporaryMount(LX_WSL2_SYSTEM_DISTRO_SHARE_ENV, WSLG_PATH, (MS_MOVE | MS_REC));
+        AddTemporaryMount(LX_LSW2_SYSTEM_DISTRO_SHARE_ENV, LSWG_PATH, (MS_MOVE | MS_REC));
     }
 
     //
@@ -1818,28 +1818,28 @@ try
 
     auto pid = std::filesystem::read_symlink(PROCFS_PATH "/self");
 
-    AddEnvironmentVariable(LX_WSL_PID_ENV, pid.c_str());
-    AddEnvironmentVariable(LX_WSL2_VM_ID_ENV, VmId);
-    AddEnvironmentVariable(LX_WSL2_DISTRO_NAME_ENV, DistributionName);
-    AddEnvironmentVariable(LX_WSL2_SHARED_MEMORY_OB_DIRECTORY, SharedMemoryRoot);
-    AddEnvironmentVariable(LX_WSL2_INSTALL_PATH, InstallPath);
-    AddEnvironmentVariable(LX_WSL2_USER_PROFILE, UserProfile);
-    AddEnvironmentVariable(LX_WSL2_NETWORKING_MODE_ENV, std::to_string(static_cast<int>(Config.NetworkingMode)).c_str());
+    AddEnvironmentVariable(LX_LSW_PID_ENV, pid.c_str());
+    AddEnvironmentVariable(LX_LSW2_VM_ID_ENV, VmId);
+    AddEnvironmentVariable(LX_LSW2_DISTRO_NAME_ENV, DistributionName);
+    AddEnvironmentVariable(LX_LSW2_SHARED_MEMORY_OB_DIRECTORY, SharedMemoryRoot);
+    AddEnvironmentVariable(LX_LSW2_INSTALL_PATH, InstallPath);
+    AddEnvironmentVariable(LX_LSW2_USER_PROFILE, UserProfile);
+    AddEnvironmentVariable(LX_LSW2_NETWORKING_MODE_ENV, std::to_string(static_cast<int>(Config.NetworkingMode)).c_str());
 
     if (DistroInitPid.has_value())
     {
-        AddEnvironmentVariable(LX_WSL2_DISTRO_INIT_PID, std::to_string(static_cast<int>(DistroInitPid.value())).c_str());
+        AddEnvironmentVariable(LX_LSW2_DISTRO_INIT_PID, std::to_string(static_cast<int>(DistroInitPid.value())).c_str());
     }
 
     if (Config.EnableSafeMode)
     {
-        AddEnvironmentVariable(LX_WSL2_SAFE_MODE, c_trueString);
+        AddEnvironmentVariable(LX_LSW2_SAFE_MODE, c_trueString);
     }
 
     //
     // If GPU support is enabled, move the GPU share mounts to temporary
     // mount points inside the distro. These will be moved by the distro init
-    // process, or unmounted if GPU support is disabled via /etc/wsl.conf.
+    // process, or unmounted if GPU support is disabled via /etc/lsw.conf.
     //
 
     if (Config.EnableGpuSupport)
@@ -1855,7 +1855,7 @@ try
         for (int ShareIndex = 0; ShareIndex < COUNT_OF(g_gpuShares); ShareIndex += 1)
         {
             auto SharePath = std::format("{}{}", GPU_SHARE_PREFIX, g_gpuShares[ShareIndex].Name);
-            auto ShareVariable = std::format("{}{}", LX_WSL2_GPU_SHARE_ENV, g_gpuShares[ShareIndex].Name);
+            auto ShareVariable = std::format("{}{}", LX_LSW2_GPU_SHARE_ENV, g_gpuShares[ShareIndex].Name);
             AddTemporaryMount(ShareVariable.c_str(), SharePath.c_str(), MS_MOVE);
         }
     }
@@ -1867,8 +1867,8 @@ try
 
     if (!Config.KernelModulesPath.empty())
     {
-        AddTemporaryMount(LX_WSL2_KERNEL_MODULES_MOUNT_ENV, Config.KernelModulesPath.c_str(), (MS_MOVE | MS_REC));
-        AddEnvironmentVariable(LX_WSL2_KERNEL_MODULES_PATH_ENV, Config.KernelModulesPath.c_str());
+        AddTemporaryMount(LX_LSW2_KERNEL_MODULES_MOUNT_ENV, Config.KernelModulesPath.c_str(), (MS_MOVE | MS_REC));
+        AddEnvironmentVariable(LX_LSW2_KERNEL_MODULES_PATH_ENV, Config.KernelModulesPath.c_str());
     }
 
     //
@@ -1954,7 +1954,7 @@ Arguments:
         environment variable.
 
     InstallPath - Supplies the Windows path for the location where the lifted
-        WSL package is installed. If this value is a non-empty string, it is
+        LSW package is installed. If this value is a non-empty string, it is
         passed to init as an environment variable.
 
     UserProfile - Supplies the Windows path for user profile of the VM owner.
@@ -1994,9 +1994,9 @@ std::set<pid_t> ListInitChildProcesses()
 {
     std::set<pid_t> children;
 
-    auto content = wsl::shared::string::ReadFile<char>("/proc/self/task/1/children");
+    auto content = lsw::shared::string::ReadFile<char>("/proc/self/task/1/children");
 
-    for (const auto& e : wsl::shared::string::Split<char>(content, ' '))
+    for (const auto& e : lsw::shared::string::Split<char>(content, ' '))
     {
         children.insert(std::stoul(e, nullptr, 10));
     }
@@ -2047,11 +2047,11 @@ Return Value:
 {
     if (Message)
     {
-        dprintf(g_LogFd, "<3>WSL (%d) ERROR: %s %s", getpid(), Message, Description);
+        dprintf(g_LogFd, "<3>LSW (%d) ERROR: %s %s", getpid(), Message, Description);
     }
     else
     {
-        dprintf(g_LogFd, "<3>WSL (%d) ERROR: %s", getpid(), Description);
+        dprintf(g_LogFd, "<3>LSW (%d) ERROR: %s", getpid(), Description);
     }
 }
 
@@ -2250,7 +2250,7 @@ Return Value:
     }
 
     //
-    // Create a bind mount of WSL init.
+    // Create a bind mount of LSW init.
     //
 
     if (MountInit(SYSTEM_DISTRO_PATH LX_INIT_PATH) < 0)
@@ -2290,7 +2290,7 @@ Return Value:
 {
     std::string DevicePath = std::format("/sys/block/{}", DeviceName);
 
-    return wsl::shared::retry::RetryWithTimeout<std::map<unsigned long, std::string>>(
+    return lsw::shared::retry::RetryWithTimeout<std::map<unsigned long, std::string>>(
         [&]() {
             wil::unique_dir Dir{opendir(DevicePath.c_str())};
             THROW_LAST_ERROR_IF(!Dir);
@@ -2352,7 +2352,7 @@ Return Value:
 try
 {
     *Step = LxMiniInitMountStepFindPartition;
-    if (!wsl::shared::string::StartsWith(DevicePath, DEVFS_PATH "/"))
+    if (!lsw::shared::string::StartsWith(DevicePath, DEVFS_PATH "/"))
     {
         LOG_ERROR("unexpected device path {}", DevicePath);
         return -1;
@@ -2455,7 +2455,7 @@ Return Value:
 void ProcessLaunchInitMessage(
     const LX_MINI_INIT_MESSAGE* Message,
     gsl::span<gsl::byte> Buffer,
-    wsl::shared::SocketChannel&& Channel,
+    lsw::shared::SocketChannel&& Channel,
     wil::unique_fd&& SystemDistroSocketFd,
     const VmConfiguration& Config)
 {
@@ -2479,8 +2479,8 @@ void ProcessLaunchInitMessage(
 
     try
     {
-        auto* FsType = wsl::shared::string::FromSpan(Buffer, Message->FsTypeOffset);
-        auto* MountOptions = wsl::shared::string::FromSpan(Buffer, Message->MountOptionsOffset);
+        auto* FsType = lsw::shared::string::FromSpan(Buffer, Message->FsTypeOffset);
+        auto* MountOptions = lsw::shared::string::FromSpan(Buffer, Message->MountOptionsOffset);
 
         //
         // Mount the device.
@@ -2489,7 +2489,7 @@ void ProcessLaunchInitMessage(
         THROW_LAST_ERROR_IF(MountDevice(Message->MountDeviceType, Message->DeviceId, DISTRO_PATH, FsType, Message->Flags, MountOptions) < 0);
 
         //
-        // Allow /etc/wsl.conf in the user distro to opt-out of GUI support.
+        // Allow /etc/lsw.conf in the user distro to opt-out of GUI support.
         //
         // N.B. A connection for the system disto must established even if the distro opts out
         //      of GUI app support because WslService is waiting to accept a connection.
@@ -2499,7 +2499,7 @@ void ProcessLaunchInitMessage(
         if (Message->Flags & LxMiniInitMessageFlagLaunchSystemDistro && Config.EnableGuiApps)
         {
             Step = LxInitCreateInstanceStepLaunchSystemDistro;
-            wil::unique_file File{fopen(DISTRO_PATH ETC_PATH "/wsl.conf", "r")};
+            wil::unique_file File{fopen(DISTRO_PATH ETC_PATH "/lsw.conf", "r")};
             if (File)
             {
                 std::vector<ConfigKey> ConfigKeys = {ConfigKey("general.guiApplications", enableGuiApps)};
@@ -2517,26 +2517,26 @@ void ProcessLaunchInitMessage(
                 // Create a tmpfs mount for a shared folder between user and system distro.
                 //
 
-                THROW_LAST_ERROR_IF(UtilMount(nullptr, WSLG_PATH, "tmpfs", 0, nullptr) < 0);
+                THROW_LAST_ERROR_IF(UtilMount(nullptr, LSWG_PATH, "tmpfs", 0, nullptr) < 0);
 
-                THROW_LAST_ERROR_IF(mount(nullptr, WSLG_PATH, nullptr, MS_SHARED, nullptr) < 0);
+                THROW_LAST_ERROR_IF(mount(nullptr, LSWG_PATH, nullptr, MS_SHARED, nullptr) < 0);
 
                 //
                 // Create a directory to store x11 sockets.
                 //
-                // N.B. This needs to be created early so a bind mount into the shared WSLg location
+                // N.B. This needs to be created early so a bind mount into the shared LSWg location
                 //      can be created on top of the hard-coded location expected by x11 clients.
                 //
 
-                THROW_LAST_ERROR_IF(UtilMkdir(WSLG_PATH "/" X11_SOCKET_NAME, 0777) < 0);
+                THROW_LAST_ERROR_IF(UtilMkdir(LSWG_PATH "/" X11_SOCKET_NAME, 0777) < 0);
 
                 //
-                // Create a read-only bind mount of the user distro into the shared WSLg folder so fonts and icons can be accessed.
+                // Create a read-only bind mount of the user distro into the shared LSWg folder so fonts and icons can be accessed.
                 //
 
-                THROW_LAST_ERROR_IF(UtilMount(DISTRO_PATH, WSLG_PATH DISTRO_PATH, nullptr, (MS_BIND | MS_RDONLY), nullptr) < 0);
+                THROW_LAST_ERROR_IF(UtilMount(DISTRO_PATH, LSWG_PATH DISTRO_PATH, nullptr, (MS_BIND | MS_RDONLY), nullptr) < 0);
 
-                THROW_LAST_ERROR_IF(UtilMount(nullptr, WSLG_PATH DISTRO_PATH, nullptr, (MS_RDONLY | MS_REMOUNT | MS_BIND), nullptr) < 0);
+                THROW_LAST_ERROR_IF(UtilMount(nullptr, LSWG_PATH DISTRO_PATH, nullptr, (MS_RDONLY | MS_REMOUNT | MS_BIND), nullptr) < 0);
 
                 //
                 // Create a child process in a new mount, pid, and UTS namespace (with a shared IPC namespace).
@@ -2559,11 +2559,11 @@ void ProcessLaunchInitMessage(
                         SystemDistroSocketFd.get(),
                         SYSTEM_DISTRO_PATH,
                         Config,
-                        wsl::shared::string::FromSpan(Buffer, Message->VmIdOffset),
-                        wsl::shared::string::FromSpan(Buffer, Message->DistributionNameOffset),
-                        wsl::shared::string::FromSpan(Buffer, Message->SharedMemoryRootOffset),
-                        wsl::shared::string::FromSpan(Buffer, Message->InstallPathOffset),
-                        wsl::shared::string::FromSpan(Buffer, Message->UserProfileOffset),
+                        lsw::shared::string::FromSpan(Buffer, Message->VmIdOffset),
+                        lsw::shared::string::FromSpan(Buffer, Message->DistributionNameOffset),
+                        lsw::shared::string::FromSpan(Buffer, Message->SharedMemoryRootOffset),
+                        lsw::shared::string::FromSpan(Buffer, Message->InstallPathOffset),
+                        lsw::shared::string::FromSpan(Buffer, Message->UserProfileOffset),
                         ChildPid);
                 }
             }
@@ -2582,10 +2582,10 @@ void ProcessLaunchInitMessage(
             enableGuiApps,
             Config,
             nullptr,
-            wsl::shared::string::FromSpan(Buffer, Message->DistributionNameOffset),
+            lsw::shared::string::FromSpan(Buffer, Message->DistributionNameOffset),
             nullptr,
-            wsl::shared::string::FromSpan(Buffer, Message->InstallPathOffset),
-            wsl::shared::string::FromSpan(Buffer, Message->UserProfileOffset));
+            lsw::shared::string::FromSpan(Buffer, Message->InstallPathOffset),
+            lsw::shared::string::FromSpan(Buffer, Message->UserProfileOffset));
     }
     catch (...)
     {
@@ -2594,7 +2594,7 @@ void ProcessLaunchInitMessage(
     }
 }
 
-void PostProcessImportedDistribution(wsl::shared::MessageWriter<LX_MINI_INIT_IMPORT_RESULT>& Message, const char* ExtractedPath)
+void PostProcessImportedDistribution(lsw::shared::MessageWriter<LX_MINI_INIT_IMPORT_RESULT>& Message, const char* ExtractedPath)
 {
     //
     // Save the current working directory as a file descriptor so it can be restored.
@@ -2655,8 +2655,8 @@ void PostProcessImportedDistribution(wsl::shared::MessageWriter<LX_MINI_INIT_IMP
         ConfigKey("windowsterminal.enabled", Message->GenerateTerminalProfile)};
 
     {
-        wil::unique_file File{fopen(WSL_DISTRIBUTION_CONF, "r")};
-        ParseConfigFile(keys, File.get(), CFG_SKIP_UNKNOWN_VALUES, STRING_TO_WSTRING(WSL_DISTRIBUTION_CONF));
+        wil::unique_file File{fopen(LSW_DISTRIBUTION_CONF, "r")};
+        ParseConfigFile(keys, File.get(), CFG_SKIP_UNKNOWN_VALUES, STRING_TO_WSTRING(LSW_DISTRIBUTION_CONF));
     }
 
     if (!defaultName.empty())
@@ -2703,7 +2703,7 @@ void PostProcessImportedDistribution(wsl::shared::MessageWriter<LX_MINI_INIT_IMP
     CATCH_LOG();
 }
 
-void ProcessImportExportMessage(gsl::span<gsl::byte> Buffer, wsl::shared::SocketChannel&& Channel)
+void ProcessImportExportMessage(gsl::span<gsl::byte> Buffer, lsw::shared::SocketChannel&& Channel)
 {
     const LX_MINI_INIT_MESSAGE* Message{};
     sockaddr_vm ListenAddress{};
@@ -2734,8 +2734,8 @@ void ProcessImportExportMessage(gsl::span<gsl::byte> Buffer, wsl::shared::Socket
                 THROW_LAST_ERROR_IF(FormatDevice(Message->DeviceId) < 0);
             }
 
-            auto* FsType = wsl::shared::string::FromSpan(Buffer, Message->FsTypeOffset);
-            auto* MountOptions = wsl::shared::string::FromSpan(Buffer, Message->MountOptionsOffset);
+            auto* FsType = lsw::shared::string::FromSpan(Buffer, Message->FsTypeOffset);
+            auto* MountOptions = lsw::shared::string::FromSpan(Buffer, Message->MountOptionsOffset);
             THROW_LAST_ERROR_IF(MountDevice(Message->MountDeviceType, Message->DeviceId, DISTRO_PATH, FsType, Message->Flags, MountOptions) < 0);
 
             Result = 0;
@@ -2763,7 +2763,7 @@ void ProcessImportExportMessage(gsl::span<gsl::byte> Buffer, wsl::shared::Socket
         }
         else
         {
-            wsl::shared::MessageWriter<LX_MINI_INIT_IMPORT_RESULT> message;
+            lsw::shared::MessageWriter<LX_MINI_INIT_IMPORT_RESULT> message;
             message->Result = Result;
             if (Result == 0)
             {
@@ -2799,7 +2799,7 @@ void ProcessImportExportMessage(gsl::span<gsl::byte> Buffer, wsl::shared::Socket
     }
 }
 
-int ProcessMountFolderMessage(wsl::shared::SocketChannel& Channel, gsl::span<gsl::byte> Buffer)
+int ProcessMountFolderMessage(lsw::shared::SocketChannel& Channel, gsl::span<gsl::byte> Buffer)
 
 /*++
 
@@ -2825,8 +2825,8 @@ Return Value:
         return -1;
     }
 
-    const auto* Target = wsl::shared::string::FromSpan(Buffer, Message->PathIndex);
-    const auto* Name = wsl::shared::string::FromSpan(Buffer, Message->NameIndex);
+    const auto* Target = lsw::shared::string::FromSpan(Buffer, Message->PathIndex);
+    const auto* Name = lsw::shared::string::FromSpan(Buffer, Message->NameIndex);
 
     if (Target == nullptr || Name == nullptr)
     {
@@ -2865,7 +2865,7 @@ Return Value:
     }
 
     const int ChildPid = UtilCreateChildProcess(
-        "DiskMount", [Buffer, Channel = wsl::shared::SocketChannel{std::move(SocketFd), "MountResult"}]() mutable {
+        "DiskMount", [Buffer, Channel = lsw::shared::SocketChannel{std::move(SocketFd), "MountResult"}]() mutable {
             // Set up a scope exit variable to report mount status.
             int Result = -1;
             LX_MINI_MOUNT_STEP Step = LxMiniInitMountStepFindDevice;
@@ -2896,13 +2896,13 @@ Return Value:
                 // Construct the target of the mount.
                 //
 
-                Target = GetMountTarget(wsl::shared::string::FromSpan(Buffer, Message->TargetNameOffset));
+                Target = GetMountTarget(lsw::shared::string::FromSpan(Buffer, Message->TargetNameOffset));
 
                 //
                 // Determine the type of mount. If no type was specified, detect it with blkid.
                 //
 
-                const auto* Type = wsl::shared::string::FromSpan(Buffer, Message->TypeOffset);
+                const auto* Type = lsw::shared::string::FromSpan(Buffer, Message->TypeOffset);
                 if (*Type == '\0')
                 {
                     Type = nullptr;
@@ -2912,7 +2912,7 @@ Return Value:
                 // Parse the mount flags.
                 //
 
-                auto* MountOptions = wsl::shared::string::FromSpan(Buffer, Message->OptionsOffset);
+                auto* MountOptions = lsw::shared::string::FromSpan(Buffer, Message->OptionsOffset);
                 auto ParsedOptions = mountutil::MountParseFlags(MountOptions == nullptr ? "" : MountOptions);
 
                 //
@@ -2994,7 +2994,7 @@ Return Value:
     return (ChildPid < 0) ? -1 : 0;
 }
 
-int ReportMountStatus(wsl::shared::SocketChannel& Channel, int Result, LX_MINI_MOUNT_STEP Step)
+int ReportMountStatus(lsw::shared::SocketChannel& Channel, int Result, LX_MINI_MOUNT_STEP Step)
 
 /*++
 
@@ -3049,7 +3049,7 @@ Return Value:
 --*/
 
 {
-    wsl::shared::SocketChannel Channel{wil::unique_fd{UtilConnectVsock(LX_INIT_UTILITY_VM_INIT_PORT, true)}, "WaitForPmem"};
+    lsw::shared::SocketChannel Channel{wil::unique_fd{UtilConnectVsock(LX_INIT_UTILITY_VM_INIT_PORT, true)}, "WaitForPmem"};
     if (Channel.Socket() < 0)
     {
         return -1;
@@ -3071,7 +3071,7 @@ Return Value:
         //
 
         struct stat Buffer;
-        wsl::shared::retry::RetryWithTimeout<void>(
+        lsw::shared::retry::RetryWithTimeout<void>(
             [&]() { THROW_LAST_ERROR_IF(stat(DevicePath.c_str(), &Buffer) < 0); },
             c_defaultRetryPeriod,
             c_defaultRetryTimeout,
@@ -3117,7 +3117,7 @@ try
 
     const int ChildPid = UtilCreateChildProcess(
         "ResizeDistribution",
-        [Message, Channel = wsl::shared::SocketChannel{std::move(SocketFd), "ResizeDistribution"}, OutputSocket = std::move(OutputSocketFd)]() mutable {
+        [Message, Channel = lsw::shared::SocketChannel{std::move(SocketFd), "ResizeDistribution"}, OutputSocket = std::move(OutputSocketFd)]() mutable {
             int ResponseCode = -1;
             auto ReportStatus = wil::scope_exit([&]() {
                 LX_MINI_INIT_RESIZE_DISTRIBUTION_RESPONSE ResponseMessage{};
@@ -3154,7 +3154,7 @@ try
 }
 CATCH_RETURN_ERRNO();
 
-int ProcessMessage(wsl::shared::SocketChannel& Channel, LX_MESSAGE_TYPE Type, gsl::span<gsl::byte> Buffer, VmConfiguration& Config)
+int ProcessMessage(lsw::shared::SocketChannel& Channel, LX_MESSAGE_TYPE Type, gsl::span<gsl::byte> Buffer, VmConfiguration& Config)
 
 /*++
 
@@ -3195,7 +3195,7 @@ try
             const auto Message = gslhelpers::try_get_struct<LX_MINI_INIT_MESSAGE>(Buffer);
             THROW_ERRNO_IF(EINVAL, !Message);
 
-            wsl::shared::SocketChannel Channel{UtilConnectVsock(LX_INIT_UTILITY_VM_INIT_PORT, false), "Init"};
+            lsw::shared::SocketChannel Channel{UtilConnectVsock(LX_INIT_UTILITY_VM_INIT_PORT, false), "Init"};
             if (Channel.Socket() < 0)
             {
                 return -1;
@@ -3265,7 +3265,7 @@ try
 
         if (EarlyConfig->EnableSafeMode)
         {
-            LOG_WARNING("{} - many features will be disabled", WSL_SAFE_MODE_WARNING);
+            LOG_WARNING("{} - many features will be disabled", LSW_SAFE_MODE_WARNING);
             Config.EnableSafeMode = true;
         }
 
@@ -3376,8 +3376,8 @@ try
             std::string Target = std::format("{}/{}", KERNEL_MODULES_PATH, UnameBuffer.release);
             THROW_LAST_ERROR_IF(UtilMountOverlayFs(Target.c_str(), KERNEL_MODULES_VHD_PATH, (MS_NOATIME | MS_NOSUID | MS_NODEV)) < 0);
 
-            const std::string KernelModulesList = wsl::shared::string::FromSpan(Buffer, EarlyConfig->KernelModulesListOffset);
-            for (const auto& Module : wsl::shared::string::Split(KernelModulesList, ','))
+            const std::string KernelModulesList = lsw::shared::string::FromSpan(Buffer, EarlyConfig->KernelModulesListOffset);
+            for (const auto& Module : lsw::shared::string::Split(KernelModulesList, ','))
             {
                 const char* Argv[] = {MODPROBE_PATH, Module.c_str()};
                 int Status = -1;
@@ -3395,7 +3395,7 @@ try
         // Initialization required by mini_init.
         //
 
-        if (Initialize(wsl::shared::string::FromSpan(Buffer, EarlyConfig->HostnameOffset)) < 0)
+        if (Initialize(lsw::shared::string::FromSpan(Buffer, EarlyConfig->HostnameOffset)) < 0)
         {
             return -1;
         }
@@ -3621,7 +3621,7 @@ Return Value:
     return Fd;
 }
 
-int SendCapabilities(wsl::shared::SocketChannel& Channel)
+int SendCapabilities(lsw::shared::SocketChannel& Channel)
 
 /*++
 
@@ -3644,7 +3644,7 @@ try
     utsname Version;
     THROW_LAST_ERROR_IF(uname(&Version) < 0);
 
-    wsl::shared::MessageWriter<LX_INIT_GUEST_CAPABILITIES> Message(LxMiniInitMessageGuestCapabilities);
+    lsw::shared::MessageWriter<LX_INIT_GUEST_CAPABILITIES> Message(LxMiniInitMessageGuestCapabilities);
     Message.WriteString(Version.release);
 
     //
@@ -3807,7 +3807,7 @@ Return Value:
 --*/
 
 {
-    wsl::shared::retry::RetryWithTimeout<void>(
+    lsw::shared::retry::RetryWithTimeout<void>(
         [&]() {
             wil::unique_fd device{open(Path, O_RDONLY)};
             THROW_LAST_ERROR_IF(!device);
@@ -3859,7 +3859,7 @@ int main(int Argc, char* Argv[])
     ssize_t BytesRead;
     VmConfiguration Config{};
     wil::unique_fd ConsoleFd{};
-    wsl::shared::SocketChannel channel;
+    lsw::shared::SocketChannel channel;
     wil::unique_fd NotifyFd{};
     struct pollfd PollDescriptors[2];
     wil::unique_fd SignalFd{};
@@ -3871,21 +3871,21 @@ int main(int Argc, char* Argv[])
     // Determine which entrypoint should be used.
     //
 
-    if (getpid() != 1 || !getenv(WSL_ROOT_INIT_ENV))
+    if (getpid() != 1 || !getenv(LSW_ROOT_INIT_ENV))
     {
         return WslEntryPoint(Argc, Argv);
     }
 
-    if (unsetenv(WSL_ROOT_INIT_ENV))
+    if (unsetenv(LSW_ROOT_INIT_ENV))
     {
         LOG_ERROR("unsetenv failed {}", errno);
     }
 
     // Use an env variable to determine whether socket logging is enabled since /proc isn't mounted yet
     // so SocketChannel can't look at the kernel command line.
-    wsl::shared::SocketChannel::EnableSocketLogging(getenv(WSL_SOCKET_LOG_ENV) != nullptr);
+    lsw::shared::SocketChannel::EnableSocketLogging(getenv(LSW_SOCKET_LOG_ENV) != nullptr);
 
-    if (unsetenv(WSL_SOCKET_LOG_ENV))
+    if (unsetenv(LSW_SOCKET_LOG_ENV))
     {
         LOG_ERROR("unsetenv failed {}", errno);
     }
@@ -3926,7 +3926,7 @@ int main(int Argc, char* Argv[])
 
     try
     {
-        wsl::shared::retry::RetryWithTimeout<void>(
+        lsw::shared::retry::RetryWithTimeout<void>(
             [&]() {
                 ConsoleFd = open("/dev/console", O_RDWR);
                 THROW_LAST_ERROR_IF(!ConsoleFd);
@@ -4021,12 +4021,12 @@ int main(int Argc, char* Argv[])
         return -1;
     }
 
-    if (getenv(WSL_ENABLE_CRASH_DUMP_ENV))
+    if (getenv(LSW_ENABLE_CRASH_DUMP_ENV))
     {
         Config.EnableCrashDumpCollection = true;
 
         EnableCrashDumpCollection();
-        if (unsetenv(WSL_ENABLE_CRASH_DUMP_ENV) < 0)
+        if (unsetenv(LSW_ENABLE_CRASH_DUMP_ENV) < 0)
         {
             LOG_ERROR("unsetenv failed {}", errno);
         }

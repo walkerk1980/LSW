@@ -7,7 +7,7 @@
 #include "WslCoreConfig.h"
 #include "WslCoreNetworkEndpointSettings.h"
 
-namespace wsl::core {
+namespace lsw::core {
 
 class BridgedNetworking : public INetworkingEngine
 {
@@ -25,7 +25,7 @@ private:
     const HCS_SYSTEM m_system{};
 
     const Config& m_config;
-    wsl::core::networking::EphemeralHcnEndpoint m_endpoint;
+    lsw::core::networking::EphemeralHcnEndpoint m_endpoint;
 };
 
-} // namespace wsl::core
+} // namespace lsw::core

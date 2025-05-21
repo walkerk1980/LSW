@@ -13,11 +13,11 @@ Abstract:
 --*/
 
 #include <windows.h>
-#include "wslversioninfo.h"
+#include "lswversioninfo.h"
 
 #define VER_INTERNALNAME_STR "WslInstallerProxyStub.dll"
 #define VER_ORIGINALFILENAME_STR "WslInstallerProxyStub.dll"
 
-#define VER_FILEDESCRIPTION_STR "WSL Installer ProxyStub DLL"
+#define VER_FILEDESCRIPTION_STR "LSW Installer ProxyStub DLL"
 
 #include <common.ver>

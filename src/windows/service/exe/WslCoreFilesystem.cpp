@@ -16,7 +16,7 @@ Abstract:
 #include "WslCoreFilesystem.h"
 #include "WslSecurity.h"
 
-wil::unique_hfile wsl::core::filesystem::CreateFile(
+wil::unique_hfile lsw::core::filesystem::CreateFile(
     _In_ LPCWSTR fileName, _In_ DWORD desiredAccess, _In_ DWORD shareMode, _In_ DWORD creationDisposition, _In_ DWORD flagsAndAttributes, _In_ PSID userSid)
 {
     auto sd = windows::common::security::CreateSecurityDescriptor(userSid);
@@ -27,16 +27,16 @@ wil::unique_hfile wsl::core::filesystem::CreateFile(
     return file;
 }
 
-void wsl::core::filesystem::CreateVhd(_In_ LPCWSTR target, _In_ ULONGLONG maximumSize, _In_ PSID userSid, _In_ BOOL sparse, _In_ BOOL fixed)
+void lsw::core::filesystem::CreateVhd(_In_ LPCWSTR target, _In_ ULONGLONG maximumSize, _In_ PSID userSid, _In_ BOOL sparse, _In_ BOOL fixed)
 {
-    WI_ASSERT(wsl::windows::common::string::IsPathComponentEqual(
-        std::filesystem::path{target}.extension().native(), windows::common::wslutil::c_vhdxFileExtension));
+    WI_ASSERT(lsw::windows::common::string::IsPathComponentEqual(
+        std::filesystem::path{target}.extension().native(), windows::common::lswutil::c_vhdxFileExtension));
 
     // Disable creation of sparse VHDs while data corruption is being debugged.
     if (sparse)
     {
         sparse = false;
-        EMIT_USER_WARNING(wsl::shared::Localization::MessageSparseVhdDisabled());
+        EMIT_USER_WARNING(lsw::shared::Localization::MessageSparseVhdDisabled());
     }
 
     VIRTUAL_STORAGE_TYPE storageType{};
@@ -69,11 +69,11 @@ void wsl::core::filesystem::CreateVhd(_In_ LPCWSTR target, _In_ ULONGLONG maximu
         ::CreateVirtualDisk(&storageType, target, VIRTUAL_DISK_ACCESS_NONE, &sd, flags, 0, &createVhdParameters, nullptr, &vhd));
 }
 
-wil::unique_handle wsl::core::filesystem::OpenVhd(_In_ LPCWSTR Path, _In_ VIRTUAL_DISK_ACCESS_MASK Mask)
+wil::unique_handle lsw::core::filesystem::OpenVhd(_In_ LPCWSTR Path, _In_ VIRTUAL_DISK_ACCESS_MASK Mask)
 {
     WI_ASSERT(
-        wsl::shared::string::IsEqual(std::filesystem::path{Path}.extension().c_str(), windows::common::wslutil::c_vhdFileExtension, true) ||
-        wsl::shared::string::IsEqual(std::filesystem::path{Path}.extension().c_str(), windows::common::wslutil::c_vhdxFileExtension, true));
+        lsw::shared::string::IsEqual(std::filesystem::path{Path}.extension().c_str(), windows::common::lswutil::c_vhdFileExtension, true) ||
+        lsw::shared::string::IsEqual(std::filesystem::path{Path}.extension().c_str(), windows::common::lswutil::c_vhdxFileExtension, true));
 
     // N.B. Specifying unknown for device and vendor means the system will determine the type of VHD.
     VIRTUAL_STORAGE_TYPE storageType{};
@@ -86,7 +86,7 @@ wil::unique_handle wsl::core::filesystem::OpenVhd(_In_ LPCWSTR Path, _In_ VIRTUA
     return disk;
 }
 
-void wsl::core::filesystem::ResizeExistingVhd(_In_ HANDLE diskHandle, _In_ ULONGLONG maximumSize, _In_ RESIZE_VIRTUAL_DISK_FLAG resizeFlag)
+void lsw::core::filesystem::ResizeExistingVhd(_In_ HANDLE diskHandle, _In_ ULONGLONG maximumSize, _In_ RESIZE_VIRTUAL_DISK_FLAG resizeFlag)
 {
     RESIZE_VIRTUAL_DISK_PARAMETERS resize{};
     resize.Version1.NewSize = maximumSize;
@@ -94,7 +94,7 @@ void wsl::core::filesystem::ResizeExistingVhd(_In_ HANDLE diskHandle, _In_ ULONG
     THROW_IF_WIN32_ERROR(ResizeVirtualDisk(diskHandle, resizeFlag, &resize, nullptr));
 }
 
-ULONGLONG wsl::core::filesystem::GetDiskSize(_In_ HANDLE diskHandle)
+ULONGLONG lsw::core::filesystem::GetDiskSize(_In_ HANDLE diskHandle)
 {
     GET_VIRTUAL_DISK_INFO virtualDiskInfo{};
     virtualDiskInfo.Version = GET_VIRTUAL_DISK_INFO_SIZE;

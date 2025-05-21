@@ -37,7 +37,7 @@ key3 = "this key uses quotes to # include a comment prefix"
 
 #include "precomp.h"
 
-using wsl::shared::string::MacAddress;
+using lsw::shared::string::MacAddress;
 
 #else
 
@@ -57,11 +57,11 @@ using wsl::shared::string::MacAddress;
 #include "stringshared.h"
 #include "Localization.h"
 
-using wsl::shared::Localization;
+using lsw::shared::Localization;
 
 bool ConfigKey::ParseImpl(const char* name, const char* value, const wchar_t* filePath, unsigned long fileLine, bool& result)
 {
-    const auto parsed = wsl::shared::string::ParseBool(value);
+    const auto parsed = lsw::shared::string::ParseBool(value);
     if (!parsed.has_value())
     {
         EMIT_USER_WARNING(Localization::MessageConfigInvalidBoolean(value, name, filePath, fileLine));
@@ -94,10 +94,10 @@ bool ConfigKey::ParseImpl(const char* name, const char* value, const wchar_t* fi
 
 bool ConfigKey::ParseImpl(const char* name, const char* value, const wchar_t* filePath, unsigned long fileLine, MemoryString result)
 {
-    const auto memory = wsl::shared::string::ParseMemorySize(value);
+    const auto memory = lsw::shared::string::ParseMemorySize(value);
     if (!memory.has_value())
     {
-        EMIT_USER_WARNING(wsl::shared::Localization::MessageInvalidNumberString(value, name, filePath, fileLine));
+        EMIT_USER_WARNING(lsw::shared::Localization::MessageInvalidNumberString(value, name, filePath, fileLine));
         return false;
     }
 
@@ -107,7 +107,7 @@ bool ConfigKey::ParseImpl(const char* name, const char* value, const wchar_t* fi
 
 bool ConfigKey::ParseImpl(const char* name, const char* value, const wchar_t* filePath, unsigned long fileLine, std::wstring& result)
 {
-    result = wsl::shared::string::MultiByteToWide(value);
+    result = lsw::shared::string::MultiByteToWide(value);
     return true;
 }
 
@@ -115,7 +115,7 @@ bool ConfigKey::ParseImpl(const char* name, const char* value, const wchar_t* fi
 
 bool ConfigKey::ParseImpl(const char* name, const char* value, const wchar_t* filePath, unsigned long fileLine, MacAddress& outValue)
 {
-    if (auto parsed = wsl::shared::string::ParseMacAddressNoThrow<char>(value))
+    if (auto parsed = lsw::shared::string::ParseMacAddressNoThrow<char>(value))
     {
         outValue = std::move(parsed.value());
     }
@@ -131,7 +131,7 @@ bool ConfigKey::ParseImpl(const char* name, const char* value, const wchar_t* fi
 
 bool ConfigKey::ParseImpl(const char* name, const char* value, const wchar_t* filePath, unsigned long fileLine, std::filesystem::path& result)
 {
-    result = wsl::shared::string::MultiByteToWide(value);
+    result = lsw::shared::string::MultiByteToWide(value);
     return true;
 }
 
@@ -147,12 +147,12 @@ std::wstring ConfigKey::GetValueImpl(int result)
 
 std::wstring ConfigKey::GetValueImpl(const std::string& result)
 {
-    return wsl::shared::string::MultiByteToWide(result);
+    return lsw::shared::string::MultiByteToWide(result);
 }
 
 std::wstring ConfigKey::GetValueImpl(const std::optional<std::string>& result)
 {
-    return result.has_value() ? wsl::shared::string::MultiByteToWide(result.value()) : L"";
+    return result.has_value() ? lsw::shared::string::MultiByteToWide(result.value()) : L"";
 }
 
 std::wstring ConfigKey::GetValueImpl(const MemoryString& result)
@@ -169,7 +169,7 @@ std::wstring ConfigKey::GetValueImpl(const std::wstring& result)
 
 std::wstring ConfigKey::GetValueImpl(const MacAddress& result)
 {
-    return wsl::shared::string::FormatMacAddress(result, L':');
+    return lsw::shared::string::FormatMacAddress(result, L':');
 }
 
 #endif
@@ -427,7 +427,7 @@ ParseSection:
             // Config key without name.
             FAIL_FAST_IF(keyNames.empty());
             const auto keyNameUtf8 = keyNames.front();
-            const auto keyName = wsl::shared::string::MultiByteToWide(keyNameUtf8);
+            const auto keyName = lsw::shared::string::MultiByteToWide(keyNameUtf8);
             const auto sectionKeySeparatorPos = keyName.find('.');
             // Config key without separated section/key name
             FAIL_FAST_IF(sectionKeySeparatorPos == std::string_view::npos);
@@ -830,7 +830,7 @@ WriteNewKeyValue:
     // Config key without name.
     FAIL_FAST_IF(keyNames.empty());
     const auto keyNameUtf8 = keyNames.front();
-    const auto keyName = wsl::shared::string::MultiByteToWide(keyNameUtf8);
+    const auto keyName = lsw::shared::string::MultiByteToWide(keyNameUtf8);
     const auto sectionKeySeparatorPos = keyName.find('.');
     // Config key without separated section/key name
     FAIL_FAST_IF(sectionKeySeparatorPos == std::string_view::npos);

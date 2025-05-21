@@ -275,7 +275,7 @@ private:
     static const wil::unique_bstr s_DefaultRuleDescription;
 
     /// <summary>
-    /// Prefix to uniquely identify WSL firewall rules.
+    /// Prefix to uniquely identify LSW firewall rules.
     /// </summary>
     static const std::wstring s_FriendlyNamePrefix;
 };

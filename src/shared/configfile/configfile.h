@@ -20,7 +20,7 @@ Parses .gitconfig-style properties files.
 #ifdef WIN32
 
 #include <filesystem>
-#include "wslservice.h"
+#include "lswservice.h"
 #include "ExecutionContext.h"
 
 #endif
@@ -83,7 +83,7 @@ public:
     template <typename TEnum>
     inline ConfigKey(
         std::vector<const char*>&& names,
-        const std::map<std::string, TEnum, wsl::shared::string::CaseInsensitiveCompare>& values,
+        const std::map<std::string, TEnum, lsw::shared::string::CaseInsensitiveCompare>& values,
         TEnum& outValue,
         ConfigKeyPresence* presence = nullptr) :
         m_names(std::move(names))
@@ -107,7 +107,7 @@ public:
     template <typename TEnum>
     inline ConfigKey(
         const char* name,
-        const std::map<std::string, TEnum, wsl::shared::string::CaseInsensitiveCompare>& values,
+        const std::map<std::string, TEnum, lsw::shared::string::CaseInsensitiveCompare>& values,
         TEnum& outValue,
         ConfigKeyPresence* presence = nullptr) :
         ConfigKey(std::vector<const char*>{name}, values, outValue, presence)
@@ -122,7 +122,7 @@ public:
 
     template <typename TEnum>
     static inline std::optional<TEnum> ParseEnumString(
-        const std::map<std::string, TEnum, wsl::shared::string::CaseInsensitiveCompare>& mappings,
+        const std::map<std::string, TEnum, lsw::shared::string::CaseInsensitiveCompare>& mappings,
         const char* value,
         const char* name,
         const wchar_t* fileName,
@@ -144,7 +144,7 @@ public:
                 validValues << e.first;
             }
 
-            EMIT_USER_WARNING(wsl::shared::Localization::MessageConfigInvalidEnum(value, name, fileName, line, validValues.str().c_str()));
+            EMIT_USER_WARNING(lsw::shared::Localization::MessageConfigInvalidEnum(value, name, fileName, line, validValues.str().c_str()));
             return {};
         }
 
@@ -152,7 +152,7 @@ public:
     }
 
     template <typename TEnum>
-    static std::wstring GetEnumString(const std::map<std::string, TEnum, wsl::shared::string::CaseInsensitiveCompare>& mappings, TEnum& value)
+    static std::wstring GetEnumString(const std::map<std::string, TEnum, lsw::shared::string::CaseInsensitiveCompare>& mappings, TEnum& value)
     {
         auto it = mappings.begin();
         for (; it != mappings.end(); ++it)
@@ -163,7 +163,7 @@ public:
             }
         }
 
-        return it == mappings.end() ? L"" : wsl::shared::string::MultiByteToWide(it->first);
+        return it == mappings.end() ? L"" : lsw::shared::string::MultiByteToWide(it->first);
     }
 
 private:
@@ -182,8 +182,8 @@ private:
     static std::wstring GetValueImpl(const std::wstring& result);
 
 #ifdef WIN32
-    static bool ParseImpl(const char* name, const char* value, const wchar_t* filePath, unsigned long fileLine, wsl::shared::string::MacAddress& result);
-    static std::wstring GetValueImpl(const wsl::shared::string::MacAddress& result);
+    static bool ParseImpl(const char* name, const char* value, const wchar_t* filePath, unsigned long fileLine, lsw::shared::string::MacAddress& result);
+    static std::wstring GetValueImpl(const lsw::shared::string::MacAddress& result);
 #endif
 
     template <typename T>

@@ -34,7 +34,7 @@ private:
     // Wait for messages on the channel from Windows side.
     void ReceiveLoop() noexcept;
 
-    wsl::shared::SocketChannel m_channel;
+    lsw::shared::SocketChannel m_channel;
 
     // Thread running the receive loop.
     std::thread m_receiveWorkerThread;

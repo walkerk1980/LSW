@@ -8,7 +8,7 @@
 
 // SyncFirewallState is only needed when running on a Windows build with the original Hyper-V Firewall API (shipped with Windows
 // 11 22H2) later updates to the Hyper-V Firewall solve the below automatically
-void wsl::core::networking::IpStateTracking::SyncFirewallState(const NetworkSettings& preferredNetwork) noexcept
+void lsw::core::networking::IpStateTracking::SyncFirewallState(const NetworkSettings& preferredNetwork) noexcept
 try
 {
     // This function is used to update rules which are IP address based. These
@@ -43,7 +43,7 @@ try
             // If we have no IP addresses, remove any existing rules
             if (currentIpAddresses.empty())
             {
-                WSL_LOG("IpStateTracking::SyncFirewallState removing rules");
+                LSW_LOG("IpStateTracking::SyncFirewallState removing rules");
 
                 // Remove loopback rule
                 RemoveHyperVFirewallRule(loopbackRuleId);
@@ -72,11 +72,11 @@ try
                 }
 
                 // Add my IP loopback rule
-                WSL_LOG("IpStateTracking::SyncFirewallState Adding my IP loopback rule");
+                LSW_LOG("IpStateTracking::SyncFirewallState Adding my IP loopback rule");
                 AddHyperVFirewallRule(FirewallVmCreatorId.value(), myIpLoopbackRule);
 
                 // Add local subnet rule
-                WSL_LOG("IpStateTracking::SyncFirewallState Adding local subnet rule");
+                LSW_LOG("IpStateTracking::SyncFirewallState Adding local subnet rule");
                 AddHyperVFirewallRule(FirewallVmCreatorId.value(), localSubnetRule);
             }
 
@@ -85,14 +85,14 @@ try
         }
         else
         {
-            WSL_LOG(
+            LSW_LOG(
                 "IpStateTracking::SyncFirewallState - FirewallTrackedIpAddresses is syncd with the preferredNetwork",
                 TraceLoggingValue(FirewallTrackedIpAddresses.size(), "FirewallTrackedIpAddresses.size"));
         }
     }
     else
     {
-        WSL_LOG("IpStateTracking::SyncFirewallState - no FirewallVmCreatorId");
+        LSW_LOG("IpStateTracking::SyncFirewallState - no FirewallVmCreatorId");
     }
 }
 CATCH_LOG()

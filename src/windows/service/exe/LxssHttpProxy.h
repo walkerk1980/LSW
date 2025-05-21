@@ -33,7 +33,7 @@ static constexpr auto c_httpsProxyLower = "https_proxy";
 static constexpr auto c_httpsProxyUpper = "HTTPS_PROXY";
 static constexpr auto c_proxyBypassLower = "no_proxy";
 static constexpr auto c_proxyBypassUpper = "NO_PROXY";
-static constexpr auto c_pacProxy = "WSL_PAC_URL";
+static constexpr auto c_pacProxy = "LSW_PAC_URL";
 static constexpr auto c_loopback = L"loopback";
 static constexpr auto c_localhost = L"localhost";
 
@@ -128,7 +128,7 @@ class HttpProxyStateTracker
     };
 
 public:
-    HttpProxyStateTracker(int ProxyTimeout, HANDLE UserToken, wsl::core::NetworkingMode configuration);
+    HttpProxyStateTracker(int ProxyTimeout, HANDLE UserToken, lsw::core::NetworkingMode configuration);
     ~HttpProxyStateTracker();
 
     HttpProxyStateTracker(const HttpProxyStateTracker&) = delete;
@@ -145,7 +145,7 @@ public:
     /// <summary>
     /// This needs to be called after the VM is created so actual selected configuration is set.
     /// </summary>
-    void ConfigureNetworkingMode(wsl::core::NetworkingMode mode) noexcept;
+    void ConfigureNetworkingMode(lsw::core::NetworkingMode mode) noexcept;
 
     /// <summary>
     /// Loads necessary WinHttpProxy APIs into static dynamic functions from DLL if they exist.
@@ -191,7 +191,7 @@ private:
     /// <summary>
     /// Current network mode. Used to determine some cases when we should send toast notification.
     /// </summary>
-    _Guarded_by_(m_proxySettingsLock) wsl::core::NetworkingMode m_networkMode = wsl::core::NetworkingMode::Nat;
+    _Guarded_by_(m_proxySettingsLock) lsw::core::NetworkingMode m_networkMode = lsw::core::NetworkingMode::Nat;
 
     /// <summary>
     /// Indicates if we need to start another query after current one.
@@ -209,7 +209,7 @@ private:
     WINHTTP_PROXY_CHANGE_REGISTRATION_HANDLE m_proxyRegistrationHandle{};
 
     /// <summary>
-    /// Amount of time WSL will wait for proxy settings if no proxy settings have been detected by time we attempt to launch process.
+    /// Amount of time LSW will wait for proxy settings if no proxy settings have been detected by time we attempt to launch process.
     /// </summary>
     const int m_initialQueryTimeout = 1000;
 
@@ -235,7 +235,7 @@ private:
     /// <summary>
     /// Single-threaded queue to trigger work from winhttp callbacks.
     /// </summary>
-    wsl::core::WslCoreMessageQueue m_callbackQueue{};
+    lsw::core::WslCoreMessageQueue m_callbackQueue{};
 
     /// Static dynamic functions for loading in necessary WinHttpProxy APIs
     static std::optional<LxssDynamicFunction<decltype(GetProxySettingsEx)>> s_WinHttpGetProxySettingsEx;
@@ -265,12 +265,12 @@ private:
     /// </summary>
     /// <param name="proxyString"> ProxyString to check if it is localhost. </param>
     /// <param name="configuration"> Current network configuration. </param>
-    static UnsupportedProxyReason IsUnsupportedProxy(LPCWSTR proxyString, wsl::core::NetworkingMode mode) noexcept;
+    static UnsupportedProxyReason IsUnsupportedProxy(LPCWSTR proxyString, lsw::core::NetworkingMode mode) noexcept;
 
     /// <summary>
     /// Remove invalid proxy configurations depending on network mode.
     /// </summary>
     /// <param name="settings"> HttpProxySettings to be filtered. </param>
     /// <param name="configuration"> Current network configuration. </param>
-    static void FilterProxySettingsByNetworkConfiguration(HttpProxySettings& settings, wsl::core::NetworkingMode mode) noexcept;
+    static void FilterProxySettingsByNetworkConfiguration(HttpProxySettings& settings, lsw::core::NetworkingMode mode) noexcept;
 };

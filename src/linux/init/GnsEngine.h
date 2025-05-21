@@ -40,15 +40,15 @@ private:
 
     void ProcessNotification(const nlohmann::json& payload, Interface& interface);
 
-    void ProcessRouteChange(Interface& interface, const wsl::shared::hns::Route& route, wsl::shared::hns::ModifyRequestType type);
+    void ProcessRouteChange(Interface& interface, const lsw::shared::hns::Route& route, lsw::shared::hns::ModifyRequestType type);
 
-    void ProcessIpAddressChange(Interface& interface, const wsl::shared::hns::IPAddress& route, wsl::shared::hns::ModifyRequestType type);
+    void ProcessIpAddressChange(Interface& interface, const lsw::shared::hns::IPAddress& route, lsw::shared::hns::ModifyRequestType type);
 
-    void ProcessMacAddressChange(Interface& interface, const wsl::shared::hns::MacAddress& mac, wsl::shared::hns::ModifyRequestType type);
+    void ProcessMacAddressChange(Interface& interface, const lsw::shared::hns::MacAddress& mac, lsw::shared::hns::ModifyRequestType type);
 
-    void ProcessDNSChange(Interface& interface, const wsl::shared::hns::DNS& dns, wsl::shared::hns::ModifyRequestType type);
+    void ProcessDNSChange(Interface& interface, const lsw::shared::hns::DNS& dns, lsw::shared::hns::ModifyRequestType type);
 
-    void ProcessLinkChange(Interface& interface, const wsl::shared::hns::NetworkInterface& link, wsl::shared::hns::ModifyRequestType type);
+    void ProcessLinkChange(Interface& interface, const lsw::shared::hns::NetworkInterface& link, lsw::shared::hns::ModifyRequestType type);
 
     static Interface OpenAdapter(const GUID& id);
 
@@ -67,7 +67,7 @@ private:
 
     template <typename T>
     void ProcessNotificationImpl(
-        Interface& interface, const nlohmann::json& payload, void (GnsEngine::*routine)(Interface&, const T&, wsl::shared::hns::ModifyRequestType));
+        Interface& interface, const nlohmann::json& payload, void (GnsEngine::*routine)(Interface&, const T&, lsw::shared::hns::ModifyRequestType));
 
     const NotificationRoutine& notificationRoutine;
     const StatusRoutine& statusRoutine;

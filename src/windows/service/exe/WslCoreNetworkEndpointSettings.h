@@ -17,7 +17,7 @@
 #include "WslCoreNetworkingSupport.h"
 #include "hns_schema.h"
 
-namespace wsl::core::networking {
+namespace lsw::core::networking {
 
 constexpr auto AddEndpointRetryPeriod = std::chrono::milliseconds(100);
 constexpr auto AddEndpointRetryTimeout = std::chrono::seconds(3);
@@ -275,7 +275,7 @@ struct NetworkSettings
         InterfaceType(mediaType)
     {
         Routes.emplace(std::move(gateway));
-        DnsServers = wsl::shared::string::Split(dnsServerList, L',');
+        DnsServers = lsw::shared::string::Split(dnsServerList, L',');
     }
 
     GUID InterfaceGuid{};
@@ -346,7 +346,7 @@ struct NetworkSettings
 
     std::wstring DnsServersString() const
     {
-        return wsl::shared::string::Join(DnsServers, L',');
+        return lsw::shared::string::Join(DnsServers, L',');
     }
 
     // will return ULONG_MAX if there's no configured MTU
@@ -374,7 +374,7 @@ struct NetworkSettings
     }
 };
 
-std::shared_ptr<NetworkSettings> GetEndpointSettings(const wsl::shared::hns::HNSEndpoint& properties);
+std::shared_ptr<NetworkSettings> GetEndpointSettings(const lsw::shared::hns::HNSEndpoint& properties);
 std::shared_ptr<NetworkSettings> GetHostEndpointSettings();
 
 #define TRACE_NETWORKSETTINGS_OBJECT(settings) \
@@ -395,4 +395,4 @@ std::shared_ptr<NetworkSettings> GetHostEndpointSettings();
         TraceLoggingValue((settings)->PendingIPInterfaceUpdate, "PendingIPInterfaceUpdate"), \
         TraceLoggingValue((settings)->PendingUpdateToReconnectForMetered, "PendingUpdateToReconnectForMetered")
 
-} // namespace wsl::core::networking
+} // namespace lsw::core::networking

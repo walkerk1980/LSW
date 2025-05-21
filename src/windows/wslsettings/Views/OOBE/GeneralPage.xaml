@@ -9,7 +9,7 @@
     <controls:OOBEContent x:Uid="Settings_OOBEGeneral" HeroImage="ms-appx:///Assets/SettingsOOBEGeneral.png">
         <controls:OOBEContent.PageContent>
             <StackPanel Orientation="Vertical">
-                <HyperlinkButton x:Uid="Settings_OOBEGeneral_WSLDocumentationLink" Style="{StaticResource TextButtonStyle}"/>
+                <HyperlinkButton x:Uid="Settings_OOBEGeneral_LSWDocumentationLink" Style="{StaticResource TextButtonStyle}"/>
                 <HyperlinkButton x:Uid="Settings_OOBEGeneral_BestPracticesSetupLink" Style="{StaticResource TextButtonStyle}"/>
                 <HyperlinkButton x:Uid="Settings_OOBEGeneral_GettingStartedLinuxLink" Style="{StaticResource TextButtonStyle}"/>
             </StackPanel>

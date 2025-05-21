@@ -34,7 +34,7 @@ public sealed partial class ShellPage : Page
 
         RegisterNavigationService();
 
-        // TODO: Set the title bar icon by updating /Assets/wsl.ico.
+        // TODO: Set the title bar icon by updating /Assets/lsw.ico.
         // A custom title bar is required for full window theme and Mica support.
         // https://docs.microsoft.com/windows/apps/develop/title-bar?tabs=winui3#full-customization
         App.OOBEWindow!.ExtendsContentIntoTitleBar = true;

@@ -14,9 +14,9 @@
 #include "lxinitshared.h"
 #include "stringshared.h"
 
-using wsl::shared::hns::GuestEndpointResourceType;
-using wsl::shared::hns::ModifyGuestEndpointSettingRequest;
-using wsl::shared::hns::ModifyRequestType;
+using lsw::shared::hns::GuestEndpointResourceType;
+using lsw::shared::hns::ModifyGuestEndpointSettingRequest;
+using lsw::shared::hns::ModifyRequestType;
 
 constexpr auto c_interfaceLookupTimeout = std::chrono::seconds(30);
 constexpr auto c_interfaceLookupRetryPeriod = std::chrono::milliseconds(100);
@@ -67,17 +67,17 @@ Interface GnsEngine::OpenAdapterImpl(const GUID& id)
     {
         GNS_LOG_INFO(
             "Found an interface matching the GUID {}, with name {}",
-            wsl::shared::string::GuidToString<char>(id).c_str(),
+            lsw::shared::string::GuidToString<char>(id).c_str(),
             interfaceName.c_str());
         return Interface::Open(interfaceName);
     }
 
-    throw RuntimeErrorWithSourceLocation(std::format("Couldn't find an adapter for id: {}", wsl::shared::string::GuidToString<char>(id)));
+    throw RuntimeErrorWithSourceLocation(std::format("Couldn't find an adapter for id: {}", lsw::shared::string::GuidToString<char>(id)));
 }
 
 Interface GnsEngine::OpenAdapter(const GUID& id)
 {
-    return wsl::shared::retry::RetryWithTimeout<Interface>([&]() { return OpenAdapterImpl(id); }, c_interfaceLookupRetryPeriod, c_interfaceLookupTimeout);
+    return lsw::shared::retry::RetryWithTimeout<Interface>([&]() { return OpenAdapterImpl(id); }, c_interfaceLookupRetryPeriod, c_interfaceLookupTimeout);
 }
 
 Interface GnsEngine::OpenInterfaceImpl(const std::string& deviceName)
@@ -94,7 +94,7 @@ Interface GnsEngine::OpenInterfaceImpl(const std::string& deviceName)
 
 Interface GnsEngine::OpenInterface(const std::string& deviceName)
 {
-    return wsl::shared::retry::RetryWithTimeout<Interface>(
+    return lsw::shared::retry::RetryWithTimeout<Interface>(
         [&]() { return OpenInterfaceImpl(deviceName); }, c_interfaceLookupRetryPeriod, c_interfaceLookupTimeout);
 }
 
@@ -118,7 +118,7 @@ std::optional<GUID> GnsEngine::GetAdapterId(const std::string& path)
             deviceGuid = device.parent_path().parent_path().parent_path().filename();
         }
 
-        return wsl::shared::string::ToGuid(deviceGuid);
+        return lsw::shared::string::ToGuid(deviceGuid);
     }
     catch (...)
     {
@@ -130,7 +130,7 @@ Interface GnsEngine::OpenInterfaceOrAdapter(const std::wstring& nameOrId)
 {
     if (!nameOrId.empty() && nameOrId[0] == L'{')
     {
-        auto id = wsl::shared::string::ToGuid(nameOrId);
+        auto id = lsw::shared::string::ToGuid(nameOrId);
         if (!id.has_value())
         {
             THROW_ERRNO(EINVAL);
@@ -140,7 +140,7 @@ Interface GnsEngine::OpenInterfaceOrAdapter(const std::wstring& nameOrId)
     }
     else
     {
-        return OpenInterface(wsl::shared::string::WideToMultiByte(nameOrId));
+        return OpenInterface(lsw::shared::string::WideToMultiByte(nameOrId));
     }
 }
 
@@ -189,14 +189,14 @@ void GnsEngine::ProcessNotification(const nlohmann::json& payload, Interface& in
 
 template <typename T>
 void GnsEngine::ProcessNotificationImpl(
-    Interface& interface, const nlohmann::json& payload, void (GnsEngine::*routine)(Interface&, const T&, wsl::shared::hns::ModifyRequestType))
+    Interface& interface, const nlohmann::json& payload, void (GnsEngine::*routine)(Interface&, const T&, lsw::shared::hns::ModifyRequestType))
 {
     T settings{};
     nlohmann::from_json(payload.at("Settings"), settings);
-    (this->*routine)(interface, settings, payload["RequestType"].get<wsl::shared::hns::ModifyRequestType>());
+    (this->*routine)(interface, settings, payload["RequestType"].get<lsw::shared::hns::ModifyRequestType>());
 }
 
-void GnsEngine::ProcessIpAddressChange(Interface& interface, const wsl::shared::hns::IPAddress& payload, wsl::shared::hns::ModifyRequestType action)
+void GnsEngine::ProcessIpAddressChange(Interface& interface, const lsw::shared::hns::IPAddress& payload, lsw::shared::hns::ModifyRequestType action)
 {
     uint16_t addrFamily = UtilWinAfToLinuxAf(payload.Family);
     if (addrFamily != AF_INET && addrFamily != AF_INET6)
@@ -207,7 +207,7 @@ void GnsEngine::ProcessIpAddressChange(Interface& interface, const wsl::shared::
     Address address{
         addrFamily,
         payload.OnLinkPrefixLength,
-        wsl::shared::string::WideToMultiByte(payload.Address),
+        lsw::shared::string::WideToMultiByte(payload.Address),
         static_cast<IpPrefixOrigin>(payload.PrefixOrigin),
         static_cast<IpSuffixOrigin>(payload.SuffixOrigin),
         payload.PreferredLifetime};
@@ -239,7 +239,7 @@ void GnsEngine::ProcessIpAddressChange(Interface& interface, const wsl::shared::
     }
 }
 
-void GnsEngine::ProcessRouteChange(Interface& interface, const wsl::shared::hns::Route& route, wsl::shared::hns::ModifyRequestType action)
+void GnsEngine::ProcessRouteChange(Interface& interface, const lsw::shared::hns::Route& route, lsw::shared::hns::ModifyRequestType action)
 {
     int addrFamily = UtilWinAfToLinuxAf(route.Family);
     if (addrFamily != AF_INET && addrFamily != AF_INET6)
@@ -259,12 +259,12 @@ void GnsEngine::ProcessRouteChange(Interface& interface, const wsl::shared::hns:
     std::optional<Address> to;
     if (!defaultRoute)
     {
-        to = Address::FromPrefixString(addrFamily, wsl::shared::string::WideToMultiByte(route.DestinationPrefix));
+        to = Address::FromPrefixString(addrFamily, lsw::shared::string::WideToMultiByte(route.DestinationPrefix));
     }
 
     // Note: for the next hop parameter to the Route constructor, the prefix length can be any valid prefix length -
     // it's just used to create an address object.  We currently use the SitePrefixLength field for convenience.
-    const auto nextHopValue = wsl::shared::string::WideToMultiByte(route.NextHop);
+    const auto nextHopValue = lsw::shared::string::WideToMultiByte(route.NextHop);
     auto interfaceRoute =
         Route{addrFamily, {{addrFamily, route.SitePrefixLength, nextHopValue}}, interface.Index(), defaultRoute, to, route.Metric};
 
@@ -291,7 +291,7 @@ void GnsEngine::ProcessRouteChange(Interface& interface, const wsl::shared::hns:
     }
 }
 
-void GnsEngine::ProcessDNSChange(Interface& interface, const wsl::shared::hns::DNS& payload, wsl::shared::hns::ModifyRequestType action)
+void GnsEngine::ProcessDNSChange(Interface& interface, const lsw::shared::hns::DNS& payload, lsw::shared::hns::ModifyRequestType action)
 {
     if (action == ModifyRequestType::Remove)
     {
@@ -310,7 +310,7 @@ void GnsEngine::ProcessDNSChange(Interface& interface, const wsl::shared::hns::D
         content << payload.Options; // The Options field is used to pass the file header
     }
 
-    for (const auto& server : wsl::shared::string::Split(payload.ServerList, L','))
+    for (const auto& server : lsw::shared::string::Split(payload.ServerList, L','))
     {
         content << L"nameserver " << server << L"\n";
     }
@@ -322,7 +322,7 @@ void GnsEngine::ProcessDNSChange(Interface& interface, const wsl::shared::hns::D
 
     if (!payload.Search.empty())
     {
-        content << L"search " << wsl::shared::string::Join(wsl::shared::string::Split(payload.Search, L','), L' ') << L"\n";
+        content << L"search " << lsw::shared::string::Join(lsw::shared::string::Split(payload.Search, L','), L' ') << L"\n";
     }
 
     GNS_LOG_INFO(
@@ -337,16 +337,16 @@ void GnsEngine::ProcessDNSChange(Interface& interface, const wsl::shared::hns::D
     resolvConf << content.str();
 }
 
-void GnsEngine::ProcessMacAddressChange(Interface& interface, const wsl::shared::hns::MacAddress& address, wsl::shared::hns::ModifyRequestType type)
+void GnsEngine::ProcessMacAddressChange(Interface& interface, const lsw::shared::hns::MacAddress& address, lsw::shared::hns::ModifyRequestType type)
 {
     GNS_LOG_INFO(
         "Setting to MAC address to {} (will toggle the interface state) on interfaceName {} ",
         address.PhysicalAddress.c_str(),
         interface.Name().c_str());
-    manager.SetAdapterMacAddress(interface, wsl::shared::string::ParseMacAddress(address.PhysicalAddress, '-'));
+    manager.SetAdapterMacAddress(interface, lsw::shared::string::ParseMacAddress(address.PhysicalAddress, '-'));
 }
 
-void GnsEngine::ProcessLinkChange(Interface& interface, const wsl::shared::hns::NetworkInterface& link, wsl::shared::hns::ModifyRequestType type)
+void GnsEngine::ProcessLinkChange(Interface& interface, const lsw::shared::hns::NetworkInterface& link, lsw::shared::hns::ModifyRequestType type)
 {
     GNS_LOG_INFO(
         "Setting link state to {} on interfaceName {}",
@@ -393,14 +393,14 @@ std::tuple<bool, int> GnsEngine::ProcessNextMessage()
     }
     case LxGnsMessageInterfaceConfiguration:
     {
-        const auto endpoint = wsl::shared::FromJson<wsl::shared::hns::HNSEndpoint>(payload->Json.c_str());
-        const auto endpointString = wsl::shared::string::GuidToString<char>(endpoint.ID);
+        const auto endpoint = lsw::shared::FromJson<lsw::shared::hns::HNSEndpoint>(payload->Json.c_str());
+        const auto endpointString = lsw::shared::string::GuidToString<char>(endpoint.ID);
         auto interface = OpenAdapter(endpoint.ID);
 
         // Give the interface a new name if requested.
         if (endpoint.PortFriendlyName.size() > 0)
         {
-            auto assignedName = wsl::shared::string::WideToMultiByte(endpoint.PortFriendlyName);
+            auto assignedName = lsw::shared::string::WideToMultiByte(endpoint.PortFriendlyName);
             if (assignedName.compare(interface.Name()) != 0)
             {
                 // Special case for wlanxx adapters: create a virtual wifi interface.
@@ -466,29 +466,29 @@ std::tuple<bool, int> GnsEngine::ProcessNextMessage()
     }
     case LxGnsMessageVmNicCreatedNotification:
     {
-        auto vmNic = wsl::shared::FromJson<wsl::shared::hns::VmNicCreatedNotification>(payload->Json.c_str());
+        auto vmNic = lsw::shared::FromJson<lsw::shared::hns::VmNicCreatedNotification>(payload->Json.c_str());
         auto interface = OpenAdapter(vmNic.adapterId);
 
         GNS_LOG_INFO(
             "LxGnsMessageVmNicCreatedNotification: EnableLoopbackRouting on adapterId {}, interfaceName {}",
-            wsl::shared::string::GuidToString<char>(vmNic.adapterId).c_str(),
+            lsw::shared::string::GuidToString<char>(vmNic.adapterId).c_str(),
             interface.Name().c_str());
         manager.EnableLoopbackRouting(interface);
         break;
     }
     case LxGnsMessageCreateDeviceRequest:
     {
-        auto createDeviceRequest = wsl::shared::FromJson<wsl::shared::hns::CreateDeviceRequest>(payload->Json.c_str());
+        auto createDeviceRequest = lsw::shared::FromJson<lsw::shared::hns::CreateDeviceRequest>(payload->Json.c_str());
         switch (createDeviceRequest.type)
         {
-        case wsl::shared::hns::DeviceType::Loopback:
+        case lsw::shared::hns::DeviceType::Loopback:
         {
             const GUID emptyGuid{};
             assert(createDeviceRequest.lowerEdgeAdapterId.has_value());
             auto gelnic = OpenAdapter(createDeviceRequest.lowerEdgeAdapterId.value());
             GNS_LOG_INFO(
                 "LxGnsMessageCreateDeviceRequest [Loopback]: InitializeLoopbackConfiguration deviceName {}, interfaceName {}",
-                wsl::shared::string::GuidToString<char>(createDeviceRequest.lowerEdgeAdapterId.value_or(emptyGuid)).c_str(),
+                lsw::shared::string::GuidToString<char>(createDeviceRequest.lowerEdgeAdapterId.value_or(emptyGuid)).c_str(),
                 gelnic.Name().c_str());
             manager.InitializeLoopbackConfiguration(gelnic);
             break;
@@ -502,7 +502,7 @@ std::tuple<bool, int> GnsEngine::ProcessNextMessage()
     }
     case LxGnsMessageModifyGuestDeviceSettingRequest:
     {
-        auto modifyRequest = wsl::shared::FromJson<wsl::shared::hns::ModifyGuestEndpointSettingRequest<wsl::shared::hns::NetworkInterface>>(
+        auto modifyRequest = lsw::shared::FromJson<lsw::shared::hns::ModifyGuestEndpointSettingRequest<lsw::shared::hns::NetworkInterface>>(
             payload->Json.c_str());
         if (modifyRequest.ResourceType != GuestEndpointResourceType::Interface)
         {
@@ -531,8 +531,8 @@ std::tuple<bool, int> GnsEngine::ProcessNextMessage()
     }
     case LxGnsMessageLoopbackRoutesRequest:
     {
-        auto request = wsl::shared::FromJson<wsl::shared::hns::LoopbackRoutesRequest>(payload->Json.c_str());
-        if (request.operation != wsl::shared::hns::OperationType::Create && request.operation != wsl::shared::hns::OperationType::Remove)
+        auto request = lsw::shared::FromJson<lsw::shared::hns::LoopbackRoutesRequest>(payload->Json.c_str());
+        if (request.operation != lsw::shared::hns::OperationType::Create && request.operation != lsw::shared::hns::OperationType::Remove)
         {
             GNS_LOG_INFO(
                 "LxGnsMessageLoopbackRoutesRequest - ignoring request that has the wrong operation type {} for interface "
@@ -548,10 +548,10 @@ std::tuple<bool, int> GnsEngine::ProcessNextMessage()
             throw RuntimeErrorWithSourceLocation(std::format("LxGnsMessageLoopbackRoutesRequest: unexpected family: {}", request.family));
         }
 
-        assert(request.operation == wsl::shared::hns::OperationType::Create || request.operation == wsl::shared::hns::OperationType::Remove);
-        auto operation = (request.operation == wsl::shared::hns::OperationType::Create) ? Operation::Create : Operation::Remove;
+        assert(request.operation == lsw::shared::hns::OperationType::Create || request.operation == lsw::shared::hns::OperationType::Remove);
+        auto operation = (request.operation == lsw::shared::hns::OperationType::Create) ? Operation::Create : Operation::Remove;
         auto interface = OpenInterfaceOrAdapter(request.targetDeviceName);
-        auto ipAddress = wsl::shared::string::WideToMultiByte(request.ipAddress);
+        auto ipAddress = lsw::shared::string::WideToMultiByte(request.ipAddress);
         int prefixLen = MAX_PREFIX_LEN(addrFamily);
         Address address(addrFamily, prefixLen, ipAddress);
         manager.UpdateLoopbackRoute(interface, address, operation);
@@ -566,10 +566,10 @@ std::tuple<bool, int> GnsEngine::ProcessNextMessage()
     }
     case LxGnsMessageInitialIpConfigurationNotification:
     {
-        auto notification = wsl::shared::FromJson<wsl::shared::hns::InitialIpConfigurationNotification>(payload->Json.c_str());
+        auto notification = lsw::shared::FromJson<lsw::shared::hns::InitialIpConfigurationNotification>(payload->Json.c_str());
         auto interface = OpenInterfaceOrAdapter(notification.targetDeviceName);
 
-        if (WI_IsFlagClear(notification.flags, wsl::shared::hns::InitialIpConfigurationNotificationFlags::SkipPrimaryRoutingTableUpdate))
+        if (WI_IsFlagClear(notification.flags, lsw::shared::hns::InitialIpConfigurationNotificationFlags::SkipPrimaryRoutingTableUpdate))
         {
             auto table = manager.FindRoutingTableIdForInterface(interface);
             if (!table.has_value())
@@ -588,7 +588,7 @@ std::tuple<bool, int> GnsEngine::ProcessNextMessage()
         GNS_LOG_INFO("LxGnsMessageInitialIpConfigurationNotification: Resetting IPv6 state for interface {}", interface.Name().c_str());
         interface.ResetIpv6State();
 
-        if (WI_IsFlagClear(notification.flags, wsl::shared::hns::InitialIpConfigurationNotificationFlags::SkipLoopbackRouteReset))
+        if (WI_IsFlagClear(notification.flags, lsw::shared::hns::InitialIpConfigurationNotificationFlags::SkipLoopbackRouteReset))
         {
             GNS_LOG_INFO("LxGnsMessageInitialIpConfigurationNotification: Wiping loopback routes");
             manager.ResetLoopbackRoutes();
@@ -611,7 +611,7 @@ std::tuple<bool, int> GnsEngine::ProcessNextMessage()
     case LxGnsMessageConnectTestRequest:
     {
         // the payload is where to send the request, not in a JSON format
-        wsl::shared::conncheck::ConnCheckResult result = manager.SendConnectRequest(payload->Json.c_str());
+        lsw::shared::conncheck::ConnCheckResult result = manager.SendConnectRequest(payload->Json.c_str());
         // convert the 2 enums into a single integer value
         // Ipv4 status will be the lower 16 bits
         return_value = static_cast<uint32_t>(result.Ipv4Status);
@@ -630,17 +630,17 @@ std::tuple<bool, int> GnsEngine::ProcessNextMessage()
         for (const auto& ip : c_ipStrings)
         {
             runCommand(std::format("nft add table {} filter", ip));
-            runCommand(std::format("nft \"add chain {} filter WSLOUTPUT {{ type filter hook output priority filter; }}\"", ip));
-            runCommand(std::format("nft add rule {} filter WSLOUTPUT counter mark set 0x1", ip));
+            runCommand(std::format("nft \"add chain {} filter LSWOUTPUT {{ type filter hook output priority filter; }}\"", ip));
+            runCommand(std::format("nft add rule {} filter LSWOUTPUT counter mark set 0x1", ip));
             runCommand(std::format("nft add table {} nat", ip));
-            runCommand(std::format("nft \"add chain {} nat WSLPOSTROUTING {{ type nat hook postrouting priority srcnat - 1; }}\"", ip));
+            runCommand(std::format("nft \"add chain {} nat LSWPOSTROUTING {{ type nat hook postrouting priority srcnat - 1; }}\"", ip));
         }
 
         break;
     }
     case LxGnsMessageInterfaceNetFilter:
     {
-        auto interfaceNetFilterRequest = wsl::shared::FromJson<wsl::shared::hns::InterfaceNetFilterRequest>(payload->Json.c_str());
+        auto interfaceNetFilterRequest = lsw::shared::FromJson<lsw::shared::hns::InterfaceNetFilterRequest>(payload->Json.c_str());
         auto interface = OpenInterfaceOrAdapter(interfaceNetFilterRequest.targetDeviceName);
 
         GNS_LOG_INFO(
@@ -652,7 +652,7 @@ std::tuple<bool, int> GnsEngine::ProcessNextMessage()
 
         switch (interfaceNetFilterRequest.operation)
         {
-        case wsl::shared::hns::OperationType::Create:
+        case lsw::shared::hns::OperationType::Create:
         {
             // Create SNAT rules on the interface.
             for (const auto& ip : c_ipStrings)
@@ -660,7 +660,7 @@ std::tuple<bool, int> GnsEngine::ProcessNextMessage()
                 for (const auto& protocol : {"udp", "tcp"})
                 {
                     const auto commandLine = std::format(
-                        "nft add rule {} nat WSLPOSTROUTING oif {} {} sport 1-65535 mark != 0x1 counter masquerade to :{}-{}",
+                        "nft add rule {} nat LSWPOSTROUTING oif {} {} sport 1-65535 mark != 0x1 counter masquerade to :{}-{}",
                         ip,
                         interface.Name().c_str(),
                         protocol,
@@ -675,13 +675,13 @@ std::tuple<bool, int> GnsEngine::ProcessNextMessage()
             manager.UpdateMirroredLoopbackRulesForInterface(interface.Name(), Operation::Create);
             break;
         }
-        case wsl::shared::hns::OperationType::Remove:
+        case lsw::shared::hns::OperationType::Remove:
         {
             // Remove SNAT rules on the interface (one in ipv4 and one in ipv6).
             // Rules can only be removed via handle number, so find the handle numbers first.
             for (const auto& ip : c_ipStrings)
             {
-                const auto listChainCommand = std::format("nft -a list chain {} nat WSLPOSTROUTING", ip);
+                const auto listChainCommand = std::format("nft -a list chain {} nat LSWPOSTROUTING", ip);
                 std::string listOutputString;
                 THROW_LAST_ERROR_IF(UtilExecCommandLine(listChainCommand.c_str(), &listOutputString) < 0);
 
@@ -697,7 +697,7 @@ std::tuple<bool, int> GnsEngine::ProcessNextMessage()
 
                 for (const auto& handle : handleNumbers)
                 {
-                    auto commandLine = std::format("nft delete rule {} nat WSLPOSTROUTING handle {}", ip, handle);
+                    auto commandLine = std::format("nft delete rule {} nat LSWPOSTROUTING handle {}", ip, handle);
                     GNS_LOG_INFO("LxGnsMessageInterfaceNetFilter (Remove): {}", commandLine.c_str());
                     THROW_LAST_ERROR_IF(UtilExecCommandLine(commandLine.c_str()) < 0);
                 }

@@ -23,9 +23,9 @@ Abstract:
 #include "SocketChannel.h"
 #include "WslDistributionConfig.h"
 
-#define WSL_USE_VIRTIO_9P(_Config) (WI_IsFlagSet(UtilGetFeatureFlags((_Config)), LxInitFeatureVirtIo9p))
-#define WSL_USE_VIRTIO_FS(_Config) (WI_IsFlagSet(UtilGetFeatureFlags((_Config)), LxInitFeatureVirtIoFs))
-#define WSLG_SHARED_FOLDER "wslg"
+#define LSW_USE_VIRTIO_9P(_Config) (WI_IsFlagSet(UtilGetFeatureFlags((_Config)), LxInitFeatureVirtIo9p))
+#define LSW_USE_VIRTIO_FS(_Config) (WI_IsFlagSet(UtilGetFeatureFlags((_Config)), LxInitFeatureVirtIoFs))
+#define LSWG_SHARED_FOLDER "lswg"
 
 #define INIT_MAKE_SECURITY(_uid, _gid, _mode) {_uid, _gid, _mode}
 #define INIT_ANY_SYMLINK(_source, _target) \
@@ -376,57 +376,57 @@ private:
 
 void ConfigAppendToPath(EnvironmentBlock& Environment, std::string_view PathElement);
 
-wsl::linux::WslDistributionConfig ConfigInitializeCommon(struct sigaction* SavedSignalActions);
+lsw::linux::WslDistributionConfig ConfigInitializeCommon(struct sigaction* SavedSignalActions);
 
 int ConfigInitializeEntry(PCINIT_STARTUP_ANY AnyEntry);
 
-int ConfigInitializeVmMode(bool Elevated, wsl::linux::WslDistributionConfig& Config);
+int ConfigInitializeVmMode(bool Elevated, lsw::linux::WslDistributionConfig& Config);
 
 int ConfigInitializeWsl(void);
 
-void ConfigInitializeX11(const wsl::linux::WslDistributionConfig& Config);
+void ConfigInitializeX11(const lsw::linux::WslDistributionConfig& Config);
 
-void ConfigCreateResolvConfSymlink(const wsl::linux::WslDistributionConfig& Config);
+void ConfigCreateResolvConfSymlink(const lsw::linux::WslDistributionConfig& Config);
 
 int ConfigCreateResolvConfSymlinkTarget(void);
 
-EnvironmentBlock ConfigCreateEnvironmentBlock(PLX_INIT_CREATE_PROCESS_COMMON Common, const wsl::linux::WslDistributionConfig& Config);
+EnvironmentBlock ConfigCreateEnvironmentBlock(PLX_INIT_CREATE_PROCESS_COMMON Common, const lsw::linux::WslDistributionConfig& Config);
 
 std::optional<unsigned int> ConfigGetDriveLetter(std::string_view MountSource);
 
 std::set<std::pair<unsigned int, std::string>> ConfigGetMountedDrvFsVolumes(void);
 
-std::vector<std::pair<std::string, std::string>> ConfigGetWslgEnvironmentVariables(const wsl::linux::WslDistributionConfig& Config);
+std::vector<std::pair<std::string, std::string>> ConfigGetWslgEnvironmentVariables(const lsw::linux::WslDistributionConfig& Config);
 
 void ConfigHandleInteropMessage(
-    wsl::shared::SocketChannel& ResponseChannel,
-    wsl::shared::SocketChannel& InteropChannel,
+    lsw::shared::SocketChannel& ResponseChannel,
+    lsw::shared::SocketChannel& InteropChannel,
     bool Elevated,
     gsl::span<gsl::byte> Message,
     const MESSAGE_HEADER* Header,
-    const wsl::linux::WslDistributionConfig& Config);
+    const lsw::linux::WslDistributionConfig& Config);
 
 void ConfigInitializeCgroups(void);
 
-int ConfigInitializeInstance(wsl::shared::SocketChannel& Channel, gsl::span<gsl::byte> Buffer, wsl::linux::WslDistributionConfig& Config);
+int ConfigInitializeInstance(lsw::shared::SocketChannel& Channel, gsl::span<gsl::byte> Buffer, lsw::linux::WslDistributionConfig& Config);
 
-void ConfigMountDrvFsVolumes(unsigned int DrvFsVolumes, uid_t OwnerUid, std::optional<bool> Admin, const wsl::linux::WslDistributionConfig& Config);
+void ConfigMountDrvFsVolumes(unsigned int DrvFsVolumes, uid_t OwnerUid, std::optional<bool> Admin, const lsw::linux::WslDistributionConfig& Config);
 
 void ConfigMountFsTab(bool Elevated);
 
-int ConfigReconfigureResolvConfSymlink(const wsl::linux::WslDistributionConfig& Config);
+int ConfigReconfigureResolvConfSymlink(const lsw::linux::WslDistributionConfig& Config);
 
 int ConfigRegisterBinfmtInterpreter(void);
 
 int ConfigSetMountNamespace(bool Elevated);
 
-int ConfigRemountDrvFs(gsl::span<gsl::byte> Buffer, wsl::shared::SocketChannel& Channel, const wsl::linux::WslDistributionConfig& Config);
+int ConfigRemountDrvFs(gsl::span<gsl::byte> Buffer, lsw::shared::SocketChannel& Channel, const lsw::linux::WslDistributionConfig& Config);
 
-int ConfigRemountDrvFsImpl(gsl::span<gsl::byte> Buffer, const wsl::linux::WslDistributionConfig& Config);
+int ConfigRemountDrvFsImpl(gsl::span<gsl::byte> Buffer, const lsw::linux::WslDistributionConfig& Config);
 
 void ConfigUpdateLanguage(EnvironmentBlock& Environment);
 
-void ConfigUpdateNetworkInformation(gsl::span<gsl::byte> Buffer, const wsl::linux::WslDistributionConfig& Config);
+void ConfigUpdateNetworkInformation(gsl::span<gsl::byte> Buffer, const lsw::linux::WslDistributionConfig& Config);
 
 template <>
 struct std::formatter<INIT_STARTUP_TYPE, char>

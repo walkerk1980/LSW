@@ -43,10 +43,10 @@ extern bool g_lxcoreInitialized;
 
 using namespace std::placeholders;
 using namespace Microsoft::WRL;
-using namespace wsl::windows::service;
-using wsl::windows::common::Context;
-using wsl::windows::common::ExecutionContext;
-using wsl::windows::common::ServiceExecutionContext;
+using namespace lsw::windows::service;
+using lsw::windows::common::Context;
+using lsw::windows::common::ExecutionContext;
+using lsw::windows::common::ServiceExecutionContext;
 
 LxssUserSession::LxssUserSession(_In_ const std::weak_ptr<LxssUserSessionImpl>& Session) : m_session(Session)
 {
@@ -70,18 +70,18 @@ try
 {
     ServiceExecutionContext context(Error);
 
-    if constexpr (wsl::shared::Arm64)
+    if constexpr (lsw::shared::Arm64)
     {
         // Pass-through disk support for ARM64 was added to Windows version 27653.
-        if (wsl::windows::common::helpers::GetWindowsVersion().BuildNumber < 27653)
+        if (lsw::windows::common::helpers::GetWindowsVersion().BuildNumber < 27653)
         {
-            return WSL_E_WSL_MOUNT_NOT_SUPPORTED;
+            return LSW_E_LSW_MOUNT_NOT_SUPPORTED;
         }
     }
 
     RETURN_HR_IF(
-        WSL_E_DISK_MOUNT_DISABLED,
-        !wsl::windows::policies::IsFeatureAllowed(wsl::windows::policies::OpenPoliciesKey().get(), wsl::windows::policies::c_allowDiskMount));
+        LSW_E_DISK_MOUNT_DISABLED,
+        !lsw::windows::policies::IsFeatureAllowed(lsw::windows::policies::OpenPoliciesKey().get(), lsw::windows::policies::c_allowDiskMount));
 
     RETURN_HR_IF(
         E_INVALIDARG,
@@ -281,7 +281,7 @@ try
     const auto result = GetDistributionConfiguration(
         &distroGuid, &distroNameLocal, Version, DefaultUid, DefaultEnvironmentCount, DefaultEnvironment, WslFlags, nullptr);
 
-    WI_ASSERT(FAILED(result) || wsl::shared::string::IsEqual(DistributionName, distroNameLocal.get(), true));
+    WI_ASSERT(FAILED(result) || lsw::shared::string::IsEqual(DistributionName, distroNameLocal.get(), true));
 
     return result;
 }
@@ -403,8 +403,8 @@ HRESULT LxssUserSession::RegisterDistribution(
     _In_ LPCWSTR DistributionName, _In_ ULONG Version, _In_opt_ HANDLE TarGzFile, _In_opt_ HANDLE TarGzPipe, _In_ LPCWSTR TargetDirectory)
 try
 {
-    const auto clientProcess = wsl::windows::common::wslutil::OpenCallingProcess(PROCESS_QUERY_LIMITED_INFORMATION);
-    const auto packageFamilyName = wsl::windows::common::wslutil::GetPackageFamilyName(clientProcess.get());
+    const auto clientProcess = lsw::windows::common::lswutil::OpenCallingProcess(PROCESS_QUERY_LIMITED_INFORMATION);
+    const auto packageFamilyName = lsw::windows::common::lswutil::GetPackageFamilyName(clientProcess.get());
     GUID distroGuid{};
 
     return RegisterDistribution(
@@ -555,7 +555,7 @@ try
 }
 CATCH_RETURN()
 
-LxssUserSessionImpl::LxssUserSessionImpl(_In_ PSID userSid, _In_ DWORD sessionId, _Inout_ wsl::windows::service::PluginManager& pluginManager) :
+LxssUserSessionImpl::LxssUserSessionImpl(_In_ PSID userSid, _In_ DWORD sessionId, _Inout_ lsw::windows::service::PluginManager& pluginManager) :
     m_sessionId(sessionId), m_pluginManager(pluginManager)
 {
     THROW_IF_WIN32_BOOL_FALSE(::CopySid(sizeof(m_userSid), &m_userSid.Sid, userSid));
@@ -566,8 +566,8 @@ LxssUserSessionImpl::LxssUserSessionImpl(_In_ PSID userSid, _In_ DWORD sessionId
         wil::unique_handle userToken;
         {
             auto runAsUser = wil::CoImpersonateClient();
-            userToken = wsl::windows::common::security::GetUserToken(TokenImpersonation);
-            lxssKey = wsl::windows::common::registry::OpenLxssUserKey();
+            userToken = lsw::windows::common::security::GetUserToken(TokenImpersonation);
+            lxssKey = lsw::windows::common::registry::OpenLxssUserKey();
         }
 
         static std::atomic<DWORD> sessionCookie;
@@ -576,7 +576,7 @@ LxssUserSessionImpl::LxssUserSessionImpl(_In_ PSID userSid, _In_ DWORD sessionId
 
         // Detect existing legacy installs and convert them to the new format.
         const DWORD state =
-            wsl::windows::common::registry::ReadDword(lxssKey.get(), nullptr, LXSS_LEGACY_INSTALL_VALUE, LxssDistributionStateInvalid);
+            lsw::windows::common::registry::ReadDword(lxssKey.get(), nullptr, LXSS_LEGACY_INSTALL_VALUE, LxssDistributionStateInvalid);
 
         if (state == LxssDistributionStateInstalled)
         {
@@ -584,7 +584,7 @@ LxssUserSessionImpl::LxssUserSessionImpl(_In_ PSID userSid, _In_ DWORD sessionId
             // installed state.
             std::lock_guard lock(m_instanceLock);
             _CreateLegacyRegistration(lxssKey.get(), userToken.get());
-            wsl::windows::common::registry::DeleteKeyValue(lxssKey.get(), LXSS_LEGACY_INSTALL_VALUE);
+            lsw::windows::common::registry::DeleteKeyValue(lxssKey.get(), LXSS_LEGACY_INSTALL_VALUE);
         }
 
         // Create a threadpool timer to terminate a Linux utility VM that is idle.
@@ -600,7 +600,7 @@ LxssUserSessionImpl::LxssUserSessionImpl(_In_ PSID userSid, _In_ DWORD sessionId
                 windowClass.cbSize = sizeof(windowClass);
                 windowClass.lpfnWndProc = s_TimezoneWindowProc;
                 windowClass.hInstance = nullptr;
-                windowClass.lpszClassName = L"wslservice-timezone-notifications";
+                windowClass.lpszClassName = L"lswservice-timezone-notifications";
                 THROW_LAST_ERROR_IF(RegisterClassExW(&windowClass) == 0);
 
                 // Note: HWND_MESSAGE cannot be used here because such windows don't receive broadcast messages like WM_TIMECHANGE
@@ -657,8 +657,8 @@ LxssUserSessionImpl::LxssUserSessionImpl(_In_ PSID userSid, _In_ DWORD sessionId
 
             // Shutdown the user's session.
             auto runAsUser = wil::impersonate_token(userToken.get());
-            const auto wslSupport = wil::CoCreateInstance<LxssUserSessionInBox, IWslSupport>(CLSCTX_LOCAL_SERVER | CLSCTX_ENABLE_CLOAKING);
-            THROW_IF_FAILED(wslSupport->Shutdown());
+            const auto lswSupport = wil::CoCreateInstance<LxssUserSessionInBox, IWslSupport>(CLSCTX_LOCAL_SERVER | CLSCTX_ENABLE_CLOAKING);
+            THROW_IF_FAILED(lswSupport->Shutdown());
         }));
     }
     CATCH_LOG()
@@ -685,16 +685,16 @@ HRESULT LxssUserSessionImpl::AttachDisk(_In_ LPCWSTR Disk, _In_ ULONG Flags)
     std::lock_guard lock(m_instanceLock);
     const wil::unique_hkey lxssKey = s_OpenLxssUserKey();
 
-    // Validate that at least one WSL2 distro is installed
+    // Validate that at least one LSW2 distro is installed
     auto pred = [&](const auto& e) { return WI_IsFlagSet(e.Read(Property::Flags), LXSS_DISTRO_FLAGS_VM_MODE); };
 
     auto distributions = _EnumerateDistributions(lxssKey.get(), true);
-    RETURN_HR_IF(WSL_E_WSL2_NEEDED, !std::any_of(distributions.begin(), distributions.end(), pred));
+    RETURN_HR_IF(LSW_E_LSW2_NEEDED, !std::any_of(distributions.begin(), distributions.end(), pred));
 
     return wil::ResultFromException([&]() {
         _CreateVm();
         const auto diskType = WI_IsFlagSet(Flags, LXSS_ATTACH_MOUNT_FLAGS_VHD) ? WslCoreVm::DiskType::VHD : WslCoreVm::DiskType::PassThrough;
-        const auto userToken = wsl::windows::common::security::GetUserToken(TokenImpersonation);
+        const auto userToken = lsw::windows::common::security::GetUserToken(TokenImpersonation);
         m_utilityVm->AttachDisk(Disk, diskType, {}, true, userToken.get());
     });
 }
@@ -704,7 +704,7 @@ try
 {
     ExecutionContext context(Context::ConfigureDistro);
 
-    WSL_LOG("ConfigureDistribution", TraceLoggingValue(DefaultUid, "DefaultUid"), TraceLoggingValue(Flags, "Flags"));
+    LSW_LOG("ConfigureDistribution", TraceLoggingValue(DefaultUid, "DefaultUid"), TraceLoggingValue(Flags, "Flags"));
 
     const wil::unique_hkey lxssKey = s_OpenLxssUserKey();
     std::lock_guard lock(m_instanceLock);
@@ -832,10 +832,10 @@ try
     CreateLxProcessConsoleData consoleData;
     if (ConsoleHandle)
     {
-        consoleData.ConsoleHandle.reset(wsl::windows::common::wslutil::DuplicateHandleFromCallingProcess(ConsoleHandle));
+        consoleData.ConsoleHandle.reset(lsw::windows::common::lswutil::DuplicateHandleFromCallingProcess(ConsoleHandle));
     }
 
-    consoleData.ClientProcess = wsl::windows::common::wslutil::OpenCallingProcess(PROCESS_VM_READ | GENERIC_READ | SYNCHRONIZE);
+    consoleData.ClientProcess = lsw::windows::common::lswutil::OpenCallingProcess(PROCESS_VM_READ | GENERIC_READ | SYNCHRONIZE);
     instance->CreateLxProcess(
         parsed, context, consoleData, Columns, Rows, StdHandles, InstanceId, ProcessHandle, ServerHandle, StandardIn, StandardOut, StandardErr, CommunicationChannel, InteropSocket);
 
@@ -848,12 +848,12 @@ void LxssUserSessionImpl::ClearDiskStateInRegistry(_In_ const LPCWSTR Disk)
 {
     bool deleted = !ARGUMENT_PRESENT(Disk);
 
-    const auto key = wsl::windows::common::registry::OpenOrCreateLxssDiskMountsKey(&m_userSid.Sid);
-    for (const auto& e : wsl::windows::common::registry::EnumKeys(key.get(), KEY_READ))
+    const auto key = lsw::windows::common::registry::OpenOrCreateLxssDiskMountsKey(&m_userSid.Sid);
+    for (const auto& e : lsw::windows::common::registry::EnumKeys(key.get(), KEY_READ))
     {
-        if (Disk == nullptr || wsl::windows::common::registry::ReadString(e.second.get(), nullptr, c_diskValueName) == Disk)
+        if (Disk == nullptr || lsw::windows::common::registry::ReadString(e.second.get(), nullptr, c_diskValueName) == Disk)
         {
-            wsl::windows::common::registry::DeleteKey(key.get(), e.first.c_str());
+            lsw::windows::common::registry::DeleteKey(key.get(), e.first.c_str());
             deleted = true;
         }
     }
@@ -898,7 +898,7 @@ HRESULT LxssUserSessionImpl::MountDisk(
         _CreateVm();
         const auto MountDiskType = WI_IsFlagSet(Flags, LXSS_ATTACH_MOUNT_FLAGS_VHD) ? WslCoreVm::DiskType::VHD : WslCoreVm::DiskType::PassThrough;
         const auto MountResult = m_utilityVm->MountDisk(Disk, MountDiskType, PartitionIndex, Name, Type, Options);
-        const auto MountNameWide = wsl::shared::string::MultiByteToWide(MountResult.MountPointName);
+        const auto MountNameWide = lsw::shared::string::MultiByteToWide(MountResult.MountPointName);
         *Result = MountResult.Result;
         *Step = MountResult.Step;
         *MountName = wil::make_unique_string<wil::unique_cotaskmem_string>(MountNameWide.c_str()).release();
@@ -912,7 +912,7 @@ HRESULT LxssUserSessionImpl::MoveDistribution(_In_ LPCGUID DistroGuid, _In_ LPCW
     std::lock_guard lock(m_instanceLock);
 
     // Fail if the distribution is running.
-    RETURN_HR_IF(WSL_E_DISTRO_NOT_STOPPED, m_runningInstances.contains(*DistroGuid));
+    RETURN_HR_IF(LSW_E_DISTRO_NOT_STOPPED, m_runningInstances.contains(*DistroGuid));
 
     // Lookup the distribution configuration
     const auto lxssKey = s_OpenLxssUserKey();
@@ -1005,7 +1005,7 @@ HRESULT LxssUserSessionImpl::EnumerateDistributions(_Out_ PULONG DistributionCou
         const auto current = &userDistributions.get()[index];
         current->DistroGuid = distributions[index].Id();
         current->State = state;
-        current->Version = WI_IsFlagSet(configuration.Flags, LXSS_DISTRO_FLAGS_VM_MODE) ? LXSS_WSL_VERSION_2 : LXSS_WSL_VERSION_1;
+        current->Version = WI_IsFlagSet(configuration.Flags, LXSS_DISTRO_FLAGS_VM_MODE) ? LXSS_LSW_VERSION_2 : LXSS_LSW_VERSION_1;
         current->Flags = 0;
         WI_SetFlagIf(current->Flags, LXSS_ENUMERATE_FLAGS_DEFAULT, IsEqualGUID(distributions[index].Id(), defaultGuid));
 
@@ -1037,11 +1037,11 @@ HRESULT LxssUserSessionImpl::ExportDistribution(_In_opt_ LPCGUID DistroGuid, _In
         configuration = s_GetDistributionConfiguration(registration);
         RETURN_HR_IF(E_ILLEGAL_STATE_CHANGE, (configuration.State != LxssDistributionStateInstalled));
 
-        // Exporting a WSL1 distro is not possible if the VHD flag is specified.
-        RETURN_HR_IF(WSL_E_WSL2_NEEDED, WI_IsFlagSet(Flags, LXSS_EXPORT_DISTRO_FLAGS_VHD) && WI_IsFlagClear(configuration.Flags, LXSS_DISTRO_FLAGS_VM_MODE));
+        // Exporting a LSW1 distro is not possible if the VHD flag is specified.
+        RETURN_HR_IF(LSW_E_LSW2_NEEDED, WI_IsFlagSet(Flags, LXSS_EXPORT_DISTRO_FLAGS_VHD) && WI_IsFlagClear(configuration.Flags, LXSS_DISTRO_FLAGS_VM_MODE));
 
-        // Exporting a WSL1 distro is not possible if the lxcore driver is not present.
-        RETURN_HR_IF(WSL_E_WSL1_NOT_SUPPORTED, WI_IsFlagClear(configuration.Flags, LXSS_DISTRO_FLAGS_VM_MODE) && !g_lxcoreInitialized);
+        // Exporting a LSW1 distro is not possible if the lxcore driver is not present.
+        RETURN_HR_IF(LSW_E_LSW1_NOT_SUPPORTED, WI_IsFlagClear(configuration.Flags, LXSS_DISTRO_FLAGS_VM_MODE) && !g_lxcoreInitialized);
 
         // Add the distribution to the list of converting distributions.
         _ConversionBegin(configuration.DistroId, LxssDistributionStateExporting);
@@ -1052,7 +1052,7 @@ HRESULT LxssUserSessionImpl::ExportDistribution(_In_opt_ LPCGUID DistroGuid, _In
     auto exportComplete = wil::scope_exit_log(WI_DIAGNOSTICS_INFO, [&] { _ConversionComplete(configuration.DistroId); });
 
     // Log telemetry to track how long exporting the distribution takes.
-    WSL_LOG_TELEMETRY(
+    LSW_LOG_TELEMETRY(
         "ExportDistributionBegin",
         PDT_ProductAndServicePerformance,
         TraceLoggingValue(configuration.Name.c_str(), "distroName"),
@@ -1060,7 +1060,7 @@ HRESULT LxssUserSessionImpl::ExportDistribution(_In_opt_ LPCGUID DistroGuid, _In
 
     HRESULT result;
     auto enableExit = wil::scope_exit([&] {
-        WSL_LOG_TELEMETRY(
+        LSW_LOG_TELEMETRY(
             "ExportDistributionEnd",
             PDT_ProductAndServicePerformance,
             TraceLoggingValue(configuration.Name.c_str(), "distroName"),
@@ -1071,29 +1071,29 @@ HRESULT LxssUserSessionImpl::ExportDistribution(_In_opt_ LPCGUID DistroGuid, _In
     // Export the distribution.
     try
     {
-        const wil::unique_handle clientProcess = wsl::windows::common::wslutil::OpenCallingProcess(GENERIC_READ | SYNCHRONIZE);
+        const wil::unique_handle clientProcess = lsw::windows::common::lswutil::OpenCallingProcess(GENERIC_READ | SYNCHRONIZE);
         if (WI_IsFlagSet(configuration.Flags, LXSS_DISTRO_FLAGS_VM_MODE))
         {
             if (WI_IsFlagSet(Flags, LXSS_EXPORT_DISTRO_FLAGS_VHD))
             {
-                const wil::unique_handle userToken = wsl::windows::common::security::GetUserToken(TokenImpersonation);
+                const wil::unique_handle userToken = lsw::windows::common::security::GetUserToken(TokenImpersonation);
                 auto runAsUser = wil::impersonate_token(userToken.get());
                 const wil::unique_hfile vhdFile(CreateFileW(
                     configuration.VhdFilePath.c_str(), GENERIC_READ, (FILE_SHARE_READ | FILE_SHARE_DELETE), nullptr, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, nullptr));
 
                 RETURN_LAST_ERROR_IF(!vhdFile);
 
-                wsl::windows::common::relay::InterruptableRelay(vhdFile.get(), FileHandle, clientProcess.get(), LXSS_RELAY_BUFFER_SIZE);
+                lsw::windows::common::relay::InterruptableRelay(vhdFile.get(), FileHandle, clientProcess.get(), LXSS_RELAY_BUFFER_SIZE);
             }
             else
             {
                 auto vmContext = _RunUtilityVmSetup(configuration, LxMiniInitMessageExport, Flags);
 
-                wsl::windows::common::relay::ScopedRelay stdErrRelay(
+                lsw::windows::common::relay::ScopedRelay stdErrRelay(
                     wil::unique_handle{reinterpret_cast<HANDLE>(vmContext.errorSocket.release())}, ErrorHandle);
 
                 // Relay the filesystem file contents to the tar.gz handle.
-                wsl::windows::common::relay::InterruptableRelay(
+                lsw::windows::common::relay::InterruptableRelay(
                     reinterpret_cast<HANDLE>(vmContext.tarSocket.get()), FileHandle, clientProcess.get(), LXSS_RELAY_BUFFER_SIZE);
 
                 // Wait for the utility VM to finish expanding the tar and ensure that
@@ -1104,7 +1104,7 @@ HRESULT LxssUserSessionImpl::ExportDistribution(_In_opt_ LPCGUID DistroGuid, _In
                 // Flush any pending IO on the error relay before exiting.
                 stdErrRelay.Sync();
 
-                THROW_HR_IF(WSL_E_EXPORT_FAILED, (exitCode != 0));
+                THROW_HR_IF(LSW_E_EXPORT_FAILED, (exitCode != 0));
             }
         }
         else
@@ -1141,7 +1141,7 @@ HRESULT LxssUserSessionImpl::ExportDistribution(_In_opt_ LPCGUID DistroGuid, _In
                 static_cast<ULONG>(mounts.size()));
 
             const auto exitStatus = _GetElfExitStatus(elfContext);
-            THROW_HR_IF(WSL_E_EXPORT_FAILED, exitStatus != 0);
+            THROW_HR_IF(LSW_E_EXPORT_FAILED, exitStatus != 0);
         }
 
         result = S_OK;
@@ -1220,7 +1220,7 @@ try
     const auto distros = _EnumerateDistributions(lxssKey.get(), listAll);
     for (const auto& registration : distros)
     {
-        if (wsl::shared::string::IsEqual(DistributionName, registration.Read(Property::Name), true))
+        if (lsw::shared::string::IsEqual(DistributionName, registration.Read(Property::Name), true))
         {
             distroFound = true;
             *pDistroGuid = registration.Id();
@@ -1229,7 +1229,7 @@ try
     }
 
     // Return an error if no distribution was found with a matching name.
-    RETURN_HR_IF(WSL_E_DISTRO_NOT_FOUND, !distroFound);
+    RETURN_HR_IF(LSW_E_DISTRO_NOT_FOUND, !distroFound);
 
     return S_OK;
 }
@@ -1262,15 +1262,15 @@ LxssUserSessionImpl::ImportDistributionInplace(_In_ LPCWSTR DistributionName, _I
     RETURN_HR_IF(
         E_INVALIDARG,
         !path.is_absolute() ||
-            (!wsl::windows::common::string::IsPathComponentEqual(path.extension().native(), wsl::windows::common::wslutil::c_vhdFileExtension) &&
-             !wsl::windows::common::string::IsPathComponentEqual(path.extension().c_str(), wsl::windows::common::wslutil::c_vhdxFileExtension)));
+            (!lsw::windows::common::string::IsPathComponentEqual(path.extension().native(), lsw::windows::common::lswutil::c_vhdFileExtension) &&
+             !lsw::windows::common::string::IsPathComponentEqual(path.extension().c_str(), lsw::windows::common::lswutil::c_vhdxFileExtension)));
 
     const wil::unique_hkey lxssKey = s_OpenLxssUserKey();
     std::lock_guard lock(m_instanceLock);
 
     // Create a registration for the distribution.
     //
-    // N.B. Import inplace is always WSL2.
+    // N.B. Import inplace is always LSW2.
     _ValidateDistributionNameAndPathNotInUse(lxssKey.get(), path.parent_path().c_str(), DistributionName);
 
     constexpr ULONG flags = LXSS_DISTRO_FLAGS_DEFAULT | LXSS_DISTRO_FLAGS_VM_MODE;
@@ -1289,7 +1289,7 @@ LxssUserSessionImpl::ImportDistributionInplace(_In_ LPCWSTR DistributionName, _I
     auto configuration = s_GetDistributionConfiguration(registration);
 
     // Declare a scope exit variable to clean up on failure.
-    const wil::unique_handle userToken = wsl::windows::common::security::GetUserToken(TokenImpersonation);
+    const wil::unique_handle userToken = lsw::windows::common::security::GetUserToken(TokenImpersonation);
     auto cleanup = wil::scope_exit_log(WI_DIAGNOSTICS_INFO, [&] {
         {
             auto runAsUser = wil::impersonate_token(userToken.get());
@@ -1306,7 +1306,7 @@ LxssUserSessionImpl::ImportDistributionInplace(_In_ LPCWSTR DistributionName, _I
     const auto& message = channel->GetChannel().ReceiveMessage<LX_MINI_INIT_IMPORT_RESULT>(&span);
 
     // Process the import result message.
-    THROW_HR_IF(WSL_E_IMPORT_FAILED, (message.Result != 0));
+    THROW_HR_IF(LSW_E_IMPORT_FAILED, (message.Result != 0));
 
     _ProcessImportResultMessage(message, span, lxssKey.get(), configuration, registration);
 
@@ -1319,7 +1319,7 @@ LxssUserSessionImpl::ImportDistributionInplace(_In_ LPCWSTR DistributionName, _I
     _LaunchOOBEIfNeeded();
 
     // Log when a distro is imported in place
-    WSL_LOG_TELEMETRY(
+    LSW_LOG_TELEMETRY(
         "ImportDistributionInplace",
         PDT_ProductAndServiceUsage,
         TraceLoggingValue(DistributionName, "distroName"),
@@ -1349,7 +1349,7 @@ HRESULT LxssUserSessionImpl::RegisterDistribution(
     HRESULT result = E_FAIL;
     auto registerExit = wil::scope_exit([&] {
         // Log when a distribution registration ends and its result
-        WSL_LOG_TELEMETRY(
+        LSW_LOG_TELEMETRY(
             "RegisterDistributionEnd",
             PDT_ProductAndServiceUsage,
             TraceLoggingValue(DistributionName, "name"),
@@ -1360,8 +1360,8 @@ HRESULT LxssUserSessionImpl::RegisterDistribution(
 
     try
     {
-        // Log when a distribution is being registered in WSL
-        WSL_LOG_TELEMETRY(
+        // Log when a distribution is being registered in LSW
+        LSW_LOG_TELEMETRY(
             "RegisterDistributionBegin",
             PDT_ProductAndServiceUsage,
             TraceLoggingValue(DistributionName, "name"),
@@ -1379,26 +1379,26 @@ HRESULT LxssUserSessionImpl::RegisterDistribution(
         // Determine the filesystem version. If WslFs is not enabled, downgrade
         // the version.
         ULONG FilesytemVersion = LXSS_DISTRO_VERSION_CURRENT;
-        if (wsl::windows::common::registry::ReadDword(lxssKey.get(), nullptr, WSL_NEW_DISTRO_LXFS, 0) != 0)
+        if (lsw::windows::common::registry::ReadDword(lxssKey.get(), nullptr, LSW_NEW_DISTRO_LXFS, 0) != 0)
         {
-            if (LXSS_DISTRO_USES_WSL_FS(FilesytemVersion) != FALSE)
+            if (LXSS_DISTRO_USES_LSW_FS(FilesytemVersion) != FALSE)
             {
                 FilesytemVersion = LXSS_DISTRO_VERSION_1;
             }
         }
 
         // Validate the version number.
-        if (Version == LXSS_WSL_VERSION_DEFAULT)
+        if (Version == LXSS_LSW_VERSION_DEFAULT)
         {
-            Version = wsl::windows::common::registry::ReadDword(lxssKey.get(), nullptr, LXSS_WSL_DEFAULT_VERSION, LXSS_WSL_VERSION_2);
+            Version = lsw::windows::common::registry::ReadDword(lxssKey.get(), nullptr, LXSS_LSW_DEFAULT_VERSION, LXSS_LSW_VERSION_2);
         }
 
-        RETURN_HR_IF(E_INVALIDARG, ((Version != LXSS_WSL_VERSION_1) && (Version != LXSS_WSL_VERSION_2)));
+        RETURN_HR_IF(E_INVALIDARG, ((Version != LXSS_LSW_VERSION_1) && (Version != LXSS_LSW_VERSION_2)));
 
-        // Registering a WSL1 distro is not possible if any VHD flags are specified.
+        // Registering a LSW1 distro is not possible if any VHD flags are specified.
         RETURN_HR_IF(
-            WSL_E_WSL2_NEEDED,
-            WI_IsAnyFlagSet(Flags, LXSS_IMPORT_DISTRO_FLAGS_VHD | LXSS_IMPORT_DISTRO_FLAGS_FIXED_VHD) && (Version == LXSS_WSL_VERSION_1));
+            LSW_E_LSW2_NEEDED,
+            WI_IsAnyFlagSet(Flags, LXSS_IMPORT_DISTRO_FLAGS_VHD | LXSS_IMPORT_DISTRO_FLAGS_FIXED_VHD) && (Version == LXSS_LSW_VERSION_1));
 
         // Registering a vhd with the fixed vhd flag is not allowed.
         if (WI_IsFlagSet(Flags, LXSS_IMPORT_DISTRO_FLAGS_VHD))
@@ -1409,13 +1409,13 @@ HRESULT LxssUserSessionImpl::RegisterDistribution(
         // Registering a distro with a fixed VHD is only allowed if a size is specified.
         RETURN_HR_IF(E_INVALIDARG, VhdSize == 0 && WI_IsFlagSet(Flags, LXSS_IMPORT_DISTRO_FLAGS_FIXED_VHD));
 
-        // Registering a WSL1 distro is not possible if the lxcore driver is not present.
-        RETURN_HR_IF(WSL_E_WSL1_NOT_SUPPORTED, (Version == LXSS_WSL_VERSION_1) && !g_lxcoreInitialized);
+        // Registering a LSW1 distro is not possible if the lxcore driver is not present.
+        RETURN_HR_IF(LSW_E_LSW1_NOT_SUPPORTED, (Version == LXSS_LSW_VERSION_1) && !g_lxcoreInitialized);
 
         DistributionRegistration registration;
         LXSS_DISTRO_CONFIGURATION configuration;
         std::filesystem::path distributionPath;
-        wil::unique_handle userToken = wsl::windows::common::security::GetUserToken(TokenImpersonation);
+        wil::unique_handle userToken = lsw::windows::common::security::GetUserToken(TokenImpersonation);
         auto config = _GetResultantConfig(userToken.get());
 
         {
@@ -1423,14 +1423,14 @@ HRESULT LxssUserSessionImpl::RegisterDistribution(
 
             // Create a registration for the distribution and determine which version should be used.
             ULONG flags = LXSS_DISTRO_FLAGS_DEFAULT;
-            WI_SetFlagIf(flags, LXSS_DISTRO_FLAGS_VM_MODE, (Version == LXSS_WSL_VERSION_2));
+            WI_SetFlagIf(flags, LXSS_DISTRO_FLAGS_VM_MODE, (Version == LXSS_LSW_VERSION_2));
 
             GUID DistributionId{};
             THROW_IF_FAILED(CoCreateGuid(&DistributionId));
 
             if (TargetDirectory == nullptr)
             {
-                distributionPath = config.DefaultDistributionLocation / wsl::shared::string::GuidToString<wchar_t>(DistributionId);
+                distributionPath = config.DefaultDistributionLocation / lsw::shared::string::GuidToString<wchar_t>(DistributionId);
             }
             else
             {
@@ -1480,13 +1480,13 @@ HRESULT LxssUserSessionImpl::RegisterDistribution(
         });
 
         // Initialize the filesystem.
-        wil::unique_handle clientProcess = wsl::windows::common::wslutil::OpenCallingProcess(GENERIC_READ | SYNCHRONIZE);
-        if (Version == LXSS_WSL_VERSION_2)
+        wil::unique_handle clientProcess = lsw::windows::common::lswutil::OpenCallingProcess(GENERIC_READ | SYNCHRONIZE);
+        if (Version == LXSS_LSW_VERSION_2)
         {
             if (WI_IsFlagSet(Flags, LXSS_IMPORT_DISTRO_FLAGS_VHD))
             {
                 auto runAsUser = wil::impersonate_token(userToken.get());
-                auto vhdFile = wsl::core::filesystem::CreateFile(
+                auto vhdFile = lsw::core::filesystem::CreateFile(
                     configuration.VhdFilePath.c_str(),
                     GENERIC_WRITE,
                     (FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE),
@@ -1495,7 +1495,7 @@ HRESULT LxssUserSessionImpl::RegisterDistribution(
                     GetUserSid());
 
                 deleteFlags = LXSS_DELETE_DISTRO_FLAGS_VHD;
-                wsl::windows::common::relay::InterruptableRelay(FileHandle, vhdFile.get(), clientProcess.get(), LXSS_RELAY_BUFFER_SIZE);
+                lsw::windows::common::relay::InterruptableRelay(FileHandle, vhdFile.get(), clientProcess.get(), LXSS_RELAY_BUFFER_SIZE);
             }
             else
             {
@@ -1507,7 +1507,7 @@ HRESULT LxssUserSessionImpl::RegisterDistribution(
                         VhdSize = config.VhdSizeBytes;
                     }
 
-                    wsl::core::filesystem::CreateVhd(
+                    lsw::core::filesystem::CreateVhd(
                         configuration.VhdFilePath.c_str(), VhdSize, GetUserSid(), config.EnableSparseVhd, WI_IsFlagSet(Flags, LXSS_IMPORT_DISTRO_FLAGS_FIXED_VHD));
 
                     deleteFlags = LXSS_DELETE_DISTRO_FLAGS_VHD;
@@ -1516,7 +1516,7 @@ HRESULT LxssUserSessionImpl::RegisterDistribution(
                 // Create a process in the utility VM to expand the tar file from a socket.
                 auto vmContext = _RunUtilityVmSetup(configuration, LxMiniInitMessageImport);
 
-                std::optional<wsl::windows::common::relay::ScopedRelay> errorRelay;
+                std::optional<lsw::windows::common::relay::ScopedRelay> errorRelay;
                 if (ErrorHandle != nullptr)
                 {
                     errorRelay.emplace(std::move(vmContext.errorSocket), ErrorHandle);
@@ -1525,7 +1525,7 @@ HRESULT LxssUserSessionImpl::RegisterDistribution(
                 // Relay the filesystem file contents to the tar.gz handle.
                 // Note: This is done in a separate thread because we can sometimes get stuck while writing the socket if tar exited without reading anything.
                 // Note: because the tarsSocket is moved, the relay owns it, meaning it will automatically close it when the relaying thread exits.
-                wsl::windows::common::relay::ScopedRelay dataRelay(FileHandle, std::move(vmContext.tarSocket));
+                lsw::windows::common::relay::ScopedRelay dataRelay(FileHandle, std::move(vmContext.tarSocket));
 
                 // Wait for the utility VM to finish expanding the tar and ensure that
                 // the operation was successful.
@@ -1541,7 +1541,7 @@ HRESULT LxssUserSessionImpl::RegisterDistribution(
                 }
 
                 // Process the import result message.
-                THROW_HR_IF(WSL_E_IMPORT_FAILED, (message.Result != 0));
+                THROW_HR_IF(LSW_E_IMPORT_FAILED, (message.Result != 0));
 
                 _ProcessImportResultMessage(message, span, lxssKey.get(), configuration, registration);
             }
@@ -1550,7 +1550,7 @@ HRESULT LxssUserSessionImpl::RegisterDistribution(
         {
             // Create the directory to store the root filesystem.
             const auto rootFsPath = configuration.BasePath / LXSS_ROOTFS_DIRECTORY;
-            wsl::windows::common::filesystem::CreateRootFs(rootFsPath.c_str(), configuration.Version);
+            lsw::windows::common::filesystem::CreateRootFs(rootFsPath.c_str(), configuration.Version);
             deleteFlags = LXSS_DELETE_DISTRO_FLAGS_ROOTFS;
 
             // Use bsdtar to extract the tar.gz file.
@@ -1567,7 +1567,7 @@ HRESULT LxssUserSessionImpl::RegisterDistribution(
                     static_cast<ULONG>(mounts.size()));
 
                 auto exitStatus = _GetElfExitStatus(elfContext);
-                THROW_HR_IF(WSL_E_IMPORT_FAILED, exitStatus != 0);
+                THROW_HR_IF(LSW_E_IMPORT_FAILED, exitStatus != 0);
             }
 
             // Invoke the init binary with the option to export the distribuiton information via stdout.
@@ -1588,18 +1588,18 @@ HRESULT LxssUserSessionImpl::RegisterDistribution(
                     mounts.data(),
                     static_cast<ULONG>(mounts.size()));
 
-                // Close handles that were marshalled to WSL1.
+                // Close handles that were marshalled to LSW1.
                 input.first.reset();
                 output.second.reset();
 
                 // Read the import result message from stdout.
-                wil::unique_handle clientProcess = wsl::windows::common::wslutil::OpenCallingProcess(GENERIC_READ | SYNCHRONIZE);
+                wil::unique_handle clientProcess = lsw::windows::common::lswutil::OpenCallingProcess(GENERIC_READ | SYNCHRONIZE);
                 MESSAGE_HEADER header{};
                 const auto headerSpan = gslhelpers::struct_as_writeable_bytes(header);
-                auto bytesRead = wsl::windows::common::relay::InterruptableRead(
+                auto bytesRead = lsw::windows::common::relay::InterruptableRead(
                     output.first.get(), gslhelpers::struct_as_writeable_bytes(header), {clientProcess.get()});
 
-                THROW_HR_IF(WSL_E_IMPORT_FAILED, bytesRead != headerSpan.size() || header.MessageSize <= headerSpan.size() || header.MessageType != LxMiniInitMessageImportResult);
+                THROW_HR_IF(LSW_E_IMPORT_FAILED, bytesRead != headerSpan.size() || header.MessageSize <= headerSpan.size() || header.MessageType != LxMiniInitMessageImportResult);
 
                 std::vector<gsl::byte> buffer(header.MessageSize);
                 const auto span = gsl::make_span(buffer);
@@ -1609,7 +1609,7 @@ HRESULT LxssUserSessionImpl::RegisterDistribution(
                 while (offset < span.size())
                 {
                     bytesRead =
-                        wsl::windows::common::relay::InterruptableRead(output.first.get(), span.subspan(offset), {clientProcess.get()});
+                        lsw::windows::common::relay::InterruptableRead(output.first.get(), span.subspan(offset), {clientProcess.get()});
                     if (bytesRead <= 0)
                     {
                         break;
@@ -1618,15 +1618,15 @@ HRESULT LxssUserSessionImpl::RegisterDistribution(
                     offset += bytesRead;
                 }
 
-                THROW_HR_IF(WSL_E_IMPORT_FAILED, offset != buffer.size());
+                THROW_HR_IF(LSW_E_IMPORT_FAILED, offset != buffer.size());
 
                 // Close the stdin write handle to let init exit and process the import result message.
                 input.second.reset();
                 auto exitStatus = _GetElfExitStatus(elfContext);
-                THROW_HR_IF(WSL_E_IMPORT_FAILED, exitStatus != 0);
+                THROW_HR_IF(LSW_E_IMPORT_FAILED, exitStatus != 0);
 
                 const auto message = gslhelpers::try_get_struct<LX_MINI_INIT_IMPORT_RESULT>(span);
-                THROW_HR_IF(WSL_E_IMPORT_FAILED, !message);
+                THROW_HR_IF(LSW_E_IMPORT_FAILED, !message);
 
                 _ProcessImportResultMessage(*message, span, lxssKey.get(), configuration, registration);
             }
@@ -1671,7 +1671,7 @@ try
     const auto registration = DistributionRegistration::Open(lxssKey.get(), *DistroGuid);
     const DWORD state = registration.Read(Property::State);
 
-    RETURN_HR_IF(WSL_E_DISTRO_NOT_FOUND, (state != LxssDistributionStateInstalled));
+    RETURN_HR_IF(LSW_E_DISTRO_NOT_FOUND, (state != LxssDistributionStateInstalled));
 
     // Set the distribution to the default.
     DistributionRegistration::SetDefault(lxssKey.get(), registration);
@@ -1693,22 +1693,22 @@ try
     // Don't attempt on V1
     if (WI_IsFlagClear(configuration.Flags, LXSS_DISTRO_FLAGS_VM_MODE))
     {
-        THROW_HR_WITH_USER_ERROR(WSL_E_VM_MODE_INVALID_STATE, wsl::shared::Localization::MessageSparseVhdWsl2Only());
+        THROW_HR_WITH_USER_ERROR(LSW_E_VM_MODE_INVALID_STATE, lsw::shared::Localization::MessageSparseVhdWsl2Only());
     }
 
     // Allow disabling sparse mode but not enabling until the data corruption issue has been resolved.
     if (Sparse && !AllowUnsafe)
     {
-        THROW_HR_WITH_USER_ERROR(E_INVALIDARG, wsl::shared::Localization::MessageSparseVhdDisabled());
+        THROW_HR_WITH_USER_ERROR(E_INVALIDARG, lsw::shared::Localization::MessageSparseVhdDisabled());
     }
 
     // Don't attempt if running
-    RETURN_HR_IF(WSL_E_DISTRO_NOT_STOPPED, m_runningInstances.contains(*DistroGuid));
+    RETURN_HR_IF(LSW_E_DISTRO_NOT_STOPPED, m_runningInstances.contains(*DistroGuid));
 
     const wil::unique_hfile vhd{::CreateFileW(configuration.VhdFilePath.c_str(), GENERIC_WRITE, 0, nullptr, OPEN_EXISTING, 0, nullptr)};
     if (const DWORD err = GetLastError(); err == ERROR_SHARING_VIOLATION)
     {
-        THROW_HR_WITH_USER_ERROR(HRESULT_FROM_WIN32(err), wsl::shared::Localization::MessageVhdInUse());
+        THROW_HR_WITH_USER_ERROR(HRESULT_FROM_WIN32(err), lsw::shared::Localization::MessageVhdInUse());
     }
     THROW_LAST_ERROR_IF(!vhd);
 
@@ -1728,28 +1728,28 @@ try
     const wil::unique_hkey lxssKey = s_OpenLxssUserKey();
     const auto registration = DistributionRegistration::Open(lxssKey.get(), *DistroGuid);
     LXSS_DISTRO_CONFIGURATION configuration = s_GetDistributionConfiguration(registration);
-    RETURN_HR_IF(WSL_E_WSL2_NEEDED, WI_IsFlagClear(configuration.Flags, LXSS_DISTRO_FLAGS_VM_MODE));
+    RETURN_HR_IF(LSW_E_LSW2_NEEDED, WI_IsFlagClear(configuration.Flags, LXSS_DISTRO_FLAGS_VM_MODE));
 
     const auto vhdFilePath = configuration.VhdFilePath;
     if (m_utilityVm && m_utilityVm->IsVhdAttached(vhdFilePath.c_str()))
     {
-        THROW_HR_WITH_USER_ERROR(WSL_E_DISTRO_NOT_STOPPED, wsl::shared::Localization::MessageVhdInUse());
+        THROW_HR_WITH_USER_ERROR(LSW_E_DISTRO_NOT_STOPPED, lsw::shared::Localization::MessageVhdInUse());
     }
 
-    auto diskHandle = wsl::core::filesystem::OpenVhd(vhdFilePath.c_str(), VIRTUAL_DISK_ACCESS_GET_INFO | VIRTUAL_DISK_ACCESS_METAOPS);
-    const auto diskSize = wsl::core::filesystem::GetDiskSize(diskHandle.get());
+    auto diskHandle = lsw::core::filesystem::OpenVhd(vhdFilePath.c_str(), VIRTUAL_DISK_ACCESS_GET_INFO | VIRTUAL_DISK_ACCESS_METAOPS);
+    const auto diskSize = lsw::core::filesystem::GetDiskSize(diskHandle.get());
 
     const auto resizingLarger = NewSize > diskSize;
     if (resizingLarger)
     {
-        wsl::core::filesystem::ResizeExistingVhd(diskHandle.get(), NewSize, RESIZE_VIRTUAL_DISK_FLAG_NONE);
+        lsw::core::filesystem::ResizeExistingVhd(diskHandle.get(), NewSize, RESIZE_VIRTUAL_DISK_FLAG_NONE);
     }
 
     diskHandle.reset();
 
     // Ensure VM exists and attach the VHD.
     _CreateVm();
-    const auto userToken = wsl::windows::common::security::GetUserToken(TokenImpersonation);
+    const auto userToken = lsw::windows::common::security::GetUserToken(TokenImpersonation);
     const auto lun = m_utilityVm->AttachDisk(vhdFilePath.c_str(), WslCoreVm::DiskType::VHD, {}, true, userToken.get());
 
     // Resize the underlying filesystem.
@@ -1764,11 +1764,11 @@ try
     //
     // N.B. RESIZE_VIRTUAL_DISK_FLAG_ALLOW_UNSAFE_VIRTUAL_SIZE is required because vhdmp can't validate that the minimum safe ext4 size.
     if (!resizingLarger &&
-        wsl::shared::string::IsEqual(vhdFilePath.extension().c_str(), wsl::windows::common::wslutil::c_vhdxFileExtension, true))
+        lsw::shared::string::IsEqual(vhdFilePath.extension().c_str(), lsw::windows::common::lswutil::c_vhdxFileExtension, true))
     {
         const auto diskHandle =
-            wsl::core::filesystem::OpenVhd(vhdFilePath.c_str(), VIRTUAL_DISK_ACCESS_GET_INFO | VIRTUAL_DISK_ACCESS_METAOPS);
-        wsl::core::filesystem::ResizeExistingVhd(diskHandle.get(), NewSize, RESIZE_VIRTUAL_DISK_FLAG_ALLOW_UNSAFE_VIRTUAL_SIZE);
+            lsw::core::filesystem::OpenVhd(vhdFilePath.c_str(), VIRTUAL_DISK_ACCESS_GET_INFO | VIRTUAL_DISK_ACCESS_METAOPS);
+        lsw::core::filesystem::ResizeExistingVhd(diskHandle.get(), NewSize, RESIZE_VIRTUAL_DISK_FLAG_ALLOW_UNSAFE_VIRTUAL_SIZE);
     }
 
     return S_OK;
@@ -1777,7 +1777,7 @@ CATCH_RETURN()
 
 HRESULT LxssUserSessionImpl::SetVersion(_In_ LPCGUID DistroGuid, _In_ ULONG Version, _In_ HANDLE StderrHandle)
 {
-    RETURN_HR_IF(E_INVALIDARG, ((Version != LXSS_WSL_VERSION_1) && (Version != LXSS_WSL_VERSION_2)));
+    RETURN_HR_IF(E_INVALIDARG, ((Version != LXSS_LSW_VERSION_1) && (Version != LXSS_LSW_VERSION_2)));
 
     DistributionRegistration registration;
     LXSS_DISTRO_CONFIGURATION configuration;
@@ -1793,25 +1793,25 @@ HRESULT LxssUserSessionImpl::SetVersion(_In_ LPCGUID DistroGuid, _In_ ULONG Vers
         RETURN_HR_IF(E_ILLEGAL_STATE_CHANGE, (configuration.State != LxssDistributionStateInstalled));
 
         // Ensure distro is not already in the requested state.
-        if (Version == LXSS_WSL_VERSION_1)
+        if (Version == LXSS_LSW_VERSION_1)
         {
-            RETURN_HR_IF(WSL_E_VM_MODE_INVALID_STATE, WI_IsFlagClear(configuration.Flags, LXSS_DISTRO_FLAGS_VM_MODE));
+            RETURN_HR_IF(LSW_E_VM_MODE_INVALID_STATE, WI_IsFlagClear(configuration.Flags, LXSS_DISTRO_FLAGS_VM_MODE));
         }
         else
         {
             // The legacy distribution does not support VM mode.
-            RETURN_HR_IF(WSL_E_VM_MODE_NOT_SUPPORTED, (configuration.Version == LXSS_DISTRO_VERSION_LEGACY));
+            RETURN_HR_IF(LSW_E_VM_MODE_NOT_SUPPORTED, (configuration.Version == LXSS_DISTRO_VERSION_LEGACY));
 
-            RETURN_HR_IF(WSL_E_VM_MODE_INVALID_STATE, WI_IsFlagSet(configuration.Flags, LXSS_DISTRO_FLAGS_VM_MODE));
+            RETURN_HR_IF(LSW_E_VM_MODE_INVALID_STATE, WI_IsFlagSet(configuration.Flags, LXSS_DISTRO_FLAGS_VM_MODE));
         }
 
         // Conversion is not possible if the lxcore driver is not present.
-        RETURN_HR_IF(WSL_E_WSL1_NOT_SUPPORTED, !g_lxcoreInitialized);
+        RETURN_HR_IF(LSW_E_LSW1_NOT_SUPPORTED, !g_lxcoreInitialized);
 
         // Add the distribution to the list of converting distributions.
         _ConversionBegin(configuration.DistroId, LxssDistributionStateConverting);
 
-        // Remove the distribution ID from m_updatedInitDistros so init is updated on the next launch (in the case of a conversion to WSL1).
+        // Remove the distribution ID from m_updatedInitDistros so init is updated on the next launch (in the case of a conversion to LSW1).
         m_updatedInitDistros.erase(
             std::remove(m_updatedInitDistros.begin(), m_updatedInitDistros.end(), configuration.DistroId), m_updatedInitDistros.end());
     }
@@ -1821,7 +1821,7 @@ HRESULT LxssUserSessionImpl::SetVersion(_In_ LPCGUID DistroGuid, _In_ ULONG Vers
     auto conversionComplete = wil::scope_exit_log(WI_DIAGNOSTICS_INFO, [&] { _ConversionComplete(configuration.DistroId); });
 
     // Log telemetry to track how long enabling VM mode takes.
-    WSL_LOG_TELEMETRY(
+    LSW_LOG_TELEMETRY(
         "SetVersionBegin",
         PDT_ProductAndServicePerformance,
         TraceLoggingValue(configuration.Name.c_str(), "distroName"),
@@ -1829,7 +1829,7 @@ HRESULT LxssUserSessionImpl::SetVersion(_In_ LPCGUID DistroGuid, _In_ ULONG Vers
 
     HRESULT result;
     auto setVersionComplete = wil::scope_exit([&] {
-        WSL_LOG_TELEMETRY(
+        LSW_LOG_TELEMETRY(
             "SetVersionEnd",
             PDT_ProductAndServicePerformance,
             TraceLoggingValue(configuration.Name.c_str(), "distroName"),
@@ -1840,7 +1840,7 @@ HRESULT LxssUserSessionImpl::SetVersion(_In_ LPCGUID DistroGuid, _In_ ULONG Vers
     try
     {
         ULONG deleteFlags = 0;
-        wil::unique_handle userToken = wsl::windows::common::security::GetUserToken(TokenImpersonation);
+        wil::unique_handle userToken = lsw::windows::common::security::GetUserToken(TokenImpersonation);
         auto cleanup = wil::scope_exit_log(WI_DIAGNOSTICS_INFO, [&] {
             auto runAsUser = wil::impersonate_token(userToken.get());
             _DeleteDistribution(configuration, deleteFlags);
@@ -1868,7 +1868,7 @@ HRESULT LxssUserSessionImpl::SetVersion(_In_ LPCGUID DistroGuid, _In_ ULONG Vers
                         THROW_IF_WIN32_BOOL_FALSE(WriteFile(StderrHandle, "\n", 1, nullptr, nullptr));
                     }
 
-                    THROW_IF_WIN32_BOOL_FALSE(WriteFile(StderrHandle, Index == 0 ? "wsl1: " : "wsl2: ", 6, nullptr, nullptr));
+                    THROW_IF_WIN32_BOOL_FALSE(WriteFile(StderrHandle, Index == 0 ? "lsw1: " : "lsw2: ", 6, nullptr, nullptr));
                     wroteLf = false;
                     lastIndex = Index;
                 }
@@ -1886,15 +1886,15 @@ HRESULT LxssUserSessionImpl::SetVersion(_In_ LPCGUID DistroGuid, _In_ ULONG Vers
             }
         };
 
-        wil::unique_handle clientProcess = wsl::windows::common::wslutil::OpenCallingProcess(GENERIC_READ | SYNCHRONIZE);
+        wil::unique_handle clientProcess = lsw::windows::common::lswutil::OpenCallingProcess(GENERIC_READ | SYNCHRONIZE);
         std::string commandLine{LXSS_BSDTAR_PATH};
         ULONG newFlags = configuration.Flags;
-        if (Version == LXSS_WSL_VERSION_1)
+        if (Version == LXSS_LSW_VERSION_1)
         {
-            auto policiesKey = wsl::windows::policies::OpenPoliciesKey();
-            if (!wsl::windows::policies::IsFeatureAllowed(policiesKey.get(), wsl::windows::policies::c_allowWSL1))
+            auto policiesKey = lsw::windows::policies::OpenPoliciesKey();
+            if (!lsw::windows::policies::IsFeatureAllowed(policiesKey.get(), lsw::windows::policies::c_allowLSW1))
             {
-                THROW_HR_WITH_USER_ERROR(WSL_E_WSL1_DISABLED, wsl::shared::Localization::MessageWSL1Disabled());
+                THROW_HR_WITH_USER_ERROR(LSW_E_LSW1_DISABLED, lsw::shared::Localization::MessageLSW1Disabled());
             }
 
             auto rootfsPath = configuration.BasePath / LXSS_ROOTFS_DIRECTORY;
@@ -1907,7 +1907,7 @@ HRESULT LxssUserSessionImpl::SetVersion(_In_ LPCGUID DistroGuid, _In_ ULONG Vers
                     _DeleteDistributionLockHeld(configuration, LXSS_DELETE_DISTRO_FLAGS_ROOTFS);
                 }
 
-                wsl::windows::common::filesystem::CreateRootFs(rootfsPath.c_str(), configuration.Version);
+                lsw::windows::common::filesystem::CreateRootFs(rootfsPath.c_str(), configuration.Version);
                 deleteFlags = LXSS_DELETE_DISTRO_FLAGS_ROOTFS;
             }
 
@@ -1915,10 +1915,10 @@ HRESULT LxssUserSessionImpl::SetVersion(_In_ LPCGUID DistroGuid, _In_ ULONG Vers
             // socket.
             auto vmContext = _RunUtilityVmSetup(configuration, LxMiniInitMessageExport, 0, true);
 
-            auto wsl1Pipe = wsl::windows::common::wslutil::OpenAnonymousPipe(LX_RELAY_BUFFER_SIZE, true, true);
+            auto lsw1Pipe = lsw::windows::common::lswutil::OpenAnonymousPipe(LX_RELAY_BUFFER_SIZE, true, true);
 
-            wsl::windows::common::relay::ScopedMultiRelay stdErrRelay(
-                std::vector<HANDLE>{wsl1Pipe.first.get(), reinterpret_cast<HANDLE*>(vmContext.errorSocket.get())}, onTarOutput);
+            lsw::windows::common::relay::ScopedMultiRelay stdErrRelay(
+                std::vector<HANDLE>{lsw1Pipe.first.get(), reinterpret_cast<HANDLE*>(vmContext.errorSocket.get())}, onTarOutput);
 
             // Add mounts for the rootfs and tools.
             auto mounts = _CreateSetupMounts(configuration);
@@ -1936,25 +1936,25 @@ HRESULT LxssUserSessionImpl::SetVersion(_In_ LPCGUID DistroGuid, _In_ ULONG Vers
                 clientProcess.get(),
                 reinterpret_cast<HANDLE>(vmContext.tarSocket.get()),
                 nullptr,
-                wsl1Pipe.second.get(),
+                lsw1Pipe.second.get(),
                 mounts.data(),
                 static_cast<ULONG>(mounts.size()));
 
-            wsl1Pipe.second.reset();
+            lsw1Pipe.second.reset();
 
             // Wait for the utility VM to finish creating the tar and ensure that
             // the export was successful.
             LONG exitStatus = 1;
             vmContext.instance->GetInitPort()->Receive(&exitStatus, sizeof(exitStatus), clientProcess.get());
-            THROW_HR_IF(WSL_E_EXPORT_FAILED, (exitStatus != 0));
+            THROW_HR_IF(LSW_E_EXPORT_FAILED, (exitStatus != 0));
 
             // Wait for the elf binary to finish expanding the tar and ensure
             // that it was successful.
             exitStatus = _GetElfExitStatus(elfContext);
-            THROW_HR_IF(WSL_E_IMPORT_FAILED, exitStatus != 0);
+            THROW_HR_IF(LSW_E_IMPORT_FAILED, exitStatus != 0);
 
             // Import from the vhd was successful.
-            deleteFlags = LXSS_DELETE_DISTRO_FLAGS_VHD | LXSS_DELETE_DISTRO_FLAGS_WSLG_SHORTCUTS;
+            deleteFlags = LXSS_DELETE_DISTRO_FLAGS_VHD | LXSS_DELETE_DISTRO_FLAGS_LSWG_SHORTCUTS;
             WI_ClearFlag(newFlags, LXSS_DISTRO_FLAGS_VM_MODE);
         }
         else
@@ -1967,7 +1967,7 @@ HRESULT LxssUserSessionImpl::SetVersion(_In_ LPCGUID DistroGuid, _In_ ULONG Vers
             // Create a vhd to store the root filesystem.
             {
                 auto runAsUser = wil::impersonate_token(userToken.get());
-                wsl::core::filesystem::CreateVhd(
+                lsw::core::filesystem::CreateVhd(
                     configuration.VhdFilePath.c_str(),
                     m_utilityVm->GetConfig().VhdSizeBytes,
                     GetUserSid(),
@@ -1980,10 +1980,10 @@ HRESULT LxssUserSessionImpl::SetVersion(_In_ LPCGUID DistroGuid, _In_ ULONG Vers
             // Create a process in the utility VM to expand the tar file from a socket.
             auto vmContext = _RunUtilityVmSetup(configuration, LxMiniInitMessageImport, 0, true);
 
-            auto wsl1Pipe = wsl::windows::common::wslutil::OpenAnonymousPipe(LX_RELAY_BUFFER_SIZE, true, true);
+            auto lsw1Pipe = lsw::windows::common::lswutil::OpenAnonymousPipe(LX_RELAY_BUFFER_SIZE, true, true);
 
-            wsl::windows::common::relay::ScopedMultiRelay stdErrRelay(
-                std::vector<HANDLE>{wsl1Pipe.first.get(), reinterpret_cast<HANDLE*>(vmContext.errorSocket.get())}, onTarOutput);
+            lsw::windows::common::relay::ScopedMultiRelay stdErrRelay(
+                std::vector<HANDLE>{lsw1Pipe.first.get(), reinterpret_cast<HANDLE*>(vmContext.errorSocket.get())}, onTarOutput);
 
             // Add mounts for the rootfs and tools.
             auto mounts = _CreateSetupMounts(configuration);
@@ -2001,14 +2001,14 @@ HRESULT LxssUserSessionImpl::SetVersion(_In_ LPCGUID DistroGuid, _In_ ULONG Vers
                 clientProcess.get(),
                 nullptr,
                 reinterpret_cast<HANDLE>(vmContext.tarSocket.get()),
-                wsl1Pipe.second.get(),
+                lsw1Pipe.second.get(),
                 mounts.data(),
                 static_cast<ULONG>(mounts.size()));
 
-            wsl1Pipe.second.reset();
+            lsw1Pipe.second.reset();
 
             LONG exitStatus = _GetElfExitStatus(elfContext);
-            THROW_HR_IF(WSL_E_IMPORT_FAILED, exitStatus != 0);
+            THROW_HR_IF(LSW_E_IMPORT_FAILED, exitStatus != 0);
 
             // Close the socket now that all data has been written.
             vmContext.tarSocket.reset();
@@ -2023,13 +2023,13 @@ HRESULT LxssUserSessionImpl::SetVersion(_In_ LPCGUID DistroGuid, _In_ ULONG Vers
 
             if (message.FlavorIndex > 0)
             {
-                configuration.Flavor = wsl::shared::string::MultiByteToWide(wsl::shared::string::FromSpan(span, message.FlavorIndex));
+                configuration.Flavor = lsw::shared::string::MultiByteToWide(lsw::shared::string::FromSpan(span, message.FlavorIndex));
                 registration.Write(Property::Flavor, configuration.Flavor.c_str());
             }
 
             if (message.VersionIndex > 0)
             {
-                configuration.OsVersion = wsl::shared::string::MultiByteToWide(wsl::shared::string::FromSpan(span, message.VersionIndex));
+                configuration.OsVersion = lsw::shared::string::MultiByteToWide(lsw::shared::string::FromSpan(span, message.VersionIndex));
                 registration.Write(Property::OsVersion, configuration.OsVersion.c_str());
             }
 
@@ -2061,14 +2061,14 @@ HRESULT LxssUserSessionImpl::Shutdown(_In_ bool PreventNewInstances, bool ForceT
             auto vmId = m_vmId.load();
             if (!IsEqualGUID(vmId, GUID_NULL))
             {
-                auto vmIdStr = wsl::shared::string::GuidToString<wchar_t>(vmId, wsl::shared::string::GuidToStringFlags::Uppercase);
+                auto vmIdStr = lsw::shared::string::GuidToString<wchar_t>(vmId, lsw::shared::string::GuidToStringFlags::Uppercase);
 
                 auto result = wil::ResultFromException([&]() {
-                    auto computeSystem = wsl::windows::common::hcs::OpenComputeSystem(vmIdStr.c_str(), GENERIC_ALL);
-                    wsl::windows::common::hcs::TerminateComputeSystem(computeSystem.get());
+                    auto computeSystem = lsw::windows::common::hcs::OpenComputeSystem(vmIdStr.c_str(), GENERIC_ALL);
+                    lsw::windows::common::hcs::TerminateComputeSystem(computeSystem.get());
                 });
 
-                WSL_LOG("ForceTerminateVm", TraceLoggingValue(result, "Result"));
+                LSW_LOG("ForceTerminateVm", TraceLoggingValue(result, "Result"));
             }
         }
 
@@ -2088,10 +2088,10 @@ HRESULT LxssUserSessionImpl::Shutdown(_In_ bool PreventNewInstances, bool ForceT
             m_httpProxyStateTracker.reset();
 
             // Clear any attached disk state.
-            // This is needed because wsl --shutdown might be called after the vm
+            // This is needed because lsw --shutdown might be called after the vm
             // has timed out (and so the disks states would have been written in the registry)
-            const auto key = wsl::windows::common::registry::OpenOrCreateLxssDiskMountsKey(&m_userSid.Sid);
-            wsl::windows::common::registry::ClearSubkeys(key.get());
+            const auto key = lsw::windows::common::registry::OpenOrCreateLxssDiskMountsKey(&m_userSid.Sid);
+            lsw::windows::common::registry::ClearSubkeys(key.get());
 
             WI_ASSERT(!PreventNewInstances || !m_disableNewInstanceCreation);
 
@@ -2114,9 +2114,9 @@ HRESULT LxssUserSessionImpl::Shutdown(_In_ bool PreventNewInstances, bool ForceT
 void LxssUserSessionImpl::TelemetryWorker(_In_ wil::unique_socket&& socket, _In_ bool drvFsNotifications) const
 try
 {
-    wsl::windows::common::wslutil::SetThreadDescription(L"Telemetry");
+    lsw::windows::common::lswutil::SetThreadDescription(L"Telemetry");
 
-    wsl::shared::SocketChannel channel(std::move(socket), "Telemetry", m_vmTerminating.get());
+    lsw::shared::SocketChannel channel(std::move(socket), "Telemetry", m_vmTerminating.get());
 
     // Aggregate information about what is running inside the VM. This is logged
     // periodically because logging each event individually would be too noisy.
@@ -2130,16 +2130,16 @@ try
 
         std::map<std::string, size_t> events{};
 
-        std::string content = wsl::shared::string::FromSpan(Span, offsetof(LX_MINI_INIT_TELEMETRY_MESSAGE, Buffer));
-        auto values = wsl::shared::string::Split<char>(content, '/');
+        std::string content = lsw::shared::string::FromSpan(Span, offsetof(LX_MINI_INIT_TELEMETRY_MESSAGE, Buffer));
+        auto values = lsw::shared::string::Split<char>(content, '/');
 
         THROW_HR_IF(E_UNEXPECTED, values.size() % 2 != 0);
 
-        // Periodically log an event to track active WSL usage. This event must be marked as
+        // Periodically log an event to track active LSW usage. This event must be marked as
         // 'MICROSOFT_KEYWORD_CRITICAL_DATA' and not MICROSOFT_KEYWORD_MEASURES.
         //
         // N.B. The count and imageName values are unused but required because they were present in the approved critical event.
-        WSL_LOG(
+        LSW_LOG(
             "ExecCritical",
             TelemetryPrivacyDataTag(PDT_ProductAndServiceUsage),
             TraceLoggingKeyword(MICROSOFT_KEYWORD_CRITICAL_DATA),
@@ -2149,8 +2149,8 @@ try
 
         for (size_t i = 0; i < values.size(); i += 2)
         {
-            // Log an aggregated account of the binary names run in WSL and their counts, used to determine popular use cases and prioritize support for issues
-            WSL_LOG_TELEMETRY(
+            // Log an aggregated account of the binary names run in LSW and their counts, used to determine popular use cases and prioritize support for issues
+            LSW_LOG_TELEMETRY(
                 "Exec",
                 PDT_ProductAndServiceUsage,
                 TraceLoggingValue(std::stoull(values[i + 1]), "count"),
@@ -2161,7 +2161,7 @@ try
         if (drvFsNotifications && Message->ShowDrvFsNotification && !values.empty())
         {
             // If a drvfs notification is requested, the first entry is the executable that triggered it.
-            LOG_IF_FAILED(wsl::windows::common::notifications::DisplayFilesystemNotification(values[0].c_str()));
+            LOG_IF_FAILED(lsw::windows::common::notifications::DisplayFilesystemNotification(values[0].c_str()));
             drvFsNotifications = false;
         }
     }
@@ -2236,7 +2236,7 @@ HRESULT LxssUserSessionImpl::UnregisterDistribution(_In_ LPCGUID DistroGuid)
         // Only log the end event if a distro was found.
         if (configuration.Name.size() > 0)
         {
-            WSL_LOG(
+            LSW_LOG(
                 "UnregisterDistributionEnd",
                 TraceLoggingValue(configuration.Name.c_str(), "name"),
                 TraceLoggingHexUInt32(result, "result"));
@@ -2249,12 +2249,12 @@ HRESULT LxssUserSessionImpl::UnregisterDistribution(_In_ LPCGUID DistroGuid)
 
         // Set up a scope exit lambda to delete the distribution registry key
         // when the function exits.
-        auto removedDistroString = wsl::shared::string::GuidToString<wchar_t>(*DistroGuid);
+        auto removedDistroString = lsw::shared::string::GuidToString<wchar_t>(*DistroGuid);
         bool removeDistro = false;
         auto deleteDistroKey = wil::scope_exit([&] {
             if (removeDistro)
             {
-                wsl::windows::common::registry::DeleteKey(lxssKey.get(), removedDistroString.c_str());
+                lsw::windows::common::registry::DeleteKey(lxssKey.get(), removedDistroString.c_str());
             }
         });
 
@@ -2266,7 +2266,7 @@ HRESULT LxssUserSessionImpl::UnregisterDistribution(_In_ LPCGUID DistroGuid)
             configuration = s_GetDistributionConfiguration(registration);
 
             // Log telemetry about the distribution being removed.
-            WSL_LOG_TELEMETRY(
+            LSW_LOG_TELEMETRY(
                 "UnregisterDistributionBegin", PDT_ProductAndServiceUsage, TraceLoggingValue(configuration.Name.c_str(), "name"));
 
             // Ensure that a filesystem export is not in progress.
@@ -2343,19 +2343,19 @@ _Requires_exclusive_lock_held_(m_instanceLock)
 void LxssUserSessionImpl::_CreateLegacyRegistration(_In_ HKEY LxssKey, _In_ HANDLE UserToken)
 {
     // Delete any existing legacy registration.
-    const auto distroGuidString = wsl::shared::string::GuidToString<wchar_t>(LXSS_LEGACY_DISTRO_GUID);
-    wsl::windows::common::registry::DeleteKey(LxssKey, distroGuidString.c_str());
+    const auto distroGuidString = lsw::shared::string::GuidToString<wchar_t>(LXSS_LEGACY_DISTRO_GUID);
+    lsw::windows::common::registry::DeleteKey(LxssKey, distroGuidString.c_str());
 
     // Migrate legacy default user configuration.
-    const ULONG defaultUid = wsl::windows::common::registry::ReadDword(LxssKey, nullptr, WSL_DISTRO_CONFIG_DEFAULT_UID, LX_UID_ROOT);
+    const ULONG defaultUid = lsw::windows::common::registry::ReadDword(LxssKey, nullptr, LSW_DISTRO_CONFIG_DEFAULT_UID, LX_UID_ROOT);
     DWORD configFlags = LXSS_DISTRO_FLAGS_DEFAULT;
-    DWORD enabled = wsl::windows::common::registry::ReadDword(LxssKey, nullptr, LXSS_LEGACY_APPEND_NT_PATH, 1);
+    DWORD enabled = lsw::windows::common::registry::ReadDword(LxssKey, nullptr, LXSS_LEGACY_APPEND_NT_PATH, 1);
     WI_ClearFlagIf(configFlags, LXSS_DISTRO_FLAGS_APPEND_NT_PATH, (enabled == 0));
-    enabled = wsl::windows::common::registry::ReadDword(LxssKey, nullptr, LXSS_LEGACY_INTEROP_ENABLED, 1);
+    enabled = lsw::windows::common::registry::ReadDword(LxssKey, nullptr, LXSS_LEGACY_INTEROP_ENABLED, 1);
     WI_ClearFlagIf(configFlags, LXSS_DISTRO_FLAGS_ENABLE_INTEROP, (enabled == 0));
 
     // Create a new registration for the legacy distro.
-    const auto basePath = wsl::windows::common::filesystem::GetLegacyBasePath(UserToken);
+    const auto basePath = lsw::windows::common::filesystem::GetLegacyBasePath(UserToken);
 
     DistributionRegistration::Create(
         LxssKey, LXSS_LEGACY_DISTRO_GUID, LXSS_LEGACY_INSTALL_NAME, LXSS_DISTRO_VERSION_LEGACY, basePath.c_str(), configFlags, defaultUid, nullptr, LXSS_VM_MODE_VHD_NAME, false);
@@ -2363,22 +2363,22 @@ void LxssUserSessionImpl::_CreateLegacyRegistration(_In_ HKEY LxssKey, _In_ HAND
     _SetDistributionInstalled(LxssKey, LXSS_LEGACY_DISTRO_GUID);
 }
 
-std::vector<wsl::windows::common::filesystem::unique_lxss_addmount> LxssUserSessionImpl::_CreateSetupMounts(_In_ const LXSS_DISTRO_CONFIGURATION& Configuration)
+std::vector<lsw::windows::common::filesystem::unique_lxss_addmount> LxssUserSessionImpl::_CreateSetupMounts(_In_ const LXSS_DISTRO_CONFIGURATION& Configuration)
 {
     // Add a rootfs mount.
     auto runAsUser = wil::CoImpersonateClient();
     const auto rootFsPath = Configuration.BasePath / LXSS_ROOTFS_DIRECTORY;
-    std::vector<wsl::windows::common::filesystem::unique_lxss_addmount> mounts;
-    mounts.emplace_back(wsl::windows::common::filesystem::CreateMount(
-        rootFsPath.c_str(), LXSS_ROOTFS_DIRECTORY, LXSS_ROOTFS_MOUNT, LXSS_DISTRO_USES_WSL_FS(Configuration.Version) ? LXSS_FS_TYPE_WSLFS : LXSS_FS_TYPE_LXFS, 0755));
+    std::vector<lsw::windows::common::filesystem::unique_lxss_addmount> mounts;
+    mounts.emplace_back(lsw::windows::common::filesystem::CreateMount(
+        rootFsPath.c_str(), LXSS_ROOTFS_DIRECTORY, LXSS_ROOTFS_MOUNT, LXSS_DISTRO_USES_LSW_FS(Configuration.Version) ? LXSS_FS_TYPE_LSWFS : LXSS_FS_TYPE_LXFS, 0755));
 
     // Add a read only sharefs mount to the inbox tools directory which contains the bsdtar binary.
     std::wstring systemDirectory;
     THROW_IF_FAILED(wil::GetSystemDirectoryW(systemDirectory));
 
     // Add a read only sharefs mount to the packaged tools directory which contains the init binary.
-    const auto initPath = wsl::windows::common::wslutil::GetBasePath() / L"tools";
-    mounts.emplace_back(wsl::windows::common::filesystem::CreateMount(
+    const auto initPath = lsw::windows::common::lswutil::GetBasePath() / L"tools";
+    mounts.emplace_back(lsw::windows::common::filesystem::CreateMount(
         initPath.c_str(), initPath.c_str(), LXSS_TOOLS_MOUNT, LXSS_FS_TYPE_SHAREFS, 0755, false));
 
     return mounts;
@@ -2401,7 +2401,7 @@ std::shared_ptr<LxssRunningInstance> LxssUserSessionImpl::_CreateInstance(_In_op
 
     wil::unique_hkey lxssKey = s_OpenLxssUserKey();
     DistributionRegistration registration;
-    wil::unique_handle userToken = wsl::windows::common::security::GetUserToken(TokenImpersonation);
+    wil::unique_handle userToken = lsw::windows::common::security::GetUserToken(TokenImpersonation);
 
     std::shared_ptr<LxssRunningInstance> instance;
     {
@@ -2427,14 +2427,14 @@ std::shared_ptr<LxssRunningInstance> LxssUserSessionImpl::_CreateInstance(_In_op
             THROW_HR_IF(E_ILLEGAL_STATE_CHANGE, (configuration.State != LxssDistributionStateInstalled));
 
             // Determine the distribution version.
-            ULONG version = WI_IsFlagSet(configuration.Flags, LXSS_DISTRO_FLAGS_VM_MODE) ? LXSS_WSL_VERSION_2 : LXSS_WSL_VERSION_1;
+            ULONG version = WI_IsFlagSet(configuration.Flags, LXSS_DISTRO_FLAGS_VM_MODE) ? LXSS_LSW_VERSION_2 : LXSS_LSW_VERSION_1;
 
             // Create a GUID for the instance.
             GUID instanceId;
             THROW_IF_FAILED(CoCreateGuid(&instanceId));
 
             // Log telemetry to determine how long instance creation takes.
-            WSL_LOG_TELEMETRY(
+            LSW_LOG_TELEMETRY(
                 "CreateInstanceBegin",
                 PDT_ProductAndServicePerformance,
                 TraceLoggingValue(configuration.Name.c_str(), "distroName"),
@@ -2444,7 +2444,7 @@ std::shared_ptr<LxssRunningInstance> LxssUserSessionImpl::_CreateInstance(_In_op
             HRESULT result = E_UNEXPECTED;
 
             auto createEnd = wil::scope_exit_log(WI_DIAGNOSTICS_INFO, [&] {
-                WSL_LOG_TELEMETRY(
+                LSW_LOG_TELEMETRY(
                     "CreateInstanceEnd",
                     PDT_ProductAndServicePerformance,
                     TraceLoggingValue(configuration.Name.c_str(), "distroName"),
@@ -2457,15 +2457,15 @@ std::shared_ptr<LxssRunningInstance> LxssUserSessionImpl::_CreateInstance(_In_op
             try
             {
                 auto clientKey = m_lifetimeManager.GetRegistrationId();
-                if (version == LXSS_WSL_VERSION_1)
+                if (version == LXSS_LSW_VERSION_1)
                 {
-                    auto key = wsl::windows::policies::OpenPoliciesKey();
-                    if (!wsl::windows::policies::IsFeatureAllowed(key.get(), wsl::windows::policies::c_allowWSL1))
+                    auto key = lsw::windows::policies::OpenPoliciesKey();
+                    if (!lsw::windows::policies::IsFeatureAllowed(key.get(), lsw::windows::policies::c_allowLSW1))
                     {
                         THROW_HR_WITH_USER_ERROR(
-                            WSL_E_WSL1_DISABLED,
-                            wsl::shared::Localization::MessageWSL1Disabled() + L"\n" +
-                                wsl::shared::Localization::MessageUpgradeToWSL2(configuration.Name));
+                            LSW_E_LSW1_DISABLED,
+                            lsw::shared::Localization::MessageLSW1Disabled() + L"\n" +
+                                lsw::shared::Localization::MessageUpgradeToLSW2(configuration.Name));
                     }
 
                     instance = std::make_shared<LxssInstance>(
@@ -2487,14 +2487,14 @@ std::shared_ptr<LxssRunningInstance> LxssUserSessionImpl::_CreateInstance(_In_op
                 }
 
                 // Log telemetry to determine how long initialization takes.
-                WSL_LOG(
+                LSW_LOG(
                     "InitializeInstanceBegin",
                     TraceLoggingValue(configuration.Name.c_str(), "distroName"),
                     TraceLoggingValue(version, "version"),
                     TraceLoggingValue(instanceId, "instanceId"));
 
                 auto initializeEnd = wil::scope_exit_log(WI_DIAGNOSTICS_INFO, [&] {
-                    WSL_LOG(
+                    LSW_LOG(
                         "InitializeInstanceEnd",
                         TraceLoggingKeyword(MICROSOFT_KEYWORD_CRITICAL_DATA),
                         TraceLoggingValue(configuration.Name.c_str(), "distroName"),
@@ -2508,7 +2508,7 @@ std::shared_ptr<LxssRunningInstance> LxssUserSessionImpl::_CreateInstance(_In_op
                 const auto* distributionInfo = instance->DistributionInformation();
                 if (distributionInfo->Flavor != nullptr && distributionInfo->Flavor != configuration.Flavor)
                 {
-                    WSL_LOG(
+                    LSW_LOG(
                         "DistributionFlavorChange",
                         TraceLoggingValue(distributionInfo->Flavor, "NewFlavor"),
                         TraceLoggingValue(configuration.Flavor.c_str(), "OldFlavor"),
@@ -2520,7 +2520,7 @@ std::shared_ptr<LxssRunningInstance> LxssUserSessionImpl::_CreateInstance(_In_op
 
                 if (distributionInfo->Version != nullptr && distributionInfo->Version != configuration.OsVersion)
                 {
-                    WSL_LOG(
+                    LSW_LOG(
                         "DistributionVersionChange",
                         TraceLoggingValue(distributionInfo->Version, "NewVersion"),
                         TraceLoggingValue(configuration.OsVersion.c_str(), "OldVersion"),
@@ -2533,7 +2533,7 @@ std::shared_ptr<LxssRunningInstance> LxssUserSessionImpl::_CreateInstance(_In_op
                 // This needs to be done before plugins are notifed because they might try to run a command inside the distribution.
                 m_runningInstances[registration.Id()] = instance;
 
-                if (version == LXSS_WSL_VERSION_2)
+                if (version == LXSS_LSW_VERSION_2)
                 {
                     auto cleanupOnFailure =
                         wil::scope_exit_log(WI_DIAGNOSTICS_INFO, [&]() { m_runningInstances.erase(registration.Id()); });
@@ -2570,7 +2570,7 @@ std::shared_ptr<LxssRunningInstance> LxssUserSessionImpl::_CreateInstance(_In_op
         wil::unique_handle currentProcess{};
         if (WI_IsFlagClear(Flags, LXSS_CREATE_INSTANCE_FLAGS_IGNORE_CLIENT))
         {
-            currentProcess = wsl::windows::common::wslutil::OpenCallingProcess(GENERIC_READ | SYNCHRONIZE);
+            currentProcess = lsw::windows::common::lswutil::OpenCallingProcess(GENERIC_READ | SYNCHRONIZE);
         }
 
         m_lifetimeManager.RegisterCallback(
@@ -2582,14 +2582,14 @@ std::shared_ptr<LxssRunningInstance> LxssUserSessionImpl::_CreateInstance(_In_op
 
     // If the system distro flag was specified, return the system distro for the instance.
     //
-    // N.B. The system distro is only supported for WSL2.
+    // N.B. The system distro is only supported for LSW2.
     if (WI_IsFlagSet(Flags, LXSS_CREATE_INSTANCE_FLAGS_USE_SYSTEM_DISTRO))
     {
-        auto wslCoreInstance = std::dynamic_pointer_cast<WslCoreInstance>(instance);
-        THROW_HR_IF(WSL_E_WSL2_NEEDED, !wslCoreInstance);
+        auto lswCoreInstance = std::dynamic_pointer_cast<WslCoreInstance>(instance);
+        THROW_HR_IF(LSW_E_LSW2_NEEDED, !lswCoreInstance);
 
-        instance = wslCoreInstance->GetSystemDistro();
-        THROW_HR_IF(WSL_E_GUI_APPLICATIONS_DISABLED, !instance);
+        instance = lswCoreInstance->GetSystemDistro();
+        THROW_HR_IF(LSW_E_GUI_APPLICATIONS_DISABLED, !instance);
     }
 
     return instance;
@@ -2601,14 +2601,14 @@ try
 {
     const auto shellLink = wil::CoCreateInstance<IShellLink>(CLSID_ShellLink);
 
-    auto shortcutPath = wsl::windows::common::filesystem::GetKnownFolderPath(FOLDERID_StartMenu, KF_FLAG_CREATE);
+    auto shortcutPath = lsw::windows::common::filesystem::GetKnownFolderPath(FOLDERID_StartMenu, KF_FLAG_CREATE);
     shortcutPath /= DistributionName + std::wstring(L".lnk");
 
     THROW_IF_FAILED(shellLink->SetPath(ExecutablePath));
 
     // Construct the command line to set the working directory to the user's home directory.
     const auto commandLine = std::format(
-        L"{} {} {} {}", WSL_DISTRIBUTION_ID_ARG, wsl::shared::string::GuidToString<wchar_t>(registration.Id()), WSL_CHANGE_DIRECTORY_ARG, WSL_CWD_HOME);
+        L"{} {} {} {}", LSW_DISTRIBUTION_ID_ARG, lsw::shared::string::GuidToString<wchar_t>(registration.Id()), LSW_CHANGE_DIRECTORY_ARG, LSW_CWD_HOME);
 
     THROW_IF_FAILED(shellLink->SetArguments(commandLine.c_str()));
     THROW_IF_FAILED(shellLink->SetIconLocation(ShortcutIcon, 0));
@@ -2626,12 +2626,12 @@ void LxssUserSessionImpl::_CreateTerminalProfile(
     _In_ const std::string_view& Template,
     _In_ _In_ const std::filesystem::path& IconPath,
     _In_ const LXSS_DISTRO_CONFIGURATION& Configuration,
-    wsl::windows::service::DistributionRegistration& Registration)
+    lsw::windows::service::DistributionRegistration& Registration)
 try
 {
-    using namespace wsl::windows::common::string;
-    using namespace wsl::windows::common::wslutil;
-    using wsl::shared::string::WideToMultiByte;
+    using namespace lsw::windows::common::string;
+    using namespace lsw::windows::common::lswutil;
+    using lsw::shared::string::WideToMultiByte;
 
     nlohmann::basic_json json;
     nlohmann::json::iterator profiles;
@@ -2646,21 +2646,21 @@ try
     }
     catch (const nlohmann::json::parse_error& e)
     {
-        EMIT_USER_WARNING(wsl::shared::Localization::MessageFailedToParseTerminalProfile(e.what()));
+        EMIT_USER_WARNING(lsw::shared::Localization::MessageFailedToParseTerminalProfile(e.what()));
         return;
     }
     catch (...)
     {
-        auto error = WideToMultiByte(wsl::windows::common::wslutil::ErrorCodeToString(wil::ResultFromCaughtException()));
-        EMIT_USER_WARNING(wsl::shared::Localization::MessageFailedToParseTerminalProfile(error));
+        auto error = WideToMultiByte(lsw::windows::common::lswutil::ErrorCodeToString(wil::ResultFromCaughtException()));
+        EMIT_USER_WARNING(lsw::shared::Localization::MessageFailedToParseTerminalProfile(error));
         return;
     }
 
-    auto distributionIdString = wsl::shared::string::GuidToString<wchar_t>(Registration.Id());
+    auto distributionIdString = lsw::shared::string::GuidToString<wchar_t>(Registration.Id());
     auto distributionProfileId =
-        wsl::shared::string::GuidToString<wchar_t>(CreateV5Uuid(WslTerminalNamespace, std::as_bytes(std::span{distributionIdString})));
+        lsw::shared::string::GuidToString<wchar_t>(CreateV5Uuid(WslTerminalNamespace, std::as_bytes(std::span{distributionIdString})));
 
-    auto hideGeneratedProfileGuid = WideToMultiByte(wsl::shared::string::GuidToString<wchar_t>(
+    auto hideGeneratedProfileGuid = WideToMultiByte(lsw::shared::string::GuidToString<wchar_t>(
         CreateV5Uuid(GeneratedProfilesTerminalNamespace, std::as_bytes(std::span{Configuration.Name}))));
 
     bool foundHideProfile = false;
@@ -2678,23 +2678,23 @@ try
         THROW_IF_FAILED(wil::GetSystemDirectory(systemDirectory));
 
         e["commandline"] = WideToMultiByte(std::format(
-            L"{}\\{} {} {} {} {}", systemDirectory, WSL_BINARY_NAME, WSL_DISTRIBUTION_ID_ARG, distributionIdString, WSL_CHANGE_DIRECTORY_ARG, WSL_CWD_HOME));
+            L"{}\\{} {} {} {} {}", systemDirectory, LSW_BINARY_NAME, LSW_DISTRIBUTION_ID_ARG, distributionIdString, LSW_CHANGE_DIRECTORY_ARG, LSW_CWD_HOME));
 
         e["name"] = WideToMultiByte(Configuration.Name);
         e["guid"] = WideToMultiByte(distributionProfileId);
         e["icon"] = IconPath.string();
 
         // See https://github.com/microsoft/terminal/pull/18195. Supported in terminal >= 1.23
-        e["pathTranslationStyle"] = "wsl";
+        e["pathTranslationStyle"] = "lsw";
 
         if (!Configuration.Flavor.empty())
         {
-            e["wsl.distribution-type"] = WideToMultiByte(Configuration.Flavor);
+            e["lsw.distribution-type"] = WideToMultiByte(Configuration.Flavor);
         }
 
         if (!Configuration.OsVersion.empty())
         {
-            e["wsl.distribution-version"] = WideToMultiByte(Configuration.OsVersion);
+            e["lsw.distribution-version"] = WideToMultiByte(Configuration.OsVersion);
         }
     }
 
@@ -2706,12 +2706,12 @@ try
         profiles->insert(profiles->begin(), hideProfile);
     }
 
-    auto targetFolder = wsl::windows::common::filesystem::GetLocalAppDataPath(nullptr) / L"Microsoft" / L"Windows Terminal" /
-                        L"Fragments" / L"Microsoft.WSL";
+    auto targetFolder = lsw::windows::common::filesystem::GetLocalAppDataPath(nullptr) / L"Microsoft" / L"Windows Terminal" /
+                        L"Fragments" / L"Microsoft.LSW";
 
     wil::CreateDirectoryDeep(targetFolder.c_str());
 
-    auto tempFilePath = wsl::windows::common::filesystem::GetTempFilename();
+    auto tempFilePath = lsw::windows::common::filesystem::GetTempFilename();
     auto targetPath = targetFolder / (distributionProfileId + L".json");
 
     // Unfortunately creating & writing the file isn't atomic.
@@ -2741,18 +2741,18 @@ void LxssUserSessionImpl::_CreateVm()
     if (!m_utilityVm)
     {
 
-        // Return an error if a plugin failed to initialize or needs a newer WSL version.
+        // Return an error if a plugin failed to initialize or needs a newer LSW version.
         // Note: It's better to do this here instead of CreateInstanceForCurrentUser() because we
         // can return a proper error message with the plugin name since we have an execution context here.
         m_pluginManager.ThrowIfFatalPluginError();
 
-        const auto userToken = wsl::windows::common::security::GetUserToken(TokenImpersonation);
+        const auto userToken = lsw::windows::common::security::GetUserToken(TokenImpersonation);
         auto config = _GetResultantConfig(userToken.get());
 
         // Initialize policies for the plugin interface.
-        WSLVmCreationSettings userSettings{};
-        WI_SetFlagIf(userSettings.CustomConfigurationFlags, WSLUserConfigurationCustomKernel, !config.KernelPath.empty());
-        WI_SetFlagIf(userSettings.CustomConfigurationFlags, WSLUserConfigurationCustomKernelCommandLine, !config.KernelCommandLine.empty());
+        LSWVmCreationSettings userSettings{};
+        WI_SetFlagIf(userSettings.CustomConfigurationFlags, LSWUserConfigurationCustomKernel, !config.KernelPath.empty());
+        WI_SetFlagIf(userSettings.CustomConfigurationFlags, LSWUserConfigurationCustomKernelCommandLine, !config.KernelCommandLine.empty());
 
         // Duplicate the passed-in user token and pass it down to plugins.
         THROW_IF_WIN32_BOOL_FALSE(
@@ -2814,8 +2814,8 @@ void LxssUserSessionImpl::_CreateVm()
                 bool drvFsNotifications = false;
                 {
                     auto impersonate = wil::impersonate_token(m_userToken.get());
-                    const auto lxssKey = wsl::windows::common::registry::OpenLxssUserKey();
-                    drvFsNotifications = wsl::windows::common::registry::ReadDword(
+                    const auto lxssKey = lsw::windows::common::registry::OpenLxssUserKey();
+                    drvFsNotifications = lsw::windows::common::registry::ReadDword(
                                              lxssKey.get(), LXSS_NOTIFICATIONS_KEY, LXSS_NOTIFICATION_DRVFS_PERF_DISABLED, 0) == 0;
                 }
 
@@ -2845,7 +2845,7 @@ void LxssUserSessionImpl::_DeleteDistribution(_In_ const LXSS_DISTRO_CONFIGURATI
     _DeleteDistributionLockHeld(Configuration, Flags);
 }
 
-// Function signature of the API to remove WSLg start menu shortcuts.
+// Function signature of the API to remove LSWg start menu shortcuts.
 HRESULT RemoveAppProvider(LPCWSTR);
 
 _Requires_exclusive_lock_held_(m_instanceLock)
@@ -2853,7 +2853,7 @@ void LxssUserSessionImpl::_DeleteDistributionLockHeld(_In_ const LXSS_DISTRO_CON
 {
     THROW_HR_IF(E_UNEXPECTED, (WI_IsAnyFlagSet(Flags, ~LXSS_DELETE_DISTRO_FLAGS_ALL)));
 
-    // For WSL1 distributions delete rootfs, temp, and the 9p socket.
+    // For LSW1 distributions delete rootfs, temp, and the 9p socket.
     std::filesystem::path deletePath{};
     if (WI_IsFlagSet(Flags, LXSS_DELETE_DISTRO_FLAGS_ROOTFS))
     {
@@ -2876,7 +2876,7 @@ void LxssUserSessionImpl::_DeleteDistributionLockHeld(_In_ const LXSS_DISTRO_CON
         }
     }
 
-    // For WSL2 distributions, unmount and delete the VHD.
+    // For LSW2 distributions, unmount and delete the VHD.
     if (WI_IsFlagSet(Flags, LXSS_DELETE_DISTRO_FLAGS_VHD) || WI_IsFlagSet(Flags, LXSS_DELETE_DISTRO_FLAGS_UNMOUNT))
     {
         if (PathFileExistsW(Configuration.VhdFilePath.c_str()))
@@ -2914,7 +2914,7 @@ void LxssUserSessionImpl::_DeleteDistributionLockHeld(_In_ const LXSS_DISTRO_CON
         // Remove the terminal profile, if any.
         try
         {
-            const auto lxssKey = wsl::windows::common::registry::OpenLxssUserKey();
+            const auto lxssKey = lsw::windows::common::registry::OpenLxssUserKey();
             const auto profile = DistributionRegistration::Open(lxssKey.get(), Configuration.DistroId).Read(Property::TerminalProfilePath);
 
             if (profile.has_value())
@@ -2925,11 +2925,11 @@ void LxssUserSessionImpl::_DeleteDistributionLockHeld(_In_ const LXSS_DISTRO_CON
         CATCH_LOG()
     }
 
-    // Remove start menu shortcuts for WSLg applications.
-    if (WI_IsFlagSet(Flags, LXSS_DELETE_DISTRO_FLAGS_WSLG_SHORTCUTS))
+    // Remove start menu shortcuts for LSWg applications.
+    if (WI_IsFlagSet(Flags, LXSS_DELETE_DISTRO_FLAGS_LSWG_SHORTCUTS))
         try
         {
-            const auto dllPath = wsl::windows::common::wslutil::GetBasePath() / WSLG_TS_PLUGIN_DLL;
+            const auto dllPath = lsw::windows::common::lswutil::GetBasePath() / LSWG_TS_PLUGIN_DLL;
             static LxssDynamicFunction<decltype(RemoveAppProvider)> removeAppProvider(dllPath.c_str(), "RemoveAppProvider");
             LOG_IF_FAILED(removeAppProvider(Configuration.Name.c_str()));
         }
@@ -2950,7 +2950,7 @@ std::vector<DistributionRegistration> LxssUserSessionImpl::_EnumerateDistributio
     // Iterate through all subkeys looking for distributions.
     std::vector<DistributionRegistration> distributions;
     std::vector<GUID> orphanedDistributions;
-    for (const auto& distro : wsl::windows::common::registry::EnumGuidKeys(LxssKey))
+    for (const auto& distro : lsw::windows::common::registry::EnumGuidKeys(LxssKey))
     {
         if (Exclude.has_value() && IsEqualGUID(Exclude.value(), distro.first))
         {
@@ -3021,7 +3021,7 @@ GUID LxssUserSessionImpl::_GetDefaultDistro(_In_ HKEY LxssKey)
     {
         const auto defaultDistro = DistributionRegistration::OpenDefault(LxssKey);
 
-        THROW_HR_IF(WSL_E_DEFAULT_DISTRO_NOT_FOUND, !defaultDistro.has_value());
+        THROW_HR_IF(LSW_E_DEFAULT_DISTRO_NOT_FOUND, !defaultDistro.has_value());
 
         // Ensure that the default distribution is valid.
         if (!_ValidateDistro(LxssKey, &defaultDistro->Id()))
@@ -3032,10 +3032,10 @@ GUID LxssUserSessionImpl::_GetDefaultDistro(_In_ HKEY LxssKey)
             const auto configuration = s_GetDistributionConfiguration(defaultDistro.value());
             _UnregisterDistributionLockHeld(LxssKey, configuration);
 
-            // Validate remaining WSL distributions, if there are any remaining
+            // Validate remaining LSW distributions, if there are any remaining
             // set the first one found to the new default.
             const auto distros = _EnumerateDistributions(LxssKey);
-            THROW_HR_IF(WSL_E_DEFAULT_DISTRO_NOT_FOUND, (distros.size() == 0));
+            THROW_HR_IF(LSW_E_DEFAULT_DISTRO_NOT_FOUND, (distros.size() == 0));
 
             DistributionRegistration::SetDefault(LxssKey, distros[0]);
             defaultDistroId = distros[0].Id();
@@ -3049,7 +3049,7 @@ GUID LxssUserSessionImpl::_GetDefaultDistro(_In_ HKEY LxssKey)
     }
     catch (...)
     {
-        result = WSL_E_DEFAULT_DISTRO_NOT_FOUND;
+        result = LSW_E_DEFAULT_DISTRO_NOT_FOUND;
     }
 
     THROW_IF_FAILED(result);
@@ -3060,8 +3060,8 @@ GUID LxssUserSessionImpl::_GetDefaultDistro(_In_ HKEY LxssKey)
 LONG LxssUserSessionImpl::_GetElfExitStatus(_In_ const LXSS_RUN_ELF_CONTEXT& Context)
 {
     // Wait for the instance to terminate or the client process to exit.
-    const wil::unique_handle clientProcess = wsl::windows::common::wslutil::OpenCallingProcess(GENERIC_READ | SYNCHRONIZE);
-    THROW_HR_IF(E_ABORT, !wsl::windows::common::relay::InterruptableWait(Context.instanceTerminatedEvent.get(), {clientProcess.get()}));
+    const wil::unique_handle clientProcess = lsw::windows::common::lswutil::OpenCallingProcess(GENERIC_READ | SYNCHRONIZE);
+    THROW_HR_IF(E_ABORT, !lsw::windows::common::relay::InterruptableWait(Context.instanceTerminatedEvent.get(), {clientProcess.get()}));
 
     // Ensure that the process exited successfully. If the process encountered
     // an error, wait for the stderr worker thread and log the error message.
@@ -3071,11 +3071,11 @@ LONG LxssUserSessionImpl::_GetElfExitStatus(_In_ const LXSS_RUN_ELF_CONTEXT& Con
     return exitStatus;
 }
 
-wsl::core::Config LxssUserSessionImpl::_GetResultantConfig(_In_ const HANDLE userToken)
+lsw::core::Config LxssUserSessionImpl::_GetResultantConfig(_In_ const HANDLE userToken)
 {
-    const auto configFilePath = wsl::windows::common::helpers::GetWslConfigPath(userToken);
-    // Open the config file (%userprofile%\.wslconfig).
-    wsl::core::Config config(configFilePath.c_str(), userToken);
+    const auto configFilePath = lsw::windows::common::helpers::GetWslConfigPath(userToken);
+    // Open the config file (%userprofile%\.lswconfig).
+    lsw::core::Config config(configFilePath.c_str(), userToken);
 
     _LoadNetworkingSettings(config, userToken);
     return config;
@@ -3085,10 +3085,10 @@ void LxssUserSessionImpl::_LoadDiskMount(_In_ HKEY Key, _In_ const std::wstring&
 try
 {
     // Get the disk path
-    const auto path = wsl::windows::common::registry::ReadString(Key, nullptr, c_diskValueName);
+    const auto path = lsw::windows::common::registry::ReadString(Key, nullptr, c_diskValueName);
 
     // Get the disk type; throw if unexpected type
-    const auto diskType = static_cast<WslCoreVm::DiskType>(wsl::windows::common::registry::ReadDword(
+    const auto diskType = static_cast<WslCoreVm::DiskType>(lsw::windows::common::registry::ReadDword(
         Key, nullptr, c_disktypeValueName, static_cast<DWORD>(WslCoreVm::DiskType::PassThrough)));
 
     THROW_HR_IF(E_UNEXPECTED, (diskType != WslCoreVm::DiskType::VHD && diskType != WslCoreVm::DiskType::PassThrough));
@@ -3101,12 +3101,12 @@ try
     m_utilityVm->AttachDisk(path.c_str(), diskType, lun, true, nullptr);
 
     // Restore each mount point.
-    for (const auto& e : wsl::windows::common::registry::EnumKeys(Key, KEY_READ))
+    for (const auto& e : lsw::windows::common::registry::EnumKeys(Key, KEY_READ))
     {
         auto optionalValue = [&](std::wstring& storage, LPCWSTR name) -> LPCWSTR {
             try
             {
-                storage = wsl::windows::common::registry::ReadString(e.second.get(), nullptr, name);
+                storage = lsw::windows::common::registry::ReadString(e.second.get(), nullptr, name);
                 return storage.c_str();
             }
             catch (...)
@@ -3120,7 +3120,7 @@ try
         std::wstring type;
 
         // Get the mount name
-        auto diskName = wsl::windows::common::registry::ReadString(e.second.get(), nullptr, c_mountNameValueName, L"");
+        auto diskName = lsw::windows::common::registry::ReadString(e.second.get(), nullptr, c_mountNameValueName, L"");
 
         // If there was not a disk name stored, set it to the default generated name when mounting
         const auto result = m_utilityVm->MountDisk(
@@ -3145,7 +3145,7 @@ try
 }
 CATCH_LOG()
 
-void LxssUserSessionImpl::_LoadNetworkingSettings(_Inout_ wsl::core::Config& config, _In_ HANDLE userToken)
+void LxssUserSessionImpl::_LoadNetworkingSettings(_Inout_ lsw::core::Config& config, _In_ HANDLE userToken)
 try
 {
     const auto autoProxyRequested = config.EnableAutoProxy;
@@ -3173,7 +3173,7 @@ try
         }
     }
 
-    WSL_LOG(
+    LSW_LOG(
         "AutoProxyEnabled",
         TraceLoggingValue(autoProxyRequested, "autoProxyRequested"),
         TraceLoggingValue(config.EnableAutoProxy, "autoProxyEnabled"));
@@ -3183,14 +3183,14 @@ CATCH_LOG();
 void LxssUserSessionImpl::_LoadDiskMounts()
 try
 {
-    const auto key = wsl::windows::common::registry::OpenOrCreateLxssDiskMountsKey(&m_userSid.Sid);
-    for (const auto& e : wsl::windows::common::registry::EnumKeys(key.get(), KEY_READ))
+    const auto key = lsw::windows::common::registry::OpenOrCreateLxssDiskMountsKey(&m_userSid.Sid);
+    for (const auto& e : lsw::windows::common::registry::EnumKeys(key.get(), KEY_READ))
     {
         _LoadDiskMount(e.second.get(), e.first);
     }
 
     // Clear the state from the registry now that the mounts have been loaded
-    wsl::windows::common::registry::ClearSubkeys(key.get());
+    lsw::windows::common::registry::ClearSubkeys(key.get());
     return;
 }
 CATCH_LOG()
@@ -3200,15 +3200,15 @@ void LxssUserSessionImpl::_ProcessImportResultMessage(
     const gsl::span<gsl::byte> Span,
     HKEY LxssKey,
     LXSS_DISTRO_CONFIGURATION& Configuration,
-    wsl::windows::service::DistributionRegistration& Registration)
+    lsw::windows::service::DistributionRegistration& Registration)
 {
-    THROW_HR_IF(WSL_E_NOT_A_LINUX_DISTRO, !Message.ValidDistribution);
+    THROW_HR_IF(LSW_E_NOT_A_LINUX_DISTRO, !Message.ValidDistribution);
 
     if (Configuration.Name.empty())
     {
-        THROW_HR_IF(WSL_E_DISTRIBUTION_NAME_NEEDED, Message.DefaultNameIndex <= 0);
+        THROW_HR_IF(LSW_E_DISTRIBUTION_NAME_NEEDED, Message.DefaultNameIndex <= 0);
 
-        auto distributionName = wsl::shared::string::MultiByteToWide(wsl::shared::string::FromSpan(Span, Message.DefaultNameIndex));
+        auto distributionName = lsw::shared::string::MultiByteToWide(lsw::shared::string::FromSpan(Span, Message.DefaultNameIndex));
 
         // Validate that name is valid, and doesn't conflict with existing distributions.
         s_ValidateDistroName(distributionName.c_str());
@@ -3220,13 +3220,13 @@ void LxssUserSessionImpl::_ProcessImportResultMessage(
 
     if (Message.FlavorIndex > 0)
     {
-        Configuration.Flavor = wsl::shared::string::MultiByteToWide(wsl::shared::string::FromSpan(Span, Message.FlavorIndex));
+        Configuration.Flavor = lsw::shared::string::MultiByteToWide(lsw::shared::string::FromSpan(Span, Message.FlavorIndex));
         Registration.Write(Property::Flavor, Configuration.Flavor.c_str());
     }
 
     if (Message.VersionIndex != 0)
     {
-        Configuration.OsVersion = wsl::shared::string::MultiByteToWide(wsl::shared::string::FromSpan(Span, Message.VersionIndex));
+        Configuration.OsVersion = lsw::shared::string::MultiByteToWide(lsw::shared::string::FromSpan(Span, Message.VersionIndex));
         Registration.Write(Property::OsVersion, Configuration.OsVersion.c_str());
     }
 
@@ -3238,7 +3238,7 @@ void LxssUserSessionImpl::_ProcessImportResultMessage(
         Registration.Write(Property::Modern, 1);
 
         std::filesystem::path iconPath;
-        const auto basePath = wsl::windows::common::wslutil::GetBasePath();
+        const auto basePath = lsw::windows::common::lswutil::GetBasePath();
 
         if (Message.ShortcutIconIndex != 0)
         {
@@ -3251,12 +3251,12 @@ void LxssUserSessionImpl::_ProcessImportResultMessage(
         }
         else
         {
-            iconPath = basePath / L"wsl.exe";
+            iconPath = basePath / L"lsw.exe";
         }
 
         if (Message.GenerateShortcut)
         {
-            _CreateDistributionShortcut(Configuration.Name.c_str(), iconPath.c_str(), (basePath / L"wsl.exe").c_str(), Registration);
+            _CreateDistributionShortcut(Configuration.Name.c_str(), iconPath.c_str(), (basePath / L"lsw.exe").c_str(), Registration);
         }
 
         // Generate a Windows Terminal profile, as long as the distribution didn't opt-out of it.
@@ -3300,27 +3300,27 @@ LXSS_RUN_ELF_CONTEXT LxssUserSessionImpl::_RunElfBinary(
     wil::unique_hfile stdInLocal;
     if (!ARGUMENT_PRESENT(StdIn))
     {
-        stdInLocal = wsl::windows::common::filesystem::OpenNulDevice(GENERIC_READ);
+        stdInLocal = lsw::windows::common::filesystem::OpenNulDevice(GENERIC_READ);
         StdIn = stdInLocal.get();
     }
 
     wil::unique_hfile stdOutLocal;
     if (!ARGUMENT_PRESENT(StdOut))
     {
-        stdOutLocal = wsl::windows::common::filesystem::OpenNulDevice(GENERIC_WRITE);
+        stdOutLocal = lsw::windows::common::filesystem::OpenNulDevice(GENERIC_WRITE);
         StdOut = stdOutLocal.get();
     }
 
     wil::unique_hfile stdErrLocal;
     if (!ARGUMENT_PRESENT(StdErr))
     {
-        stdErrLocal = wsl::windows::common::filesystem::OpenNulDevice(GENERIC_WRITE);
+        stdErrLocal = lsw::windows::common::filesystem::OpenNulDevice(GENERIC_WRITE);
         StdErr = stdErrLocal.get();
     }
 
     // Get the user and instance tokens.
-    const auto userToken = wsl::windows::common::security::GetUserToken(TokenImpersonation);
-    const wil::unique_handle instanceToken(wsl::windows::common::security::CreateRestrictedToken(userToken.get()));
+    const auto userToken = lsw::windows::common::security::GetUserToken(TokenImpersonation);
+    const wil::unique_handle instanceToken(lsw::windows::common::security::CreateRestrictedToken(userToken.get()));
 
     // Open handles to the root directory and temp directory while impersonating
     // the client.
@@ -3328,12 +3328,12 @@ LXSS_RUN_ELF_CONTEXT LxssUserSessionImpl::_RunElfBinary(
     wil::unique_hfile tempDirectory;
     {
         auto runAsUser = wil::impersonate_token(userToken.get());
-        rootDirectory = wsl::windows::common::filesystem::OpenDirectoryHandle(TargetDirectory, true);
+        rootDirectory = lsw::windows::common::filesystem::OpenDirectoryHandle(TargetDirectory, true);
         const auto tempFolder = std::filesystem::path(TargetDirectory) / LXSS_TEMP_DIRECTORY;
-        wsl::windows::common::filesystem::EnsureDirectory(tempFolder.c_str());
-        const auto instanceIdString = wsl::shared::string::GuidToString<wchar_t>(instanceId);
+        lsw::windows::common::filesystem::EnsureDirectory(tempFolder.c_str());
+        const auto instanceIdString = lsw::shared::string::GuidToString<wchar_t>(instanceId);
         const auto tempPath = tempFolder / instanceIdString;
-        tempDirectory = wsl::windows::common::filesystem::WipeAndOpenDirectory(tempPath.c_str());
+        tempDirectory = lsw::windows::common::filesystem::WipeAndOpenDirectory(tempPath.c_str());
     }
 
     // Create manual reset event that is signaled on instance termination
@@ -3373,7 +3373,7 @@ LXSS_RUN_ELF_CONTEXT LxssUserSessionImpl::_RunElfBinary(
 
     {
         // Acquire assign primary token privilege in order to pass the primary token for init process.
-        auto revertPriv = wsl::windows::common::security::AcquirePrivilege(SE_ASSIGNPRIMARYTOKEN_NAME);
+        auto revertPriv = lsw::windows::common::security::AcquirePrivilege(SE_ASSIGNPRIMARYTOKEN_NAME);
         THROW_IF_NTSTATUS_FAILED(LxssClientInstanceCreate(&createParameters, &elfContext.instanceHandle));
     }
 
@@ -3402,7 +3402,7 @@ LxssUserSessionImpl::_RunUtilityVmSetup(_In_ const LXSS_DISTRO_CONFIGURATION& Co
     THROW_HR_IF(E_INVALIDARG, ((MessageType != LxMiniInitMessageImport) && (MessageType != LxMiniInitMessageExport) && (MessageType != LxMiniInitMessageImportInplace)));
 
     // Open the client process so the operation can be aborted if client exits.
-    wil::unique_handle clientProcess = wsl::windows::common::wslutil::OpenCallingProcess(GENERIC_READ | SYNCHRONIZE);
+    wil::unique_handle clientProcess = lsw::windows::common::lswutil::OpenCallingProcess(GENERIC_READ | SYNCHRONIZE);
 
     // Ensure that the Linux utility VM has been created.
     std::lock_guard lock(m_instanceLock);
@@ -3419,8 +3419,8 @@ LxssUserSessionImpl::_RunUtilityVmSetup(_In_ const LXSS_DISTRO_CONFIGURATION& Co
     context.instance = m_utilityVm->CreateInstance(instanceId, Configuration, MessageType, 0, 0, 0, ExportFlags, &connectPort);
 
     // Establish the socket that will be used to transfer the tar file contents.
-    context.tarSocket = wsl::windows::common::hvsocket::Connect(m_utilityVm->GetRuntimeId(), connectPort);
-    context.errorSocket = wsl::windows::common::hvsocket::Connect(m_utilityVm->GetRuntimeId(), connectPort);
+    context.tarSocket = lsw::windows::common::hvsocket::Connect(m_utilityVm->GetRuntimeId(), connectPort);
+    context.errorSocket = lsw::windows::common::hvsocket::Connect(m_utilityVm->GetRuntimeId(), connectPort);
     WI_ASSERT(context.tarSocket.is_valid());
 
     return context;
@@ -3488,9 +3488,9 @@ bool LxssUserSessionImpl::_TerminateInstanceInternal(_In_ LPCGUID DistroGuid, _I
             success = (success || force);
             if (success)
             {
-                if (const auto* wslcoreInstance = dynamic_cast<WslCoreInstance*>(instance->second.get()); wslcoreInstance != nullptr)
+                if (const auto* lswcoreInstance = dynamic_cast<WslCoreInstance*>(instance->second.get()); lswcoreInstance != nullptr)
                 {
-                    m_pluginManager.OnDistributionStopping(&m_session, wslcoreInstance->DistributionInformation());
+                    m_pluginManager.OnDistributionStopping(&m_session, lswcoreInstance->DistributionInformation());
                 }
 
                 instance->second->Stop();
@@ -3505,7 +3505,7 @@ bool LxssUserSessionImpl::_TerminateInstanceInternal(_In_ LPCGUID DistroGuid, _I
 
                 m_runningInstances.erase(instance);
 
-                // If the instance that was terminated was a WSL2 instance,
+                // If the instance that was terminated was a LSW2 instance,
                 // check if the VM is now idle.
                 if (clientId != LXSS_CLIENT_ID_INVALID)
                 {
@@ -3524,7 +3524,7 @@ void LxssUserSessionImpl::_UpdateInit(_In_ const LXSS_DISTRO_CONFIGURATION& Conf
     auto lock = m_initUpdateLock.lock_exclusive();
     if (std::find(m_updatedInitDistros.begin(), m_updatedInitDistros.end(), Configuration.DistroId) == m_updatedInitDistros.end())
     {
-        wsl::windows::common::filesystem::UpdateInit(Configuration.BasePath.c_str(), Configuration.Version);
+        lsw::windows::common::filesystem::UpdateInit(Configuration.BasePath.c_str(), Configuration.Version);
         m_updatedInitDistros.emplace_back(Configuration.DistroId);
     }
 }
@@ -3550,12 +3550,12 @@ HRESULT LxssUserSessionImpl::CreateLinuxProcess(_In_opt_ const GUID* Distro, _In
     else
     {
         const auto distro = _RunningInstance(Distro);
-        THROW_HR_IF(WSL_E_VM_MODE_INVALID_STATE, !distro);
+        THROW_HR_IF(LSW_E_VM_MODE_INVALID_STATE, !distro);
 
-        const auto wsl2Distro = dynamic_cast<WslCoreInstance*>(distro.get());
-        THROW_HR_IF(WSL_E_WSL2_NEEDED, !wsl2Distro);
+        const auto lsw2Distro = dynamic_cast<WslCoreInstance*>(distro.get());
+        THROW_HR_IF(LSW_E_LSW2_NEEDED, !lsw2Distro);
 
-        *Socket = wsl2Distro->CreateLinuxProcess(Path, Arguments).release();
+        *Socket = lsw2Distro->CreateLinuxProcess(Path, Arguments).release();
     }
     return S_OK;
 }
@@ -3567,7 +3567,7 @@ void LxssUserSessionImpl::_UnregisterDistributionLockHeld(_In_ HKEY LxssKey, _In
 
     try
     {
-        const auto removedDistroString = wsl::shared::string::GuidToString<wchar_t>(Configuration.DistroId);
+        const auto removedDistroString = lsw::shared::string::GuidToString<wchar_t>(Configuration.DistroId);
 
         // Terminate any running instance of the distro and delete the distro.
         _TerminateInstanceInternal(&Configuration.DistroId);
@@ -3579,7 +3579,7 @@ void LxssUserSessionImpl::_UnregisterDistributionLockHeld(_In_ HKEY LxssKey, _In
         }
 
         // Delete the distro registry key.
-        wsl::windows::common::registry::DeleteKey(LxssKey, removedDistroString.c_str());
+        lsw::windows::common::registry::DeleteKey(LxssKey, removedDistroString.c_str());
     }
     CATCH_LOG()
 }
@@ -3587,7 +3587,7 @@ void LxssUserSessionImpl::_UnregisterDistributionLockHeld(_In_ HKEY LxssKey, _In
 void LxssUserSessionImpl::_TimezoneUpdated()
 try
 {
-    WSL_LOG("Received timezone change notification");
+    LSW_LOG("Received timezone change notification");
 
     // Update the timezone information for each running instance.
     std::lock_guard lock(m_instanceLock);
@@ -3637,7 +3637,7 @@ bool LxssUserSessionImpl::_ValidateDistro(_In_ HKEY LxssKey, _In_ LPCGUID Distro
             // If the path is not found and the package is removed, then the distro can be considered to be uninstalled.
             // Only do this if the path is actually missing to prevent any accidental distro deletion if the store API
             // can't find the package for transient reasons.
-            if (!PathFileExistsW(path) && !wsl::windows::common::helpers::IsPackageInstalled(packageFamilyName.c_str()))
+            if (!PathFileExistsW(path) && !lsw::windows::common::helpers::IsPackageInstalled(packageFamilyName.c_str()))
             {
                 isValid = false;
             }
@@ -3647,7 +3647,7 @@ bool LxssUserSessionImpl::_ValidateDistro(_In_ HKEY LxssKey, _In_ LPCGUID Distro
 
     if (!isValid)
     {
-        WSL_LOG("ValidateDistributionFailed", TraceLoggingValue(packageFamilyName.c_str(), "packageFamilyName"));
+        LSW_LOG("ValidateDistributionFailed", TraceLoggingValue(packageFamilyName.c_str(), "packageFamilyName"));
     }
 
     return isValid;
@@ -3701,7 +3701,7 @@ void LxssUserSessionImpl::_ValidateDistributionNameAndPathNotInUse(
             continue;
         }
 
-        if (Name != nullptr && wsl::shared::string::IsEqual(Name, configuration.Name, true))
+        if (Name != nullptr && lsw::shared::string::IsEqual(Name, configuration.Name, true))
         {
             THROW_HR_MSG(
                 (configuration.State == LxssDistributionStateInstalled) ? HRESULT_FROM_WIN32(ERROR_ALREADY_EXISTS) : E_ILLEGAL_STATE_CHANGE,
@@ -3721,7 +3721,7 @@ void LxssUserSessionImpl::_ValidateDistributionNameAndPathNotInUse(
             // Ensure another distribution by a different name is not already registered to the same location.
             THROW_HR_IF(
                 HRESULT_FROM_WIN32(ERROR_FILE_EXISTS),
-                wsl::windows::common::string::IsPathComponentEqual(error ? configuration.BasePath.native() : canonicalDistroPath.native(), Path));
+                lsw::windows::common::string::IsPathComponentEqual(error ? configuration.BasePath.native() : canonicalDistroPath.native(), Path));
         }
     }
 }
@@ -3733,7 +3733,7 @@ void LxssUserSessionImpl::_VmCheckIdle()
     // Otherwise, cancel any pending termination timers.
     //
     // N.B. A negative timeout means that the VM will continue running until it
-    //      is terminated via wsl.exe --shutdown, or the service is stopped.
+    //      is terminated via lsw.exe --shutdown, or the service is stopped.
     if (_VmIsIdle())
     {
         const auto timeout = m_utilityVm->GetVmIdleTimeout();
@@ -3754,7 +3754,7 @@ void LxssUserSessionImpl::_VmIdleTerminate()
     std::lock_guard lock(m_instanceLock);
     if (_VmIsIdle())
     {
-        WSL_LOG("StopVm");
+        LSW_LOG("StopVm");
         m_utilityVm->SaveAttachedDisksState();
         _VmTerminate();
     }
@@ -3810,7 +3810,7 @@ try
     const auto localTracker = m_httpProxyStateTracker;
     if (localTracker)
     {
-        WSL_LOG("_SetHttpProxyInfo: Attempting to set proxy info");
+        LSW_LOG("_SetHttpProxyInfo: Attempting to set proxy info");
         const std::optional<HttpProxySettings> proxySettings = localTracker->WaitForInitialProxySettings();
 
         if (proxySettings.has_value())
@@ -3820,27 +3820,27 @@ try
                 switch (proxySettings->UnsupportedProxyDropReason)
                 {
                 case UnsupportedProxyReason::LoopbackNotMirrored:
-                    EMIT_USER_WARNING(wsl::shared::Localization::MessageProxyLocalhostSettingsDropped());
+                    EMIT_USER_WARNING(lsw::shared::Localization::MessageProxyLocalhostSettingsDropped());
                     break;
                 case UnsupportedProxyReason::Ipv6NotMirrored:
-                    EMIT_USER_WARNING(wsl::shared::Localization::MessageProxyV6SettingsDropped());
+                    EMIT_USER_WARNING(lsw::shared::Localization::MessageProxyV6SettingsDropped());
                     break;
                 case UnsupportedProxyReason::LoopbackV6:
-                    EMIT_USER_WARNING(wsl::shared::Localization::MessageProxyLoopbackV6SettingsDropped());
+                    EMIT_USER_WARNING(lsw::shared::Localization::MessageProxyLoopbackV6SettingsDropped());
                     break;
                 case UnsupportedProxyReason::UnsupportedError:
-                    EMIT_USER_WARNING(wsl::shared::Localization::MessageProxyUnexpectedSettingsDropped());
+                    EMIT_USER_WARNING(lsw::shared::Localization::MessageProxyUnexpectedSettingsDropped());
                     break;
                 case UnsupportedProxyReason::Supported:
                 default:
-                    WSL_LOG("_SetHttpProxyInfo: Unexpected UnsupportedProxyReason");
+                    LSW_LOG("_SetHttpProxyInfo: Unexpected UnsupportedProxyReason");
                 }
             }
             if (proxySettings->HasSettingsConfigured())
             {
                 s_AddHttpProxyToEnvironment(proxySettings.value(), environment);
 
-                WSL_LOG(
+                LSW_LOG(
                     "AutoProxyConfiguration",
                     TraceLoggingValue(!proxySettings->Proxy.empty(), "ProxySet"),
                     TraceLoggingValue(!proxySettings->SecureProxy.empty(), "SecureProxySet"),
@@ -3849,13 +3849,13 @@ try
             }
             else
             {
-                WSL_LOG("_SetHttpProxyInfo: No HttpProxy settings detected so not configuring env vars.");
+                LSW_LOG("_SetHttpProxyInfo: No HttpProxy settings detected so not configuring env vars.");
             }
         }
         else
         {
-            // User will get a notification to restart WSL if proxy query completes later.
-            WSL_LOG("_SetHttpProxyInfo: Initial HttpProxy query timeout, start WSL process anyway.");
+            // User will get a notification to restart LSW if proxy query completes later.
+            LSW_LOG("_SetHttpProxyInfo: Initial HttpProxy query timeout, start LSW process anyway.");
         }
     }
 }
@@ -3868,7 +3868,7 @@ try
     const wil::unique_hkey lxssKey = s_OpenLxssUserKey();
 
     // OOBE hasn't run if the value is not present or set to 0.
-    if (wsl::windows::common::registry::ReadDword(lxssKey.get(), nullptr, LXSS_OOBE_COMPLETE_NAME, false) != false)
+    if (lsw::windows::common::registry::ReadDword(lxssKey.get(), nullptr, LXSS_OOBE_COMPLETE_NAME, false) != false)
     {
         return;
     }
@@ -3878,17 +3878,17 @@ try
     THROW_IF_FAILED(EnumerateDistributions(distributions.size_address<ULONG>(), &distributions));
     if (distributions.size() > 1)
     {
-        wsl::windows::common::registry::WriteDword(lxssKey.get(), nullptr, LXSS_OOBE_COMPLETE_NAME, true);
+        lsw::windows::common::registry::WriteDword(lxssKey.get(), nullptr, LXSS_OOBE_COMPLETE_NAME, true);
         return;
     }
 
-    const auto userToken = wsl::windows::common::security::GetUserToken(TokenImpersonation);
+    const auto userToken = lsw::windows::common::security::GetUserToken(TokenImpersonation);
     // This is needed to launch the OOBE process as the user.
     wil::unique_handle userTokenCreateProcess;
     THROW_IF_WIN32_BOOL_FALSE(::DuplicateTokenEx(
         userToken.get(), MAXIMUM_ALLOWED, nullptr, SecurityImpersonation, TokenImpersonation, &userTokenCreateProcess));
-    wsl::windows::common::helpers::LaunchWslSettingsOOBE(userTokenCreateProcess.get());
-    wsl::windows::common::registry::WriteDword(lxssKey.get(), nullptr, LXSS_OOBE_COMPLETE_NAME, true);
+    lsw::windows::common::helpers::LaunchWslSettingsOOBE(userTokenCreateProcess.get());
+    lsw::windows::common::registry::WriteDword(lxssKey.get(), nullptr, LXSS_OOBE_COMPLETE_NAME, true);
 }
 CATCH_LOG()
 
@@ -3929,7 +3929,7 @@ CreateLxProcessContext LxssUserSessionImpl::s_GetCreateProcessContext(_In_ const
     if (!SystemDistro)
     {
         auto runAsUser = wil::CoImpersonateClient();
-        const auto lxssKey = wsl::windows::common::registry::OpenLxssUserKey();
+        const auto lxssKey = lsw::windows::common::registry::OpenLxssUserKey();
 
         const auto registration = DistributionRegistration::Open(lxssKey.get(), DistroGuid);
 
@@ -3942,12 +3942,12 @@ CreateLxProcessContext LxssUserSessionImpl::s_GetCreateProcessContext(_In_ const
         context.DefaultEnvironment = Property::DefaultEnvironmnent.DefaultValue;
     }
 
-    context.UserToken = wsl::windows::common::security::GetUserToken(TokenImpersonation);
-    context.Elevated = wsl::windows::common::security::IsTokenElevated(context.UserToken.get());
+    context.UserToken = lsw::windows::common::security::GetUserToken(TokenImpersonation);
+    context.Elevated = lsw::windows::common::security::IsTokenElevated(context.UserToken.get());
     return context;
 }
 
-// Note that if the user defines proxy variables via WSLENV, these values will be overwritten by those when init spawns process
+// Note that if the user defines proxy variables via LSWENV, these values will be overwritten by those when init spawns process
 void LxssUserSessionImpl::s_AddHttpProxyToEnvironment(_In_ const HttpProxySettings& proxySettings, _Inout_ std::vector<std::string>& environment) noexcept
 try
 {
@@ -3982,7 +3982,7 @@ CATCH_LOG()
 wil::unique_hkey LxssUserSessionImpl::s_OpenLxssUserKey()
 {
     auto runAsUser = wil::CoImpersonateClient();
-    return wsl::windows::common::registry::OpenLxssUserKey();
+    return lsw::windows::common::registry::OpenLxssUserKey();
 }
 
 bool LxssUserSessionImpl::s_TerminateInstance(_Inout_ LxssUserSessionImpl* UserSession, _In_ GUID DistroGuid, _In_ bool CheckForClients)
@@ -4027,9 +4027,9 @@ void LxssUserSessionImpl::s_ValidateDistroName(_In_ LPCWSTR Name)
     std::wstring regex{L"^[a-zA-Z0-9._-]{1,"};
     regex += std::to_wstring(LX_INIT_DISTRO_NAME_MAX);
     regex += L"}$";
-    if ((!std::regex_match(Name, std::wregex(regex.c_str()))) || wsl::shared::string::IsEqual(Name, LXSS_LEGACY_INSTALL_NAME, true))
+    if ((!std::regex_match(Name, std::wregex(regex.c_str()))) || lsw::shared::string::IsEqual(Name, LXSS_LEGACY_INSTALL_NAME, true))
     {
-        THROW_HR_WITH_USER_ERROR(E_INVALIDARG, wsl::shared::Localization::MessageInvalidInstallDistributionName(Name));
+        THROW_HR_WITH_USER_ERROR(E_INVALIDARG, lsw::shared::Localization::MessageInvalidInstallDistributionName(Name));
     }
 }
 

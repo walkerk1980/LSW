@@ -7,7 +7,7 @@
 #include "WslCoreHostDnsInfo.h"
 #include "GnsPortTrackerChannel.h"
 
-namespace wsl::core {
+namespace lsw::core {
 
 using AddGuestDeviceRoutine = std::function<GUID(const GUID& clsid, const GUID& deviceId, PCWSTR tag, PCWSTR options)>;
 using ModifyOpenPortsCallback = std::function<int(const GUID& clsid, PCWSTR tag, const SOCKADDR_INET& addr, int protocol, bool isOpen)>;
@@ -44,7 +44,7 @@ private:
     HRESULT HandlePortNotification(const SOCKADDR_INET& addr, int protocol, bool allocate) const noexcept;
     void RefreshGuestConnection(NL_NETWORK_CONNECTIVITY_HINT hint) noexcept;
     void SetupLoopbackDevice();
-    void UpdateDns(wsl::shared::hns::DNS&& dnsSettings);
+    void UpdateDns(lsw::shared::hns::DNS&& dnsSettings);
     void UpdateMtu();
 
     mutable wil::srwlock m_lock;
@@ -63,7 +63,7 @@ private:
 
     std::optional<ULONGLONG> m_interfaceLuid;
     ULONG m_networkMtu = 0;
-    std::optional<wsl::core::networking::HostDnsInfo> m_dnsInfo;
+    std::optional<lsw::core::networking::HostDnsInfo> m_dnsInfo;
 
     // Note: this field must be destroyed first to stop the callbacks before any other field is destroyed.
     networking::unique_notify_handle m_networkNotifyHandle;
@@ -74,4 +74,4 @@ private:
     static constexpr GUID c_virtioNetworkDeviceId = {0xF07010D0, 0x0EA9, 0x447F, {0x88, 0xEF, 0xBD, 0x95, 0x2A, 0x4D, 0x2F, 0x14}};
 };
 
-} // namespace wsl::core
+} // namespace lsw::core

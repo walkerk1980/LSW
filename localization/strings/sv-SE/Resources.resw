@@ -121,14 +121,14 @@
     <value>Windows-undersystem för Linux</value>
   </data>
   <data name="AppShortName" xml:space="preserve">
-    <value>WSL</value>
+    <value>LSW</value>
   </data>
   <data name="AppDescription" xml:space="preserve">
     <value>Windows-undersystem för Linux gör att utvecklare kan köra en GNU/Linux-miljö, inklusive de flesta kommandoradsverktyg, verktyg och program, direkt i Windows, oförändrade, utan att behöva använda en traditionell virtuell dator eller installation med dubbel start.</value>
   </data>
   <data name="MessageDetachFailed" xml:space="preserve">
-    <value>Det gick inte att koppla från disken: {}. Mer information finns i 'dmesg' i WSL2.
-Om du vill tvinga WSL2 att stoppa och koppla från disken kör du 'wsl.exe {}'.</value>
+    <value>Det gick inte att koppla från disken: {}. Mer information finns i 'dmesg' i LSW2.
+Om du vill tvinga LSW2 att stoppa och koppla från disken kör du 'lsw.exe {}'.</value>
     <comment>{FixedPlaceholder="{}"}Command line arguments, file names and string inserts should not be translated</comment>
   </data>
   <data name="MessageDiskAlreadyAttached" xml:space="preserve">
@@ -136,7 +136,7 @@ Om du vill tvinga WSL2 att stoppa och koppla från disken kör du 'wsl.exe {}'.<
     <comment>{FixedPlaceholder="{}"}Command line arguments, file names and string inserts should not be translated</comment>
   </data>
   <data name="MessageDiskAlreadyMounted" xml:space="preserve">
-    <value>Volymen är redan monterad i WSL2.</value>
+    <value>Volymen är redan monterad i LSW2.</value>
   </data>
   <data name="MessageDiskMountNameAlreadyExists" xml:space="preserve">
     <value>En disk med det namnet har redan monterats; demontera disken eller välj ett nytt namn och försök igen.</value>
@@ -145,20 +145,20 @@ Om du vill tvinga WSL2 att stoppa och koppla från disken kör du 'wsl.exe {}'.<
     <value>Det angivna monteringsnamnet innehåller ett ogiltigt /-tecken. Försök igen utan det ogiltiga tecknet.</value>
   </data>
   <data name="MessageDiskMounted" xml:space="preserve">
-    <value>Disken har monterats som '/mnt/wsl/{}'.
-Obs! Platsen skiljer sig om du har ändrat inställningen automount.root i /etc/wsl.conf.
-Om du vill demontera och koppla från disken kör du 'wsl.exe {} {}'.</value>
+    <value>Disken har monterats som '/mnt/lsw/{}'.
+Obs! Platsen skiljer sig om du har ändrat inställningen automount.root i /etc/lsw.conf.
+Om du vill demontera och koppla från disken kör du 'lsw.exe {} {}'.</value>
     <comment>{FixedPlaceholder="{}"}Command line arguments, file names and string inserts should not be translated</comment>
   </data>
   <data name="MessageDiskMountFailed" xml:space="preserve">
     <value>Disken anslöts men kunde inte monteras: {}.
-Kör dmesg i WSL2 om du vill ha mer information.
-Om du vill koppla från disken kör du wsl.exe {} {}.</value>
+Kör dmesg i LSW2 om du vill ha mer information.
+Om du vill koppla från disken kör du lsw.exe {} {}.</value>
     <comment>{FixedPlaceholder="{}"}Command line arguments, file names and string inserts should not be translated</comment>
   </data>
   <data name="MessageDistributionListOnline" xml:space="preserve">
     <value>Följande är en lista över giltiga distributioner som kan installeras.
-Installera med wsl.exe {} &lt;Distro&gt;.
+Installera med lsw.exe {} &lt;Distro&gt;.
 </value>
     <comment>{FixedPlaceholder="{}"}Command line arguments, file names and string inserts should not be translated</comment>
   </data>
@@ -214,7 +214,7 @@ Installera med wsl.exe {} &lt;Distro&gt;.
   </data>
   <data name="MessageInvalidDistributionName" xml:space="preserve">
     <value>Ogiltigt distributionsnamn: {}.
-Använd wsl.exe --list --online' om du vill hämta en lista över giltiga distributioner.</value>
+Använd lsw.exe --list --online' om du vill hämta en lista över giltiga distributioner.</value>
     <comment>{FixedPlaceholder="{}"}{Locked="--list "}{Locked="--online'"}Command line arguments, file names and string inserts should not be translated</comment>
   </data>
   <data name="MessageInstanceTerminated" xml:space="preserve">
@@ -251,8 +251,8 @@ Använd {} --help' för att hämta en lista över argument som stöds.</value>
     <value>Windows-undersystem för Linux har inga installerade distributioner.
 Du kan lösa detta genom att installera en distribution med anvisningarna nedan:
 
-Använd wsl.exe --list --online' för att lista tillgängliga distributioner
-och wsl.exe --install &lt;Distro&gt; att installera.</value>
+Använd lsw.exe --list --online' för att lista tillgängliga distributioner
+och lsw.exe --install &lt;Distro&gt; att installera.</value>
     <comment>{Locked="--list "}{Locked="--online'"}{Locked="--install "}Command line arguments, file names and string inserts should not be translated</comment>
   </data>
   <data name="MessageNoRunningDistro" xml:space="preserve">
@@ -280,7 +280,7 @@ och wsl.exe --install &lt;Distro&gt; att installera.</value>
     <value>Användaren hittades inte.</value>
   </data>
   <data name="MessageVmModeConversionInfo" xml:space="preserve">
-    <value>Information om nyckelskillnader med WSL 2 finns på https://aka.ms/wsl2</value>
+    <value>Information om nyckelskillnader med LSW 2 finns på https://aka.ms/lsw2</value>
   </data>
   <data name="MessageConversionStart" xml:space="preserve">
     <value>Konvertering pågår. Det kan ta några minuter.</value>
@@ -289,12 +289,12 @@ och wsl.exe --install &lt;Distro&gt; att installera.</value>
     <value>Distributionen är redan den begärda versionen.</value>
   </data>
   <data name="MessageVmModeNotSupported" xml:space="preserve">
-    <value>Den äldre distributionen stöder inte WSL 2.</value>
+    <value>Den äldre distributionen stöder inte LSW 2.</value>
   </data>
   <data name="MessageEnableVirtualization" xml:space="preserve">
-    <value>WSL2 stöds inte med den aktuella datorkonfigurationen.
+    <value>LSW2 stöds inte med den aktuella datorkonfigurationen.
 Aktivera den valfria komponenten Virtual Machine Platform och se till att virtualisering har aktiverats i BIOS.
-Aktivera Virtual Machine Platform genom att köra: wsl.exe --install --no-distribution
+Aktivera Virtual Machine Platform genom att köra: lsw.exe --install --no-distribution
 Mer information finns på https://aka.ms/enablevirtualization</value>
     <comment>{Locked="--install "}{Locked="--no-distribution
 "}Command line arguments, file names and string inserts should not be translated</comment>
@@ -303,15 +303,15 @@ Mer information finns på https://aka.ms/enablevirtualization</value>
     <value>För många virtuella hårddiskar eller fysiska diskar är anslutna.</value>
   </data>
   <data name="MessageUserVhdAlreadyAttached" xml:space="preserve">
-    <value>VHD har redan monterats via wsl.exe --mount, demontera disken innan du startar.</value>
+    <value>VHD har redan monterats via lsw.exe --mount, demontera disken innan du startar.</value>
     <comment>{Locked="--mount,"}Command line arguments, file names and string inserts should not be translated</comment>
   </data>
   <data name="MessageWsl1NotSupported" xml:space="preserve">
-    <value>WSL1 stöds inte med den aktuella datorkonfigurationen.
-Aktivera den valfria komponenten "Windows-undersystem för Linux" för att använda WSL1.</value>
+    <value>LSW1 stöds inte med den aktuella datorkonfigurationen.
+Aktivera den valfria komponenten "Windows-undersystem för Linux" för att använda LSW1.</value>
   </data>
   <data name="MessageWsl2Needed" xml:space="preserve">
-    <value>Den här åtgärden stöds bara av WSL2.</value>
+    <value>Den här åtgärden stöds bara av LSW2.</value>
   </data>
   <data name="MessageWslInfoUsage" xml:space="preserve">
     <value>Användning:
@@ -322,7 +322,7 @@ Aktivera den valfria komponenten "Windows-undersystem för Linux" för att anvä
         Visa sökvägen till MSAL-proxyprogrammet.
 
     --version
-        Visa WSL-paketets version.
+        Visa LSW-paketets version.
 
     -n
         Skriv inte ut en ny rad.</value>
@@ -336,13 +336,13 @@ Aktivera den valfria komponenten "Windows-undersystem för Linux" för att anvä
     -a
         Tvinga resultatet till absolut sökvägsformat.
     -u
-        Översätt från en Windows-sökväg till en WSL-sökväg (standard).
+        Översätt från en Windows-sökväg till en LSW-sökväg (standard).
     -w
         Översätt från en WLS-sökväg till en Windows-sökväg.
     -m
         Översätt från en WLS-sökväg till en Windows-sökväg med '/' istället för '\\'
 
-Exempel: wslpath 'c:\\users'</value>
+Exempel: lswpath 'c:\\users'</value>
     <comment>{Locked="-a
 "}{Locked="-u
 "}{Locked="-w
@@ -374,11 +374,11 @@ Användning:
     <value>Copyright (c) Microsoft Corporation. Med ensamrätt.
 Sekretessinformation för den här produkten finns på https://aka.ms/privacy.
 
-Användning: wsl.exe [Argument] [Options...] [CommandLine]
+Användning: lsw.exe [Argument] [Options...] [CommandLine]
 
 Argument för att köra Linux-binärfiler:
 
-    Om ingen kommandorad anges startar wsl.exe standardgränssnittet.
+    Om ingen kommandorad anges startar lsw.exe standardgränssnittet.
 
     --exec, -e &lt;CommandLine&gt;
         Kör det angivna kommandot utan att använda standardgränssnittet för Linux.
@@ -414,15 +414,15 @@ Argument för att hantera Windows-undersystem för Linux:
         Visa användningsinformation.
 
     --debug-shell
-        Öppna ett WSL2-felsökningsgränssnitt i diagnostiksyfte.
+        Öppna ett LSW2-felsökningsgränssnitt i diagnostiksyfte.
 
     --install [Distro] [Options...]
         Installera ett Windows-undersystem för Linux distribution.
-        Om du vill ha en lista över giltiga distributioner använder du 'wsl.exe --list --online'.
+        Om du vill ha en lista över giltiga distributioner använder du 'lsw.exe --list --online'.
 
         Alternativ:
-            --enable-wsl1
-                Aktivera WSL1-stöd.
+            --enable-lsw1
+                Aktivera LSW1-stöd.
 
             --fixed-vhd
                 Skapa en disk med fast storlek för att lagra distributionen.
@@ -471,14 +471,14 @@ Argument för att hantera Windows-undersystem för Linux:
                 Ändra storlek på disken för fördelningen till den angivna storleken.
 
     --mount &lt;Disk&gt;
-        Ansluter och monterar en fysisk eller virtuell disk i alla WSL 2-distributioner.
+        Ansluter och monterar en fysisk eller virtuell disk i alla LSW 2-distributioner.
 
         Alternativ:
             --vhd
                 Anger att &lt;Disk&gt; refererar till en virtuell hårddisk.
 
             --bare
-                Anslut disken till WSL2, men montera den inte.
+                Anslut disken till LSW2, men montera den inte.
 
             --name &lt;Name&gt;
                 Montera disken med ett anpassat namn för monteringspunkten.
@@ -496,18 +496,18 @@ Argument för att hantera Windows-undersystem för Linux:
         Ändrar standardinstallationsversionen för nya distributioner.
 
     --shutdown
-        Avslutar omedelbart alla distributioner som körs och WSL 2
+        Avslutar omedelbart alla distributioner som körs och LSW 2
         den virtuella datorn med förenklat verktyg.
 
         Alternativ:
             --force
-                Avsluta den virtuella WSL 2-datorn även om en åtgärd pågår. Kan orsaka dataförlust.
+                Avsluta den virtuella LSW 2-datorn även om en åtgärd pågår. Kan orsaka dataförlust.
 
     --status
         Visa statusen för Windows-undersystem för Linux.
 
     --unmount [Disk]
-        Demonterar och kopplar bort en disk från alla WSL2-distributioner.
+        Demonterar och kopplar bort en disk från alla LSW2-distributioner.
         Demonterar och kopplar bort alla diskar om de anropas utan argument.
 
     --uninstall
@@ -567,7 +567,7 @@ Argument för att hantera distributioner i Windows-undersystem för Linux:
                 Visa detaljerad information om alla distributioner.
 
             --online, -o
-                Visar en lista över tillgängliga distributioner för installation med 'wsl.exe --install'.
+                Visar en lista över tillgängliga distributioner för installation med 'lsw.exe --install'.
 
     --set-default, -s &lt;Distro&gt;
         Anger fördelningen som standard.
@@ -583,7 +583,7 @@ Argument för att hantera distributioner i Windows-undersystem för Linux:
   <comment>{Locked="--exec,"}{Locked="--shell-type "}{Locked="--cd "}{Locked="--distribution,"}{Locked="--distribution-id "}{Locked="--user,"}{Locked="--system
 "}{Locked="--help
 "}{Locked="--debug-shell
-"}{Locked="--install "}{Locked="--list "}{Locked="--online'"}{Locked="--enable-wsl1
+"}{Locked="--install "}{Locked="--list "}{Locked="--online'"}{Locked="--enable-lsw1
 "}{Locked="--fixed-vhd
 "}{Locked="--from-file "}{Locked="--legacy
 "}{Locked="--location "}{Locked="--name "}{Locked="--no-distribution
@@ -602,9 +602,9 @@ Argument för att hantera distributioner i Windows-undersystem för Linux:
 "}{Locked="--quiet,"}{Locked="--verbose,"}{Locked="--online,"}{Locked="--install'"}{Locked="--set-default,"}{Locked="--set-version "}{Locked="--terminate,"}{Locked="--unregister "}Command line arguments, file names and string inserts should not be translated</comment>
   </data>
   <data name="MessagePackageVersions" xml:space="preserve">
-    <value>WSL-version: {}
+    <value>LSW-version: {}
 Kernelversion: {}
-WSLg-version: {}
+LSWg-version: {}
 MSRDC-version: {}
 Direct3D-version: {}
 DXCore-version: {}
@@ -633,7 +633,7 @@ Build-tid: {}</value>
     <value>Copyright (c) Microsoft Corporation. Med ensamrätt.
 Sekretessinformation om den här produkten finns på https://aka.ms/privacy.
 
-Användning: wslg.exe [Argument] [Options...] [CommandLine]
+Användning: lswg.exe [Argument] [Options...] [CommandLine]
 
 Argument:
     --cd &lt;Directory&gt;
@@ -673,7 +673,7 @@ Argument:
     <value>Import pågår. Det kan ta några minuter.</value>
   </data>
   <data name="GuiApplicationsDisabled" xml:space="preserve">
-    <value>Stöd för GUI-program har inaktiverats via {} eller /etc/wsl.conf.</value>
+    <value>Stöd för GUI-program har inaktiverats via {} eller /etc/lsw.conf.</value>
     <comment>{FixedPlaceholder="{}"}Command line arguments, file names and string inserts should not be translated</comment>
   </data>
   <data name="MessageCheckingForUpdates" xml:space="preserve">
@@ -683,7 +683,7 @@ Argument:
     <value>Den här distributionen är endast tillgänglig från Microsoft Store.</value>
   </data>
   <data name="MessageWslMountNotSupportedOnArm" xml:space="preserve">
-    <value>wsl.exe --mount på ARM64 kräver Windows version 27653 eller senare.</value>
+    <value>lsw.exe --mount på ARM64 kräver Windows version 27653 eller senare.</value>
     <comment>{Locked="--mount "}Command line arguments, file names and string inserts should not be translated</comment>
   </data>
   <data name="MessageUpdateNotNeeded" xml:space="preserve">
@@ -695,7 +695,7 @@ Argument:
   </data>
   <data name="MessageWslOptionalComponentRequired" xml:space="preserve">
     <value>Det här programmet kräver den Windows-undersystem för Linux valfria komponenten.
-Installera genom att köra: wsl.exe --install --no-distribution
+Installera genom att köra: lsw.exe --install --no-distribution
 Systemet kan behöva startas om så att ändringarna kan börja gälla.</value>
      <comment>{Locked="--install "}{Locked="--no-distribution
 "}Command line arguments, file names and string inserts should not be translated</comment>
@@ -708,14 +708,14 @@ Systemet kan behöva startas om så att ändringarna kan börja gälla.</value>
     <comment>{FixedPlaceholder="{}"}Command line arguments, file names and string inserts should not be translated</comment>
   </data>
   <data name="MessageVmSwitchNotSet" xml:space="preserve">
-    <value>Bryggda nätverk kräver att wsl2.vmSwitch anges.</value>
+    <value>Bryggda nätverk kräver att lsw2.vmSwitch anges.</value>
   </data>
   <data name="MessageCouldFetchDistributionList" xml:space="preserve">
     <value>Det gick inte att hämta listdistributionen från '{}'. {}</value>
     <comment>{FixedPlaceholder="{}"}Command line arguments, file names and string inserts should not be translated</comment>
   </data>
   <data name="MessageFailedToAttachDisk" xml:space="preserve">
-    <value>Det gick inte att ansluta disken'{}' till WSL2: {}</value>
+    <value>Det gick inte att ansluta disken'{}' till LSW2: {}</value>
     <comment>{FixedPlaceholder="{}"}Command line arguments, file names and string inserts should not be translated</comment>
   </data>
   <data name="MessageFailedToResizeDisk" xml:space="preserve">
@@ -730,11 +730,11 @@ Systemet kan behöva startas om så att ändringarna kan börja gälla.</value>
   <data name="MessageOsNotSupported" xml:space="preserve">
     <value>Windows-versionen {} stöder inte den paketerade versionen av Windows-undersystem för Linux.
 Installera den begärda uppdateringen via Windows Update eller via: {}
-Mer information finns på https://aka.ms/wslinstall</value>
+Mer information finns på https://aka.ms/lswinstall</value>
     <comment>{FixedPlaceholder="{}"}Command line arguments, file names and string inserts should not be translated</comment>
   </data>
   <data name="MessageAdministratorAccessRequiredForDebugShell" xml:space="preserve">
-    <value>Om du kör felsökningsgränssnittet måste du köra wsl.exe som administratör.</value>
+    <value>Om du kör felsökningsgränssnittet måste du köra lsw.exe som administratör.</value>
   </data>
   <data name="MessageInstallProcessFailed" xml:space="preserve">
     <value>Installationsprocessen för distributionen '{}' misslyckades med slutkoden: {}.</value>
@@ -785,7 +785,7 @@ Mer information finns på https://aka.ms/wslinstall</value>
     <comment>{FixedPlaceholder="{}"}Command line arguments, file names and string inserts should not be translated</comment>
   </data>
   <data name="MessageWarningDuringStartup" xml:space="preserve">
-    <value>Fel uppstod vid WSL-start</value>
+    <value>Fel uppstod vid LSW-start</value>
   </data>
   <data name="MessageOpenEventViewer" xml:space="preserve">
     <value>Öppna EventViewer</value>
@@ -830,12 +830,12 @@ Mer information finns på https://aka.ms/wslinstall</value>
     <comment>{FixedPlaceholder="{}"}Command line arguments, file names and string inserts should not be translated</comment>
   </data>
   <data name="MessageDistributionInstalled" xml:space="preserve">
-    <value>Distributionen har installerats. Det kan startas via "wsl.exe -d {}"</value>
+    <value>Distributionen har installerats. Det kan startas via "lsw.exe -d {}"</value>
     <comment>{FixedPlaceholder="{}"}Command line arguments, file names and string inserts should not be translated</comment>
   </data>
   <data name="MessageInvalidNumberString" xml:space="preserve">
-    <value>Ogiltig minnessträng '{}' för .wslconfig-posten '{}' i {}:{}</value>
-    <comment>{FixedPlaceholder="{}"}{Locked=".wslconfig"}Command line arguments, file names and string inserts should not be translated</comment>
+    <value>Ogiltig minnessträng '{}' för .lswconfig-posten '{}' i {}:{}</value>
+    <comment>{FixedPlaceholder="{}"}{Locked=".lswconfig"}Command line arguments, file names and string inserts should not be translated</comment>
   </data>
   <data name="MessagedFailedToCreateSwapVhd" xml:space="preserve">
     <value>Det gick inte att skapa växlingsdisken i '{}': {}</value>
@@ -874,22 +874,22 @@ Mer information finns på https://aka.ms/wslinstall</value>
     <value>DNS-tunneltrafik stöds inte</value>
   </data>
   <data name="MessageLocalhostForwardingNotSupportedMirroredMode" xml:space="preserve">
-    <value>Inställningen wsl2.localhostForwarding har ingen effekt när speglat nätverksläge används</value>
+    <value>Inställningen lsw2.localhostForwarding har ingen effekt när speglat nätverksläge används</value>
   </data>
   <data name="MessageHttpProxyChangeDetected" xml:space="preserve">
-    <value>En http-proxyändring har identifierats på värden. Starta om WSL för att tillämpa ändringen.</value>
+    <value>En http-proxyändring har identifierats på värden. Starta om LSW för att tillämpa ändringen.</value>
   </data>
   <data name="MessageProxyLocalhostSettingsDropped" xml:space="preserve">
-    <value>En konfiguration för localhost-proxy upptäcktes men speglades inte i WSL. WSL i NAT-läge stöder inte localhost-proxys.</value>
+    <value>En konfiguration för localhost-proxy upptäcktes men speglades inte i LSW. LSW i NAT-läge stöder inte localhost-proxys.</value>
   </data>
   <data name="MessageProxyV6SettingsDropped" xml:space="preserve">
-    <value>En IPv6-proxykonfiguration identifierades men speglades inte till WSL. WSL i NAT-läge stöder inte IPv6.</value>
+    <value>En IPv6-proxykonfiguration identifierades men speglades inte till LSW. LSW i NAT-läge stöder inte IPv6.</value>
   </data>
   <data name="MessageProxyLoopbackV6SettingsDropped" xml:space="preserve">
-    <value>En konfiguration för localhost IPv6-proxy upptäcktes men speglades inte i WSL. WSL stöder inte localhost IPv6-proxys.</value>
+    <value>En konfiguration för localhost IPv6-proxy upptäcktes men speglades inte i LSW. LSW stöder inte localhost IPv6-proxys.</value>
   </data>
   <data name="MessageProxyUnexpectedSettingsDropped" xml:space="preserve">
-    <value>Ett oväntat fel uppstod när proxyinställningarna skulle matchas. Proxyinställningarna speglades inte i WSL.</value>
+    <value>Ett oväntat fel uppstod när proxyinställningarna skulle matchas. Proxyinställningarna speglades inte i LSW.</value>
   </data>
   <data name="MessageRegistryError" xml:space="preserve">
     <value>Ett fel uppstod vid åtkomst till registret. Sökväg: {}. Fel: {}</value>
@@ -900,7 +900,7 @@ Mer information finns på https://aka.ms/wslinstall</value>
     <comment>{FixedPlaceholder="{}"}Command line arguments, file names and string inserts should not be translated</comment>
   </data>
   <data name="MessageVirtualMachinePlatformNotInstalled" xml:space="preserve">
-    <value>Det gick inte att starta det virtuella nätverket. Installera den valfria komponenten Virtual Machine Platform genom att köra: wsl.exe --install --no-distribution</value>
+    <value>Det gick inte att starta det virtuella nätverket. Installera den valfria komponenten Virtual Machine Platform genom att köra: lsw.exe --install --no-distribution</value>
     <comment>{Locked="--install "}{Locked="--no-distribution"}Command line arguments, file names and string inserts should not be translated</comment>
   </data>
   <data name="MessageNetworkInitializationFailedFallback2" xml:space="preserve">
@@ -920,29 +920,29 @@ Mer information finns på https://aka.ms/wslinstall</value>
     <comment>{FixedPlaceholder="{}"}Command line arguments, file names and string inserts should not be translated</comment>
   </data>
   <data name="MessagePluginRequiresUpdate" xml:space="preserve">
-    <value>Plugin-programmet {} kräver en nyare version av WSL. Kör: wsl.exe --update</value>
+    <value>Plugin-programmet {} kräver en nyare version av LSW. Kör: lsw.exe --update</value>
     <comment>{FixedPlaceholder="{}"}{Locked="--update"}Command line arguments, file names and string inserts should not be translated</comment>
   </data>
   <data name="MessageSettingOverridenByPolicy" xml:space="preserve">
-    <value>.wslconfig-inställningen '{}' har inaktiverats av datorprincipen.</value>
-    <comment>{FixedPlaceholder="{}"}{Locked=".wslconfig"}Command line arguments, file names and string inserts should not be translated</comment>
+    <value>.lswconfig-inställningen '{}' har inaktiverats av datorprincipen.</value>
+    <comment>{FixedPlaceholder="{}"}{Locked=".lswconfig"}Command line arguments, file names and string inserts should not be translated</comment>
   </data>
   <data name="MessageDebugShellDisabled" xml:space="preserve">
     <value>Felsökningsgränssnittet har inaktiverats av datorprincipen.</value>
   </data>
-  <data name="MessageWSLMountDisabled" xml:space="preserve">
-    <value>wsl.exe --mount har inaktiverats av datorprincipen.</value>
+  <data name="MessageLSWMountDisabled" xml:space="preserve">
+    <value>lsw.exe --mount har inaktiverats av datorprincipen.</value>
     <comment>{Locked="--mount "}Command line arguments, file names and string inserts should not be translated</comment>
   </data>
-  <data name="MessageWSL1Disabled" xml:space="preserve">
-    <value>WSL1 har inaktiverats av datorprincipen.</value>
+  <data name="MessageLSW1Disabled" xml:space="preserve">
+    <value>LSW1 har inaktiverats av datorprincipen.</value>
   </data>
-  <data name="MessageUpgradeToWSL2" xml:space="preserve">
-    <value>Kör wsl.exe --set-version {} 2 för att uppgradera till WSL2.</value>
+  <data name="MessageUpgradeToLSW2" xml:space="preserve">
+    <value>Kör lsw.exe --set-version {} 2 för att uppgradera till LSW2.</value>
     <comment>{FixedPlaceholder="{}"}{Locked="--set-version "}Command line arguments, file names and string inserts should not be translated</comment>
   </data>
   <data name="MessageFinishMsiInstallation" xml:space="preserve">
-    <value>WSL slutför en uppgradering...</value>
+    <value>LSW slutför en uppgradering...</value>
   </data>
   <data name="MessageUpdateFailed" xml:space="preserve">
     <value>Uppdateringen misslyckades (slutkod: {}).</value>
@@ -965,7 +965,7 @@ Mer information finns på https://aka.ms/wslinstall</value>
     <comment>{FixedPlaceholder="{}"}Command line arguments, file names and string inserts should not be translated</comment>
   </data>
   <data name="MessageMissingOptionalComponents" xml:space="preserve">
-    <value>Valfria komponenter som behövs för att köra WSL har inte installerats.</value>
+    <value>Valfria komponenter som behövs för att köra LSW har inte installerats.</value>
   </data>
   <data name="MessageInstallMissingOptionalComponents" xml:space="preserve">
     <value>Installera komponenter som saknas.</value>
@@ -990,7 +990,7 @@ Mer information finns på https://aka.ms/wslinstall</value>
     <value>Visa dokument</value>
   </data>
   <data name="MessageVhdInUse" xml:space="preserve">
-    <value>Det gick inte att slutföra åtgärden eftersom vhdx används för närvarande. Så här tvingar du WSL att sluta använda: wsl.exe --shutdown</value>
+    <value>Det gick inte att slutföra åtgärden eftersom vhdx används för närvarande. Så här tvingar du LSW att sluta använda: lsw.exe --shutdown</value>
     <comment>{Locked="--shutdown"}Command line arguments, file names and string inserts should not be translated</comment>
   </data>
   <data name="MessageInvalidBoolean" xml:space="preserve">
@@ -998,10 +998,10 @@ Mer information finns på https://aka.ms/wslinstall</value>
     <comment>{FixedPlaceholder="{}"}Command line arguments, file names and string inserts should not be translated</comment>
   </data>
   <data name="MessageSparseVhdWsl2Only" xml:space="preserve">
-    <value>Sparse vhdx stöds endast på WSL2.</value>
+    <value>Sparse vhdx stöds endast på LSW2.</value>
   </data>
   <data name="MessageLocalSystemNotSupported" xml:space="preserve">
-    <value>Det finns inte stöd för att köra WSL som lokalt system.</value>
+    <value>Det finns inte stöd för att köra LSW som lokalt system.</value>
   </data>
   <data name="MessagePerformanceTip" xml:space="preserve">
     <value>Prestandatips:</value>
@@ -1016,10 +1016,10 @@ Mer information finns på https://aka.ms/wslinstall</value>
   <data name="MessageDontShowAgain" xml:space="preserve">
     <value>Visa inte detta igen</value>
   </data>
-  <data name="MessageWSL2Crashed" xml:space="preserve">
-    <value>Den virtuella WSL2-maskinen kraschade.</value>
+  <data name="MessageLSW2Crashed" xml:space="preserve">
+    <value>Den virtuella LSW2-maskinen kraschade.</value>
   </data>
-  <data name="MessageWSL2CrashedStackTrace" xml:space="preserve">
+  <data name="MessageLSW2CrashedStackTrace" xml:space="preserve">
     <value>Stackspårningen har sparats i: {}</value>
     <comment>{FixedPlaceholder="{}"}Command line arguments, file names and string inserts should not be translated</comment>
   </data>
@@ -1059,11 +1059,11 @@ Försöker ladda ned...</value>
     <value>Ingen standarddistribution har konfigurerats. Ange en distribution att installera.</value>
   </data>
   <data name="MessageConfigVirtio9pDisabled" xml:space="preserve">
-    <value>wsl2.virtio9p är inaktiverat och återgår till 9p med vsock-transport.</value>
+    <value>lsw2.virtio9p är inaktiverat och återgår till 9p med vsock-transport.</value>
   </data>
   <data name="MessageInstallationCorrupted" xml:space="preserve">
-    <value>WSL-installationen verkar vara skadad (felkod: {}).
-Tryck på valfri tangent för att reparera WSL eller CTRL-C för att avbryta.
+    <value>LSW-installationen verkar vara skadad (felkod: {}).
+Tryck på valfri tangent för att reparera LSW eller CTRL-C för att avbryta.
 Tidsgränsen för den här frågan går ut om 60 sekunder.</value>
     <comment>{FixedPlaceholder="{}"}Command line arguments, file names and string inserts should not be translated</comment>
   </data>
@@ -1085,14 +1085,14 @@ Felkod: {}</value>
     <comment>{FixedPlaceholder="{}"}Command line arguments, file names and string inserts should not be translated</comment>
   </data>
   <data name="MessageTooManyProcessors" xml:space="preserve">
-    <value>wsl2.processors får inte överskrida antalet logiska processorer i systemet ({} &gt; {})</value>
+    <value>lsw2.processors får inte överskrida antalet logiska processorer i systemet ({} &gt; {})</value>
     <comment>{FixedPlaceholder="{}"}Command line arguments, file names and string inserts should not be translated</comment>
   </data>
   <data name="MessageFailedToQueryNetworkingMode" xml:space="preserve">
     <value>Det gick inte att fråga om nätverksläget</value>
   </data>
   <data name="MessageMismatchedKernelModulesError" xml:space="preserve">
-    <value>Anpassade kernelmoduler angavs utan att en anpassad kernel angavs. Mer information finns i https://aka.ms/wslcustomkernel.</value>
+    <value>Anpassade kernelmoduler angavs utan att en anpassad kernel angavs. Mer information finns i https://aka.ms/lswcustomkernel.</value>
   </data>
   <data name="MessageDnsTunnelingDisabled" xml:space="preserve">
     <value>DNS-tunneling är inaktiverat på grund av ett aktuellt kompatibilitetsproblem med klienten för Global säker åtkomst.</value>
@@ -1100,7 +1100,7 @@ Felkod: {}</value>
   <data name="MessageSparseVhdDisabled" xml:space="preserve">
     <value>Stöd för dynamiskt expanderbar VHD är för närvarande inaktiverat på grund av potentiell datakorruption.
 Om du vill tvinga en distribution att använda en dynamiskt expanderbar VHD kör du:
-wsl.exe --manage &lt;DistributionName&gt; --set-sparse --allow-unsafe</value>
+lsw.exe --manage &lt;DistributionName&gt; --set-sparse --allow-unsafe</value>
     <comment>{Locked="--manage "}{Locked="--set-sparse "}{Locked="--allow-unsafe"}Command line arguments, file names and string inserts should not be translated</comment>
   </data>
   <data name="MessageDrvfsMountFailed" xml:space="preserve">
@@ -1112,7 +1112,7 @@ wsl.exe --manage &lt;DistributionName&gt; --set-sparse --allow-unsafe</value>
   </data>
   <data name="MessageReadOnlyDistro" xml:space="preserve">
     <value>Ett fel uppstod vid montering av distributionsdisken, den monterades skrivskyddad som en reservåtgärd.
-Se återställningsinstruktioner på: https://aka.ms/wsldiskmountrecovery</value>
+Se återställningsinstruktioner på: https://aka.ms/lswdiskmountrecovery</value>
   </data>
   <data name="MessageFailedToTranslate" xml:space="preserve">
     <value>Det gick inte att översätta "{}"</value>
@@ -1134,8 +1134,8 @@ Se återställningsinstruktioner på: https://aka.ms/wsldiskmountrecovery</value
     <value>Windows-undersystem för Linux inställningar</value>
   </data>
   <data name="Settings_AppDescription" xml:space="preserve">
-    <value>Windows-undersystem för Linux Inställningar låter utvecklare hantera .wslconfig-filen med hjälp av ett GUI-baserat program.</value>
-    <comment>{Locked=".wslconfig"}Command line arguments, file names and string inserts should not be translated</comment>
+    <value>Windows-undersystem för Linux Inställningar låter utvecklare hantera .lswconfig-filen med hjälp av ett GUI-baserat program.</value>
+    <comment>{Locked=".lswconfig"}Command line arguments, file names and string inserts should not be translated</comment>
   </data>
   <data name="Settings_AutoMemoryReclaim.Header" xml:space="preserve">
     <value>Frigör automatiskt minne</value>
@@ -1153,26 +1153,26 @@ Se återställningsinstruktioner på: https://aka.ms/wsldiskmountrecovery</value
     <value>Automatisk proxy har aktiverats</value>
   </data>
   <data name="Settings_AutoProxy.Description" xml:space="preserve">
-    <value>Gör att WSL kan använda Windows HTTP-proxyinformation.</value>
+    <value>Gör att LSW kan använda Windows HTTP-proxyinformation.</value>
   </data>
   <data name="Settings_AutoProxyToggleSwitch.AutomationProperties.Name" xml:space="preserve">
     <value>Automatisk proxy har aktiverats.</value>
   </data>
   <data name="Settings_AutoProxyToggleSwitch.AutomationProperties.HelpText" xml:space="preserve">
-    <value>Gör att WSL kan använda Windows HTTP-proxyinformation.</value>
+    <value>Gör att LSW kan använda Windows HTTP-proxyinformation.</value>
   </data>
   <data name="Settings_BestEffortDNS.Header" xml:space="preserve">
     <value>Använd bästa möjliga DNS-parsning</value>
   </data>
   <data name="Settings_BestEffortDNS.Description" xml:space="preserve">
-    <value>Gäller endast när wsl2.dnsTunneling har angetts till true. När värdet är true extraherar Windows frågan från DNS-begäran och försöker lösa den och ignorerar de okända posterna.</value>
-    <comment>{Locked="wsl2.dnsTunneling"}.wslconfig property key names should not be translated</comment>
+    <value>Gäller endast när lsw2.dnsTunneling har angetts till true. När värdet är true extraherar Windows frågan från DNS-begäran och försöker lösa den och ignorerar de okända posterna.</value>
+    <comment>{Locked="lsw2.dnsTunneling"}.lswconfig property key names should not be translated</comment>
   </data>
   <data name="Settings_BestEffortDNSToggleSwitch.AutomationProperties.Name" xml:space="preserve">
     <value>Använd bästa möjliga DNS-parsning.</value>
   </data>
   <data name="Settings_BestEffortDNSToggleSwitch.AutomationProperties.HelpText" xml:space="preserve">
-    <value>Gäller endast när wsl2.dnsTunneling har angetts till true. När värdet är true extraherar Windows frågan från DNS-begäran och försöker lösa den och ignorerar de okända posterna.</value>
+    <value>Gäller endast när lsw2.dnsTunneling har angetts till true. När värdet är true extraherar Windows frågan från DNS-begäran och försöker lösa den och ignorerar de okända posterna.</value>
   </data>
   <data name="Settings_CustomKernelPath.Header" xml:space="preserve">
     <value>Anpassad kernel</value>
@@ -1211,36 +1211,36 @@ Se återställningsinstruktioner på: https://aka.ms/wsldiskmountrecovery</value
     <value>Bläddra bland distributioner</value>
   </data>
   <data name="Settings_CustomSystemDistroPathDescription.Text" xml:space="preserve">
-    <value>Ange en sökväg till en virtuell hårddisk som ska läsas in som en anpassad systemdistro, främst för att driva GUI-appar i WSL. [Läs mer om systemdistros här].</value>
+    <value>Ange en sökväg till en virtuell hårddisk som ska läsas in som en anpassad systemdistro, främst för att driva GUI-appar i LSW. [Läs mer om systemdistros här].</value>
     <comment>{Locked="["}{Locked="]"}The text in between the delimiters [ ] is made into an hyperlink in code, and the delimiters are removed</comment>
   </data>
   <data name="Settings_CustomSystemDistroPathDescription.NavigateUri" xml:space="preserve">
-    <value>https://aka.ms/wslgsystemdistro</value>
-    <comment>{Locked}Uri to the Microsoft WSLg architecture devblog</comment>
+    <value>https://aka.ms/lswgsystemdistro</value>
+    <comment>{Locked}Uri to the Microsoft LSWg architecture devblog</comment>
   </data>
   <data name="Settings_CustomSystemDistroPathTextBox.AutomationProperties.Name" xml:space="preserve">
     <value>Distribution av anpassat system</value>
   </data>
   <data name="Settings_CustomSystemDistroPathTextBox.AutomationProperties.HelpText" xml:space="preserve">
-    <value>Ange en sökväg till en virtuell hårddisk som ska läsas in som en anpassad systemdistro, främst för att driva GUI-appar i WSL.</value>
+    <value>Ange en sökväg till en virtuell hårddisk som ska läsas in som en anpassad systemdistro, främst för att driva GUI-appar i LSW.</value>
   </data>
   <data name="Settings_DebugConsole.Header" xml:space="preserve">
     <value>Aktivera felsökningskonsol</value>
   </data>
   <data name="Settings_DebugConsole.Description" xml:space="preserve">
-    <value>Booleskt värde för att aktivera ett utdatakonsolfönster som visar innehållet i dmesg när en WSL 2-distributionsinstans startas.</value>
+    <value>Booleskt värde för att aktivera ett utdatakonsolfönster som visar innehållet i dmesg när en LSW 2-distributionsinstans startas.</value>
   </data>
   <data name="Settings_DebugConsoleToggleSwitch.AutomationProperties.Name" xml:space="preserve">
     <value>Aktivera felsökningskonsol.</value>
   </data>
   <data name="Settings_DebugConsoleToggleSwitch.AutomationProperties.HelpText" xml:space="preserve">
-    <value>Booleskt värde för att aktivera ett utdatakonsolfönster som visar innehållet i diagnostikmeddelanden när en WSL 2-distributionsinstans startas.</value>
+    <value>Booleskt värde för att aktivera ett utdatakonsolfönster som visar innehållet i diagnostikmeddelanden när en LSW 2-distributionsinstans startas.</value>
   </data>
   <data name="Settings_DefaultVHDSize.Header" xml:space="preserve">
     <value>Standardstorlek för virtuell hårddisk</value>
   </data>
   <data name="Settings_DefaultVHDSize.Description" xml:space="preserve">
-    <value>Standardstorleken för den expanderbara virtuella WSL-hårddisken (VHD) för nyligen skapade distributioner.</value>
+    <value>Standardstorleken för den expanderbara virtuella LSW-hårddisken (VHD) för nyligen skapade distributioner.</value>
   </data>
   <data name="Settings_DefaultVHDSizeResetButton.Content" xml:space="preserve">
     <value>Återställ storlek</value>
@@ -1249,7 +1249,7 @@ Se återställningsinstruktioner på: https://aka.ms/wsldiskmountrecovery</value
     <value>Standardstorlek för virtuell hårddisk</value>
   </data>
   <data name="Settings_DefaultVHDSizeTextBox.AutomationProperties.HelpText" xml:space="preserve">
-    <value>Standardstorleken, angiven i megabyte, för den expanderbara virtuella WSL-hårddisken (VHD) endast för nyligen skapade distributioner.</value>
+    <value>Standardstorleken, angiven i megabyte, för den expanderbara virtuella LSW-hårddisken (VHD) endast för nyligen skapade distributioner.</value>
   </data>
   <data name="Settings_DeveloperPageTitle.Text" xml:space="preserve">
     <value>Utvecklare</value>
@@ -1258,39 +1258,39 @@ Se återställningsinstruktioner på: https://aka.ms/wsldiskmountrecovery</value
     <value>Dokumentation</value>
   </data>
   <data name="Settings_DocumentationLink.NavigateUri" xml:space="preserve">
-    <value>https://aka.ms/wsldocs</value>
-    <comment>{Locked}Uri to Microsoft WSL documentation</comment>
+    <value>https://aka.ms/lswdocs</value>
+    <comment>{Locked}Uri to Microsoft LSW documentation</comment>
   </data>
   <data name="Settings_DrvFSMode.Header" xml:space="preserve">
     <value>Ändra DrvFS-läge</value>
   </data>
   <data name="Settings_DrvFSMode.Description" xml:space="preserve">
-    <value>Ändrar implementering av filåtkomst mellan operativsystem i WSL.</value>
+    <value>Ändrar implementering av filåtkomst mellan operativsystem i LSW.</value>
   </data>
   <data name="Settings_DNSProxy.Header" xml:space="preserve">
     <value>DNS-proxy har aktiverats</value>
   </data>
   <data name="Settings_DNSProxy.Description" xml:space="preserve">
-    <value>Gäller endast när wsl2.networkingMode har angetts till NAT. Booleskt värde för att informera WSL om att konfigurera DNS-servern i Linux till NAT på värden. Om du anger falskt speglas DNS-servrar från Windows till Linux.</value>
-    <comment>{Locked="wsl2.networkingMode"}.wslconfig property key names should not be translated</comment>
+    <value>Gäller endast när lsw2.networkingMode har angetts till NAT. Booleskt värde för att informera LSW om att konfigurera DNS-servern i Linux till NAT på värden. Om du anger falskt speglas DNS-servrar från Windows till Linux.</value>
+    <comment>{Locked="lsw2.networkingMode"}.lswconfig property key names should not be translated</comment>
   </data>
   <data name="Settings_DNSProxyToggleSwitch.AutomationProperties.Name" xml:space="preserve">
     <value>DNS-proxy har aktiverats.</value>
   </data>
   <data name="Settings_DNSProxyToggleSwitch.AutomationProperties.HelpText" xml:space="preserve">
-    <value>Gäller endast när wsl2.networkingMode har angetts till NAT. Booleskt värde för att informera WSL om att konfigurera DNS-servern i Linux till NAT på värden. Om du anger falskt speglas DNS-servrar från Windows till Linux.</value>
+    <value>Gäller endast när lsw2.networkingMode har angetts till NAT. Booleskt värde för att informera LSW om att konfigurera DNS-servern i Linux till NAT på värden. Om du anger falskt speglas DNS-servrar från Windows till Linux.</value>
   </data>
   <data name="Settings_DNSTunneling.Header" xml:space="preserve">
     <value>Händelsedirigering nedåt för DNS har aktiverats</value>
   </data>
   <data name="Settings_DNSTunneling.Description" xml:space="preserve">
-    <value>Ändrar hur DNS-begäranden proxieras från WSL till Windows.</value>
+    <value>Ändrar hur DNS-begäranden proxieras från LSW till Windows.</value>
   </data>
   <data name="Settings_DNSTunnelingToggleSwitch.AutomationProperties.Name" xml:space="preserve">
     <value>Händelsedirigering nedåt för DNS har aktiverats.</value>
   </data>
   <data name="Settings_DNSTunnelingToggleSwitch.AutomationProperties.HelpText" xml:space="preserve">
-    <value>Ändrar hur DNS-begäranden proxieras från WSL till Windows.</value>
+    <value>Ändrar hur DNS-begäranden proxieras från LSW till Windows.</value>
   </data>
   <data name="Settings_FileSystemPageTitle.Text" xml:space="preserve">
     <value>Filsystem</value>
@@ -1299,17 +1299,17 @@ Se återställningsinstruktioner på: https://aka.ms/wsldiskmountrecovery</value
     <value>Aktivera GUI-program</value>
   </data>
   <data name="Settings_GUIApplicationsDescription.Text" xml:space="preserve">
-    <value>Booleskt värde för att aktivera eller inaktivera stöd för GUI-program ([WSLg]) i WSL.</value>
+    <value>Booleskt värde för att aktivera eller inaktivera stöd för GUI-program ([LSWg]) i LSW.</value>
   </data>
   <data name="Settings_GUIApplicationsDescription.NavigateUri" xml:space="preserve">
-    <value>https://aka.ms/wslgproject</value>
-    <comment>{Locked}Uri to the Microsoft GitHub WSLg project</comment>
+    <value>https://aka.ms/lswgproject</value>
+    <comment>{Locked}Uri to the Microsoft GitHub LSWg project</comment>
   </data>
   <data name="Settings_GUIApplicationsToggleSwitch.AutomationProperties.Name" xml:space="preserve">
     <value>Aktivera GUI-program.</value>
   </data>
   <data name="Settings_GUIApplicationsToggleSwitch.AutomationProperties.HelpText" xml:space="preserve">
-    <value>Booleskt värde för att aktivera eller inaktivera stöd för GUI-program (kallas WSL g) i WSL.</value>
+    <value>Booleskt värde för att aktivera eller inaktivera stöd för GUI-program (kallas LSW g) i LSW.</value>
   </data>
   <data name="Settings_HWPerfCounters.Header" xml:space="preserve">
     <value>Aktivera prestandaräknare för maskinvara</value>
@@ -1327,33 +1327,33 @@ Se återställningsinstruktioner på: https://aka.ms/wsldiskmountrecovery</value
     <value>Hyper-V-brandväggen är aktiverad</value>
   </data>
   <data name="Settings_HyperVFirewall.Description" xml:space="preserve">
-    <value>Aktiverar Hyper-V-brandväggen som gör att Windows-brandväggsreglerna och regler som är specifika för Hyper-V-trafik kan filtrera WSL-nätverkstrafik.</value>
+    <value>Aktiverar Hyper-V-brandväggen som gör att Windows-brandväggsreglerna och regler som är specifika för Hyper-V-trafik kan filtrera LSW-nätverkstrafik.</value>
   </data>
   <data name="Settings_HyperVFirewallToggleSwitch.AutomationProperties.Name" xml:space="preserve">
     <value>Hyper-V-brandväggen har aktiverats.</value>
   </data>
   <data name="Settings_HyperVFirewallToggleSwitch.AutomationProperties.HelpText" xml:space="preserve">
-    <value>Aktiverar Hyper-V-brandväggen som gör att Windows-brandväggsreglerna och regler som är specifika för Hyper-V-trafik kan filtrera WSL-nätverkstrafik.</value>
+    <value>Aktiverar Hyper-V-brandväggen som gör att Windows-brandväggsreglerna och regler som är specifika för Hyper-V-trafik kan filtrera LSW-nätverkstrafik.</value>
   </data>
   <data name="Settings_HostAddressLoopback.Header" xml:space="preserve">
     <value>Loopback för värdadress</value>
   </data>
   <data name="Settings_HostAddressLoopback.Description" xml:space="preserve">
-    <value>Gäller endast när wsl2.networkingMode är inställt på spegling. När värdet är True tillåter det att containern ansluter till värden, eller värden, för att ansluta till containern, via en IP-adress som tilldelats värden. Observera att loopback-adressen 127.0.0.1 alltid kan användas – med det här alternativet kan även alla ytterligare tilldelade lokala IP-adresser användas.</value>
-    <comment>{Locked="wsl2.networkingMode"}.wslconfig property key names should not be translated</comment>
+    <value>Gäller endast när lsw2.networkingMode är inställt på spegling. När värdet är True tillåter det att containern ansluter till värden, eller värden, för att ansluta till containern, via en IP-adress som tilldelats värden. Observera att loopback-adressen 127.0.0.1 alltid kan användas – med det här alternativet kan även alla ytterligare tilldelade lokala IP-adresser användas.</value>
+    <comment>{Locked="lsw2.networkingMode"}.lswconfig property key names should not be translated</comment>
   </data>
   <data name="Settings_HostAddressLoopbackToggleSwitch.AutomationProperties.Name" xml:space="preserve">
     <value>Loopback för värddatoradress.</value>
   </data>
   <data name="Settings_HostAddressLoopbackToggleSwitch.AutomationProperties.HelpText" xml:space="preserve">
-    <value>Gäller endast när wsl2.networkingMode är inställt på spegling. När värdet är True tillåter det att containern ansluter till värden, eller värden, för att ansluta till containern, via en IP-adress som tilldelats värden. Observera att loopback-adressen 127.0.0.1 alltid kan användas – med det här alternativet kan även alla ytterligare tilldelade lokala IP-adresser användas.</value>
+    <value>Gäller endast när lsw2.networkingMode är inställt på spegling. När värdet är True tillåter det att containern ansluter till värden, eller värden, för att ansluta till containern, via en IP-adress som tilldelats värden. Observera att loopback-adressen 127.0.0.1 alltid kan användas – med det här alternativet kan även alla ytterligare tilldelade lokala IP-adresser användas.</value>
   </data>
   <data name="Settings_IgnoredPorts.Header" xml:space="preserve">
     <value>Ignorerade portar</value>
   </data>
   <data name="Settings_IgnoredPorts.Description" xml:space="preserve">
-    <value>Gäller endast när wsl2.networkingMode är inställt på spegling. Anger vilka portar Som Linux-program kan binda till som inte vidarebefordras automatiskt eller beaktas i Windows. Ska formateras i en kommaavgränsad lista, t.ex. 3000 9000 9090.</value>
-    <comment>{Locked="wsl2.networkingMode"}.wslconfig property key names should not be translated</comment>
+    <value>Gäller endast när lsw2.networkingMode är inställt på spegling. Anger vilka portar Som Linux-program kan binda till som inte vidarebefordras automatiskt eller beaktas i Windows. Ska formateras i en kommaavgränsad lista, t.ex. 3000 9000 9090.</value>
+    <comment>{Locked="lsw2.networkingMode"}.lswconfig property key names should not be translated</comment>
   </data>
   <data name="Settings_IgnoredPortsResetButton.Content" xml:space="preserve">
     <value>Återställ portar</value>
@@ -1362,14 +1362,14 @@ Se återställningsinstruktioner på: https://aka.ms/wsldiskmountrecovery</value
     <value>Ignorerade portar</value>
   </data>
   <data name="Settings_IgnoredPortsTextBox.AutomationProperties.HelpText" xml:space="preserve">
-    <value>Gäller endast när wsl2.networkingMode är inställt på spegling. Anger vilka portar som Linux-program kan binda till som inte vidarebefordras automatiskt eller tas i beaktande i Windows. Ska formateras i en kommaavgränsad lista, t.ex. 3000, 9000, 9090.</value>
+    <value>Gäller endast när lsw2.networkingMode är inställt på spegling. Anger vilka portar som Linux-program kan binda till som inte vidarebefordras automatiskt eller tas i beaktande i Windows. Ska formateras i en kommaavgränsad lista, t.ex. 3000, 9000, 9090.</value>
   </data>
   <data name="Settings_InitialAutoProxyTimeout.Header" xml:space="preserve">
     <value>Tidsgräns för inledande automatisk proxy</value>
   </data>
   <data name="Settings_InitialAutoProxyTimeout.Description" xml:space="preserve">
-    <value>Gäller endast när wsl2.autoProxy har angetts till true. Anger hur länge (i millisekunder) WSL ska vänta på att HTTP-proxyinformation hämtas när en WSL-behållare startas. Om proxyinställningarna matchas efter den här tidpunkten måste WSL-instansen startas om för att använda de hämtade proxyinställningarna.</value>
-    <comment>{Locked="wsl2.autoProxy"}.wslconfig property key names should not be translated</comment>
+    <value>Gäller endast när lsw2.autoProxy har angetts till true. Anger hur länge (i millisekunder) LSW ska vänta på att HTTP-proxyinformation hämtas när en LSW-behållare startas. Om proxyinställningarna matchas efter den här tidpunkten måste LSW-instansen startas om för att använda de hämtade proxyinställningarna.</value>
+    <comment>{Locked="lsw2.autoProxy"}.lswconfig property key names should not be translated</comment>
   </data>
   <data name="Settings_InitialAutoProxyTimeoutResetButton.Content" xml:space="preserve">
     <value>Återställ tidsgräns</value>
@@ -1378,7 +1378,7 @@ Se återställningsinstruktioner på: https://aka.ms/wsldiskmountrecovery</value
     <value>Tidsgräns för inledande automatisk proxy</value>
   </data>
   <data name="Settings_InitialAutoProxyTimeoutTextBox.AutomationProperties.HelpText" xml:space="preserve">
-    <value>Gäller endast när wsl2.autoProxy har angetts till true. Anger hur länge WSL i millisekunder ska vänta på att HTTP-proxyinformation hämtas när en WSL-container startas. Om proxyinställningarna matchas efter den här tidpunkten måste WSL-instansen startas om för att använda de hämtade proxyinställningarna.</value>
+    <value>Gäller endast när lsw2.autoProxy har angetts till true. Anger hur länge LSW i millisekunder ska vänta på att HTTP-proxyinformation hämtas när en LSW-container startas. Om proxyinställningarna matchas efter den här tidpunkten måste LSW-instansen startas om för att använda de hämtade proxyinställningarna.</value>
   </data>
   <data name="Settings_KernelCommandLine.Header" xml:space="preserve">
     <value>Kernel-kommandorad</value>
@@ -1390,13 +1390,13 @@ Se återställningsinstruktioner på: https://aka.ms/wsldiskmountrecovery</value
     <value>Aktivera localhost-vidarebefordran</value>
   </data>
   <data name="Settings_LocalhostForwarding.Description" xml:space="preserve">
-    <value>Booleskt värde som anger om portar som är bundna till jokertecken eller localhost i den virtuella WSL 2-datorn ska kunna anslutas från värden via localhost:port.</value>
+    <value>Booleskt värde som anger om portar som är bundna till jokertecken eller localhost i den virtuella LSW 2-datorn ska kunna anslutas från värden via localhost:port.</value>
   </data>
   <data name="Settings_LocalhostForwardingToggleSwitch.AutomationProperties.Name" xml:space="preserve">
     <value>Aktivera localhost-vidarebefordran.</value>
   </data>
   <data name="Settings_LocalhostForwardingToggleSwitch.AutomationProperties.HelpText" xml:space="preserve">
-    <value>Booleskt värde som anger om portar som är bundna till jokertecken eller localhost i den virtuella WSL 2-datorn ska kunna anslutas från värddatorn via localhost, kolon, port.</value>
+    <value>Booleskt värde som anger om portar som är bundna till jokertecken eller localhost i den virtuella LSW 2-datorn ska kunna anslutas från värddatorn via localhost, kolon, port.</value>
   </data>
   <data name="Settings_MegabyteStringFormat" xml:space="preserve">
     <value>{0} MB</value>
@@ -1408,7 +1408,7 @@ Se återställningsinstruktioner på: https://aka.ms/wsldiskmountrecovery</value
     <value>Minnesstorlek</value>
   </data>
   <data name="Settings_MemorySize.Description" xml:space="preserve">
-    <value>Hur mycket minne som ska tilldelas den virtuella WSL 2-datorn.</value>
+    <value>Hur mycket minne som ska tilldelas den virtuella LSW 2-datorn.</value>
   </data>
   <data name="Settings_MemorySizeResetButton.Content" xml:space="preserve">
     <value>Återställ storlek</value>
@@ -1417,7 +1417,7 @@ Se återställningsinstruktioner på: https://aka.ms/wsldiskmountrecovery</value
     <value>Minnesstorlek</value>
   </data>
   <data name="Settings_MemorySizeTextBox.AutomationProperties.HelpText" xml:space="preserve">
-    <value>Hur mycket minne som anges i megabyte för att tilldela den virtuella WSL 2-datorn.</value>
+    <value>Hur mycket minne som anges i megabyte för att tilldela den virtuella LSW 2-datorn.</value>
   </data>
   <data name="Settings_MillisecondsStringFormat" xml:space="preserve">
     <value>{0} millisekunder</value>
@@ -1426,25 +1426,25 @@ Se återställningsinstruktioner på: https://aka.ms/wsldiskmountrecovery</value
     <value>Aktivera kapslad virtualisering</value>
   </data>
   <data name="Settings_NestedVirtualization.Description" xml:space="preserve">
-    <value>Booleskt värde för att aktivera eller inaktivera kapslad virtualisering, vilket gör att andra kapslade virtuella datorer kan köras i WSL 2.</value>
+    <value>Booleskt värde för att aktivera eller inaktivera kapslad virtualisering, vilket gör att andra kapslade virtuella datorer kan köras i LSW 2.</value>
   </data>
   <data name="Settings_NestedVirtualizationToggleSwitch.AutomationProperties.Name" xml:space="preserve">
     <value>Aktivera kapslad virtualisering.</value>
   </data>
   <data name="Settings_NestedVirtualizationToggleSwitch.AutomationProperties.HelpText" xml:space="preserve">
-    <value>Booleskt värde för att aktivera eller inaktivera kapslad virtualisering, vilket gör att andra kapslade virtuella datorer kan köras i WSL 2.</value>
+    <value>Booleskt värde för att aktivera eller inaktivera kapslad virtualisering, vilket gör att andra kapslade virtuella datorer kan köras i LSW 2.</value>
   </data>
   <data name="Settings_NetworkingMode.Header" xml:space="preserve">
     <value>Nätverksläge</value>
   </data>
   <data name="Settings_NetworkingMode.Description" xml:space="preserve">
-    <value>Anger nätverksläget för WSL.</value>
+    <value>Anger nätverksläget för LSW.</value>
   </data>
   <data name="Settings_NetworkingModeComboBox.AutomationProperties.Name" xml:space="preserve">
     <value>Nätverksläge.</value>
   </data>
   <data name="Settings_NetworkingModeComboBox.AutomationProperties.HelpText" xml:space="preserve">
-    <value>Anger nätverksläget för WSL.</value>
+    <value>Anger nätverksläget för LSW.</value>
   </data>
   <data name="Settings_NetworkingPageTitle.Text" xml:space="preserve">
     <value>Nätverk</value>
@@ -1467,14 +1467,14 @@ cd /mnt/c</value>
     <value>Få åtkomst till dina Linux-filer med Utforskaren</value>
   </data>
   <data name="Settings_OOBECrossOSFileAccess_LinuxFromFileExplorerSample.Text" xml:space="preserve">
-    <value>Du kan visa dina Linux-filer från Utforskaren genom att navigera till \\wsl.localhost\ eller klicka på Linux-ikonen.</value>
-    <comment>{Locked="\\wsl.localhost\"}Url addresses should not be translated.</comment>
+    <value>Du kan visa dina Linux-filer från Utforskaren genom att navigera till \\lsw.localhost\ eller klicka på Linux-ikonen.</value>
+    <comment>{Locked="\\lsw.localhost\"}Url addresses should not be translated.</comment>
   </data>
-  <data name="Settings_OOBECrossOSFileAccess_LaunchWindowsFromWSLTitle.Text" xml:space="preserve">
-    <value>Starta Windows-filer och -program från WSL</value>
+  <data name="Settings_OOBECrossOSFileAccess_LaunchWindowsFromLSWTitle.Text" xml:space="preserve">
+    <value>Starta Windows-filer och -program från LSW</value>
   </data>
-  <data name="Settings_OOBECrossOSFileAccess_LaunchWindowsFromWSLSample.Text" xml:space="preserve">
-    <value>Även om du använder WSL kan du köra dina körbara Windows-filer direkt från bash. Prova att köra
+  <data name="Settings_OOBECrossOSFileAccess_LaunchWindowsFromLSWSample.Text" xml:space="preserve">
+    <value>Även om du använder LSW kan du köra dina körbara Windows-filer direkt från bash. Prova att köra
 powershell.exe /c start . för att öppna Utforskaren i den aktuella mappen.</value>
     <comment>{Locked="/c start ."}Command line arguments and file names should not be translated</comment>
   </data>
@@ -1493,106 +1493,106 @@ powershell.exe /c start . för att öppna Utforskaren i den aktuella mappen.</va
     <value>Nätverk i speglat läge</value>
   </data>
   <data name="Settings_OOBECrossOSFileAccess_MirroredModeNetworkingSample.Text" xml:space="preserve">
-    <value>WSL innehåller också ett nytt nätverksläge som kallas speglat läge som lägger till avancerade funktioner som IPv6-stöd och möjlighet att komma åt dina nätverksprogram i ditt lokala nätverk.</value>
+    <value>LSW innehåller också ett nytt nätverksläge som kallas speglat läge som lägger till avancerade funktioner som IPv6-stöd och möjlighet att komma åt dina nätverksprogram i ditt lokala nätverk.</value>
   </data>
   <data name="Settings_OOBECrossOSFileAccessLink.Content" xml:space="preserve">
     <value>Läs mer om filåtkomst mellan operativsystem</value>
   </data>
   <data name="Settings_OOBECrossOSFileAccessLink.NavigateUri" xml:space="preserve">
-    <value>https://aka.ms/wslfilesystems</value>
+    <value>https://aka.ms/lswfilesystems</value>
     <comment>{Locked}Uri to the Working across Windows and Linux file systems documentation</comment>
   </data>
   <data name="Settings_OOBEDisplayName" xml:space="preserve">
     <value>Välkommen till Windows-undersystem för Linux</value>
   </data>
   <data name="Settings_OOBEDistroManagement.Description" xml:space="preserve">
-   <value>WSL är ett bra sätt att testa olika Linux-distributioner.</value>
+   <value>LSW är ett bra sätt att testa olika Linux-distributioner.</value>
   </data>
   <data name="Settings_OOBEDistroManagement.Title" xml:space="preserve">
     <value>Distributionshantering</value>
   </data>
-  <data name="Settings_OOBEDistroManagementBasicWSLCommandsLink.Content" xml:space="preserve">
-    <value>Läs mer om grundläggande WSL-kommandon</value>
+  <data name="Settings_OOBEDistroManagementBasicLSWCommandsLink.Content" xml:space="preserve">
+    <value>Läs mer om grundläggande LSW-kommandon</value>
   </data>
-  <data name="Settings_OOBEDistroManagementBasicWSLCommandsLink.NavigateUri" xml:space="preserve">
-    <value>https://aka.ms/wslcommands</value>
-    <comment>{Locked}Uri to the basic WSL commands documentation</comment>
+  <data name="Settings_OOBEDistroManagementBasicLSWCommandsLink.NavigateUri" xml:space="preserve">
+    <value>https://aka.ms/lswcommands</value>
+    <comment>{Locked}Uri to the basic LSW commands documentation</comment>
   </data>
   <data name="Settings_OOBEDistroManagementImportCustomDistroLink.Content" xml:space="preserve">
     <value>Läs mer om hur du importerar Linux-distributioner</value>
   </data>
   <data name="Settings_OOBEDistroManagementImportCustomDistroLink.NavigateUri" xml:space="preserve">
-    <value>https://aka.ms/wslcustomdistro</value>
-    <comment>{Locked}Uri to the import any linux distribution to use with WSL documentation</comment>
+    <value>https://aka.ms/lswcustomdistro</value>
+    <comment>{Locked}Uri to the import any linux distribution to use with LSW documentation</comment>
   </data>
   <data name="Settings_OOBEDistroManagement_InstallableDistrosTitle.Text" xml:space="preserve">
-    <value>Visa lista över installerbara WSL-distributionskommandon</value>
+    <value>Visa lista över installerbara LSW-distributionskommandon</value>
   </data>
   <data name="Settings_OOBEDistroManagement_InstallableDistrosSample.Text" xml:space="preserve">
-    <value>wsl.exe -l -o</value>
+    <value>lsw.exe -l -o</value>
     <comment>{Locked="-l -o"}Command line arguments and file names should not be translated</comment>
   </data>
   <data name="Settings_OOBEDistroManagement_InstallNamedDistrosTitle.Text" xml:space="preserve">
-    <value>Installera ett namngivet WSL Distro-kommando</value>
+    <value>Installera ett namngivet LSW Distro-kommando</value>
   </data>
   <data name="Settings_OOBEDistroManagement_InstallNamedDistrosSample.Text" xml:space="preserve">
-    <value>wsl.exe --install &lt;DistroName&gt;</value>
+    <value>lsw.exe --install &lt;DistroName&gt;</value>
     <comment>{Locked="--install "}Command line arguments, file names and string inserts should not be translated</comment>
   </data>
   <data name="Settings_OOBEDistroManagement_AvailableDistrosTitle.Text" xml:space="preserve">
-    <value>Visa lista över tillgängliga WSL-distributionskommandon</value>
+    <value>Visa lista över tillgängliga LSW-distributionskommandon</value>
   </data>
   <data name="Settings_OOBEDistroManagement_AvailableDistrosSample.Text" xml:space="preserve">
-    <value>wsl.exe -l</value>
+    <value>lsw.exe -l</value>
     <comment>{Locked="-l"}Command line arguments and file names should not be translated</comment>
   </data>
   <data name="Settings_OOBEDockerDesktopIntegration.Description" xml:space="preserve">
-    <value>Docker Desktop fungerar utmärkt med WSL för att hjälpa dig att utveckla med Linux-containrar.
+    <value>Docker Desktop fungerar utmärkt med LSW för att hjälpa dig att utveckla med Linux-containrar.
 
-Några av fördelarna med att använda Docker Desktop med WSL är:
+Några av fördelarna med att använda Docker Desktop med LSW är:
 
-• Du kan köra Docker-kommandon i WSL eller i Windows med samma Docker-daemon och avbildningar.
-• Du kan dela filer och mappar sömlöst mellan Windows och Linux med hjälp av den automatiska monteringen av Windows-enheter i WSL.
-• Du kan använda de Windows-verktyg och -redigerare du föredrar för att arbeta med Linux-kod och -filer, och vice versa, tack vare WSL:s samverkan.</value>
+• Du kan köra Docker-kommandon i LSW eller i Windows med samma Docker-daemon och avbildningar.
+• Du kan dela filer och mappar sömlöst mellan Windows och Linux med hjälp av den automatiska monteringen av Windows-enheter i LSW.
+• Du kan använda de Windows-verktyg och -redigerare du föredrar för att arbeta med Linux-kod och -filer, och vice versa, tack vare LSW:s samverkan.</value>
  </data>
   <data name="Settings_OOBEDockerDesktopIntegration.Title" xml:space="preserve">
     <value>Docker Desktop-integration</value>
   </data>
   <data name="Settings_OOBEDockerDesktopIntegrationLink.Content" xml:space="preserve">
-    <value>Läs mer om att använda WSL med Docker</value>
+    <value>Läs mer om att använda LSW med Docker</value>
   </data>
   <data name="Settings_OOBEDockerDesktopIntegrationLink.NavigateUri" xml:space="preserve">
-    <value>https://aka.ms/wsldocker</value>
-    <comment>{Locked}Uri to the Docker remote containers on WSL 2 documentation</comment>
+    <value>https://aka.ms/lswdocker</value>
+    <comment>{Locked}Uri to the Docker remote containers on LSW 2 documentation</comment>
   </data>
   <data name="Settings_OOBEGeneral.Description" xml:space="preserve">
-    <value>Med Windows-undersystem för Linux (WSL) kan du köra dina Linux-verktyg, hjälpmedel, program och arbetsflöden direkt i Windows.
+    <value>Med Windows-undersystem för Linux (LSW) kan du köra dina Linux-verktyg, hjälpmedel, program och arbetsflöden direkt i Windows.
 
 Ta en stund för att förhandsgranska några av communityns favoritfunktioner eller visa vår omfattande dokumentation.</value>
   </data>
   <data name="Settings_OOBEGeneral.Title" xml:space="preserve">
-    <value>Välkommen till WSL</value>
+    <value>Välkommen till LSW</value>
   </data>
   <data name="Settings_OOBEGeneral_BestPracticesSetupLink.Content" xml:space="preserve">
     <value>Metodtips för konfiguration</value>
   </data>
   <data name="Settings_OOBEGeneral_BestPracticesSetupLink.NavigateUri" xml:space="preserve">
-    <value>https://aka.ms/wslsetup</value>
+    <value>https://aka.ms/lswsetup</value>
     <comment>{Locked}Uri to the Best Practices for Setup Documentation</comment>
   </data>
   <data name="Settings_OOBEGeneral_GettingStartedLinuxLink.Content" xml:space="preserve">
     <value>Komma igång med Linux</value>
   </data>
   <data name="Settings_OOBEGeneral_GettingStartedLinuxLink.NavigateUri" xml:space="preserve">
-    <value>https://aka.ms/wslgettingstarted</value>
+    <value>https://aka.ms/lswgettingstarted</value>
     <comment>{Locked}Uri to the Getting Started with Linux Documentation</comment>
   </data>
-  <data name="Settings_OOBEGeneral_WSLDocumentationLink.Content" xml:space="preserve">
-    <value>dokumentation om Windows-undersystem för Linux (WSL)</value>
+  <data name="Settings_OOBEGeneral_LSWDocumentationLink.Content" xml:space="preserve">
+    <value>dokumentation om Windows-undersystem för Linux (LSW)</value>
   </data>
-  <data name="Settings_OOBEGeneral_WSLDocumentationLink.NavigateUri" xml:space="preserve">
-    <value>https://aka.ms/wsldocs</value>
-    <comment>{Locked}Uri to the Microsoft WSL Documentation</comment>
+  <data name="Settings_OOBEGeneral_LSWDocumentationLink.NavigateUri" xml:space="preserve">
+    <value>https://aka.ms/lswdocs</value>
+    <comment>{Locked}Uri to the Microsoft LSW Documentation</comment>
   </data>
   <data name="Settings_OOBEGUIApps.Description" xml:space="preserve">
     <value>Du kan använda grafiska Linux-program med inbyggda Windows-interaktioner som alt-tab, startmenystart, fästning i aktivitetsfältet och stöd för klipp ut och klistra in.</value>
@@ -1601,9 +1601,9 @@ Ta en stund för att förhandsgranska några av communityns favoritfunktioner el
     <value>GUI-appar</value>
   </data>
   <data name="Settings_OOBEGPUAcceleration.Description" xml:space="preserve">
-    <value>WSL kan utnyttja din Windows GPU för Machine Learning-arbetsflöden 
+    <value>LSW kan utnyttja din Windows GPU för Machine Learning-arbetsflöden 
 
-Linux-binärfiler som körs i WSL kan automatiskt använda din GPU i Windows för att öka prestandan. Du behöver bara installera och köra dessa arbetsflöden på samma sätt som på en vanlig Linux-dator. Det finns många olika sätt att komma igång från att köra CUDA i en docker-container om du har ett NVIDIA-grafikkort, till att köra PyTorch eller TensorFlow med DirectML på ditt AMD-, Intel- eller NVIDIA-grafikkort. Se vår komma igång-guide nedan om du vill veta mer.</value>
+Linux-binärfiler som körs i LSW kan automatiskt använda din GPU i Windows för att öka prestandan. Du behöver bara installera och köra dessa arbetsflöden på samma sätt som på en vanlig Linux-dator. Det finns många olika sätt att komma igång från att köra CUDA i en docker-container om du har ett NVIDIA-grafikkort, till att köra PyTorch eller TensorFlow med DirectML på ditt AMD-, Intel- eller NVIDIA-grafikkort. Se vår komma igång-guide nedan om du vill veta mer.</value>
   </data>
   <data name="Settings_OOBEGPUAcceleration.Title" xml:space="preserve">
     <value>GPU-acceleration</value>
@@ -1612,15 +1612,15 @@ Linux-binärfiler som körs i WSL kan automatiskt använda din GPU i Windows fö
     <value>Läs mer om GPU-acceleration</value>
   </data>
   <data name="Settings_OOBEGPUAccelerationLink.NavigateUri" xml:space="preserve">
-    <value>https://aka.ms/wslgpu</value>
-    <comment>{Locked}Uri to the GPU acceleration for ML in WSL documentation</comment>
+    <value>https://aka.ms/lswgpu</value>
+    <comment>{Locked}Uri to the GPU acceleration for ML in LSW documentation</comment>
   </data>
   <data name="Settings_OOBEGUIAppsLink.Content" xml:space="preserve">
-    <value>Läs mer om WSL GUI-appar</value>
+    <value>Läs mer om LSW GUI-appar</value>
   </data>
   <data name="Settings_OOBEGUIAppsLink.NavigateUri" xml:space="preserve">
-    <value>https://aka.ms/wslguiapps</value>
-    <comment>{Locked}Uri to the Run GUI apps on the WSL documentation</comment>
+    <value>https://aka.ms/lswguiapps</value>
+    <comment>{Locked}Uri to the Run GUI apps on the LSW documentation</comment>
   </data>
   <data name="Settings_OOBEGUIApps_AppsListDescription.Text" xml:space="preserve">
     <value>Här är en lista över appar att prova (du kan installera alla dessa i Ubuntu genom att skriva sudo apt install &lt;Appnamnet&gt;)
@@ -1642,44 +1642,44 @@ Linux-binärfiler som körs i WSL kan automatiskt använda din GPU i Windows fö
     <value>Läs mer om nätverksprogram</value>
   </data>
   <data name="Settings_OOBENetworkingIntegrationLinuxNetworkingAppsLink.NavigateUri" xml:space="preserve">
-    <value>https://aka.ms/wslnetworking</value>
-    <comment>{Locked}Uri to the Accessing network applications with WSL documentation</comment>
+    <value>https://aka.ms/lswnetworking</value>
+    <comment>{Locked}Uri to the Accessing network applications with LSW documentation</comment>
   </data>
   <data name="Settings_OOBENetworkingIntegrationMirroredModeLink.Content" xml:space="preserve">
     <value>Läs mer om nätverk i speglat läge</value>
   </data>
   <data name="Settings_OOBENetworkingIntegrationMirroredModeLink.NavigateUri" xml:space="preserve">
-    <value>https://aka.ms/wslmirroredmode</value>
-    <comment>{Locked}Uri to the WSL Mirrored Mode networking documentation</comment>
+    <value>https://aka.ms/lswmirroredmode</value>
+    <comment>{Locked}Uri to the LSW Mirrored Mode networking documentation</comment>
   </data>
   <data name="Settings_OOBEVSCodeIntegration.Description" xml:space="preserve">
-   <value>Du kan använda WSL som din utvecklingsmiljö på heltid direkt från VS Code.</value>
+   <value>Du kan använda LSW som din utvecklingsmiljö på heltid direkt från VS Code.</value>
   </data>
   <data name="Settings_OOBEVSCodeIntegration.Title" xml:space="preserve">
     <value>VS Code-integration</value>
   </data>
   <data name="Settings_OOBEVSCodeIntegrationLink.Content" xml:space="preserve">
-    <value>Läs mer om att använda WSL med VS Code</value>
+    <value>Läs mer om att använda LSW med VS Code</value>
   </data>
   <data name="Settings_OOBEVSCodeIntegrationLink.NavigateUri" xml:space="preserve">
-    <value>https://aka.ms/wslvscode</value>
-    <comment>{Locked}Uri to the using Visual Studio Code with WSL documentation</comment>
+    <value>https://aka.ms/lswvscode</value>
+    <comment>{Locked}Uri to the using Visual Studio Code with LSW documentation</comment>
   </data>
   <data name="Settings_OOBEVSCodeIntegration_VSCodeInstallTitle.Text" xml:space="preserve">
     <value>Så här installerar du</value>
   </data>
   <data name="Settings_OOBEVSCodeIntegration_VSCodeInstallSample.Text" xml:space="preserve">
-    <value>När du har installerat VS Code kan du installera WSL-fjärrtillägget från Windows-terminal:
+    <value>När du har installerat VS Code kan du installera LSW-fjärrtillägget från Windows-terminal:
 
-code –install-extension ms-vscode-remote.remote-wsl</value>
+code –install-extension ms-vscode-remote.remote-lsw</value>
   </data>
   <data name="Settings_OOBEVSCodeIntegration_VSCodeOpenProjectTitle.Text" xml:space="preserve">
-    <value>Öppna ett WSL-projekt i Visual Studio Code</value>
+    <value>Öppna ett LSW-projekt i Visual Studio Code</value>
   </data>
   <data name="Settings_OOBEVSCodeIntegration_VSCodeOpenProjectSample.Text" xml:space="preserve">
-    <value>Öppna ett projekt i VS Code från WSL-distributionen genom att öppna distributionens kommandorad och köra kod. För att öppna en projektfil.
+    <value>Öppna ett projekt i VS Code från LSW-distributionen genom att öppna distributionens kommandorad och köra kod. För att öppna en projektfil.
 
-Du kan också komma åt fler VS Code-fjärralternativ via kommandopaletten inom själva VS Code. Tryck på SKIFT+CTRL+P på tangentbordet för att öppna kommandopaletten och skriv Remote-WSL om du vill se en lista över tillgängliga VS Code-fjärralternativ så att du kan öppna mappen igen i en fjärrsession, ange vilken distribution du vill öppna med mera.</value>
+Du kan också komma åt fler VS Code-fjärralternativ via kommandopaletten inom själva VS Code. Tryck på SKIFT+CTRL+P på tangentbordet för att öppna kommandopaletten och skriv Remote-LSW om du vill se en lista över tillgängliga VS Code-fjärralternativ så att du kan öppna mappen igen i en fjärrsession, ange vilken distribution du vill öppna med mera.</value>
   </data>
   <data name="Settings_OOBE_HowToUse.Text" xml:space="preserve">
     <value>Så här använder du</value>
@@ -1691,7 +1691,7 @@ Du kan också komma åt fler VS Code-fjärralternativ via kommandopaletten inom 
     <value>Aktivera sidrapportering</value>
   </data>
   <data name="Settings_PageReporting.Description" xml:space="preserve">
-    <value>Med standardinställningen true kan Windows frigöra oanvänt minne som allokerats till den virtuella WSL 2-datorn.</value>
+    <value>Med standardinställningen true kan Windows frigöra oanvänt minne som allokerats till den virtuella LSW 2-datorn.</value>
   </data>
   <data name="Settings_PrivacyPolicyLink.Content" xml:space="preserve">
     <value>Sekretesspolicy</value>
@@ -1704,7 +1704,7 @@ Du kan också komma åt fler VS Code-fjärralternativ via kommandopaletten inom 
     <value>Antal processorer</value>
   </data>
   <data name="Settings_ProcCount.Description" xml:space="preserve">
-    <value>Hur många logiska processorer som ska tilldelas den virtuella WSL 2-datorn.</value>
+    <value>Hur många logiska processorer som ska tilldelas den virtuella LSW 2-datorn.</value>
   </data>
   <data name="Settings_ProcCountResetButton.Content" xml:space="preserve">
     <value>Återställ antal</value>
@@ -1713,7 +1713,7 @@ Du kan också komma åt fler VS Code-fjärralternativ via kommandopaletten inom 
     <value>Antal processorer</value>
   </data>
   <data name="Settings_ProcCountTextBox.AutomationProperties.HelpText" xml:space="preserve">
-    <value>Hur många logiska processorer som ska tilldelas den virtuella WSL 2-datorn.</value>
+    <value>Hur många logiska processorer som ska tilldelas den virtuella LSW 2-datorn.</value>
   </data>
   <data name="Settings_RelatedLinks.Text" xml:space="preserve">
     <value>Relaterade länkar</value>
@@ -1722,20 +1722,20 @@ Du kan också komma åt fler VS Code-fjärralternativ via kommandopaletten inom 
     <value>Viktig information</value>
   </data>
   <data name="Settings_ReleaseNotesLink.NavigateUri" xml:space="preserve">
-    <value>https://aka.ms/wslreleases</value>
-    <comment>{Locked}Uri to Microsoft WSL release notes</comment>
+    <value>https://aka.ms/lswreleases</value>
+    <comment>{Locked}Uri to Microsoft LSW release notes</comment>
   </data>
   <data name="Settings_SafeMode.Header" xml:space="preserve">
     <value>Aktivera felsäkert läge</value>
   </data>
   <data name="Settings_SafeMode.Description" xml:space="preserve">
-    <value>Kör WSL i felsäkert läge, vilket inaktiverar många funktioner och är avsett att användas för att återställa distributioner i felaktiga tillstånd.</value>
+    <value>Kör LSW i felsäkert läge, vilket inaktiverar många funktioner och är avsett att användas för att återställa distributioner i felaktiga tillstånd.</value>
   </data>
   <data name="Settings_SafeModeToggleSwitch.AutomationProperties.Name" xml:space="preserve">
     <value>Aktivera felsäkert läge.</value>
   </data>
   <data name="Settings_SafeModeToggleSwitch.AutomationProperties.HelpText" xml:space="preserve">
-    <value>Kör WSL i felsäkert läge, vilket inaktiverar många funktioner och är avsett att användas för att återställa distributioner i felaktiga tillstånd.</value>
+    <value>Kör LSW i felsäkert läge, vilket inaktiverar många funktioner och är avsett att användas för att återställa distributioner i felaktiga tillstånd.</value>
   </data>
   <data name="Settings_Shell_About.Content" xml:space="preserve">
     <value>Om</value>
@@ -1761,8 +1761,8 @@ Du kan också komma åt fler VS Code-fjärralternativ via kommandopaletten inom 
   <data name="Settings_Shell_GUIApps.Content" xml:space="preserve">
     <value>GUI-appar</value>
   </data>
-  <data name="Settings_Shell_LaunchWSL.Content" xml:space="preserve">
-    <value>Starta wsl.exe</value>
+  <data name="Settings_Shell_LaunchLSW.Content" xml:space="preserve">
+    <value>Starta lsw.exe</value>
   </data>
   <data name="Settings_Shell_MemAndProc.Content" xml:space="preserve">
     <value>Minne och processor</value>
@@ -1774,7 +1774,7 @@ Du kan också komma åt fler VS Code-fjärralternativ via kommandopaletten inom 
     <value>Nätverksintegrering</value>
   </data>
   <data name="Settings_Shell_OOBE.Content" xml:space="preserve">
-    <value>Välkommen till WSL</value>
+    <value>Välkommen till LSW</value>
   </data>
   <data name="Settings_Shell_OptionalFeatures.Content" xml:space="preserve">
     <value>Valfria funktioner</value>
@@ -1795,8 +1795,8 @@ Du kan också komma åt fler VS Code-fjärralternativ via kommandopaletten inom 
     <value>Problem</value>
   </data>
   <data name="Settings_IssuesLink.NavigateUri" xml:space="preserve">
-    <value>https://aka.ms/wslproject</value>
-    <comment>{Locked}Uri to Microsoft WSL issues</comment>
+    <value>https://aka.ms/lswproject</value>
+    <comment>{Locked}Uri to Microsoft LSW issues</comment>
   </data>
   <data name="Settings_SparseVHD.Header" xml:space="preserve">
     <value>Aktivera virtuell hårddisk med sparse som standard</value>
@@ -1829,7 +1829,7 @@ Du kan också komma åt fler VS Code-fjärralternativ via kommandopaletten inom 
     <value>Växlingsstorlek</value>
   </data>
   <data name="Settings_SwapSize.Description" xml:space="preserve">
-    <value>Hur mycket växlingsutrymme som ska läggas till på den virtuella WSL 2-datorn, 0 utan växlingsfil. Växlingslagring är diskbaserat RAM-minne som används när minnesbehovet överskrider gränsen på maskinvaruenheten.</value>
+    <value>Hur mycket växlingsutrymme som ska läggas till på den virtuella LSW 2-datorn, 0 utan växlingsfil. Växlingslagring är diskbaserat RAM-minne som används när minnesbehovet överskrider gränsen på maskinvaruenheten.</value>
   </data>
   <data name="Settings_SwapSizeResetButton.Content" xml:space="preserve">
     <value>Återställ storlek</value>
@@ -1838,7 +1838,7 @@ Du kan också komma åt fler VS Code-fjärralternativ via kommandopaletten inom 
     <value>Växlingsstorlek</value>
   </data>
   <data name="Settings_SwapSizeTextBox.AutomationProperties.HelpText" xml:space="preserve">
-    <value>Hur mycket växlingsutrymme, som anges i megabyte, som ska läggas till i den virtuella WSL 2-datorn. 0 för ingen växlingsfil. Växlingslagring är diskbaserat RAM-minne som används när minnesbehovet överskrider gränsen på maskinvaruenheten.</value>
+    <value>Hur mycket växlingsutrymme, som anges i megabyte, som ska läggas till i den virtuella LSW 2-datorn. 0 för ingen växlingsfil. Växlingslagring är diskbaserat RAM-minne som används när minnesbehovet överskrider gränsen på maskinvaruenheten.</value>
   </data>
   <data name="Settings_Virtio.Header" xml:space="preserve">
     <value>Aktivera VirtIO</value>

@@ -17,18 +17,18 @@ Abstract:
 #include "WslPluginApi.h"
 #include "LxssUserSessionFactory.h"
 
-using wsl::windows::common::Context;
-using wsl::windows::common::ExecutionContext;
-using wsl::windows::service::PluginManager;
+using lsw::windows::common::Context;
+using lsw::windows::common::ExecutionContext;
+using lsw::windows::service::PluginManager;
 
 constexpr auto c_pluginPath = L"SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Lxss\\Plugins";
 
-constexpr WSLVersion Version = {wsl::shared::VersionMajor, wsl::shared::VersionMinor, wsl::shared::VersionRevision};
+constexpr LSWVersion Version = {lsw::shared::VersionMajor, lsw::shared::VersionMinor, lsw::shared::VersionRevision};
 
 thread_local std::optional<std::wstring> g_pluginErrorMessage;
 
 extern "C" {
-HRESULT MountFolder(WSLSessionId Session, LPCWSTR WindowsPath, LPCWSTR LinuxPath, BOOL ReadOnly, LPCWSTR Name)
+HRESULT MountFolder(LSWSessionId Session, LPCWSTR WindowsPath, LPCWSTR LinuxPath, BOOL ReadOnly, LPCWSTR Name)
 try
 {
     const auto session = FindSessionByCookie(Session);
@@ -36,7 +36,7 @@ try
 
     auto result = session->MountRootNamespaceFolder(WindowsPath, LinuxPath, ReadOnly, Name);
 
-    WSL_LOG(
+    LSW_LOG(
         "PluginMountFolderCall",
         TraceLoggingValue(WindowsPath, "WindowsPath"),
         TraceLoggingValue(LinuxPath, "LinuxPath"),
@@ -48,7 +48,7 @@ try
 }
 CATCH_RETURN();
 
-HRESULT ExecuteBinary(WSLSessionId Session, LPCSTR Path, LPCSTR* Arguments, SOCKET* Socket)
+HRESULT ExecuteBinary(LSWSessionId Session, LPCSTR Path, LPCSTR* Arguments, SOCKET* Socket)
 try
 {
 
@@ -57,7 +57,7 @@ try
 
     auto result = session->CreateLinuxProcess(nullptr, Path, Arguments, Socket);
 
-    WSL_LOG("PluginExecuteBinaryCall", TraceLoggingValue(Path, "Path"), TraceLoggingValue(result, "Result"));
+    LSW_LOG("PluginExecuteBinaryCall", TraceLoggingValue(Path, "Path"), TraceLoggingValue(result, "Result"));
     return result;
 }
 CATCH_RETURN();
@@ -70,8 +70,8 @@ try
     THROW_HR_IF_MSG(
         E_ILLEGAL_METHOD_CALL, context == nullptr || WI_IsFlagClear(context->CurrentContext(), Context::Plugin), "Message: %ls", UserMessage);
 
-    // Logs when a WSL plugin hits an error and what that error message is
-    WSL_LOG_TELEMETRY("PluginError", PDT_ProductAndServicePerformance, TraceLoggingValue(UserMessage, "Message"));
+    // Logs when a LSW plugin hits an error and what that error message is
+    LSW_LOG_TELEMETRY("PluginError", PDT_ProductAndServicePerformance, TraceLoggingValue(UserMessage, "Message"));
 
     THROW_HR_IF(E_ILLEGAL_STATE_CHANGE, g_pluginErrorMessage.has_value());
 
@@ -81,7 +81,7 @@ try
 }
 CATCH_RETURN();
 
-HRESULT ExecuteBinaryInDistribution(WSLSessionId Session, const GUID* Distro, LPCSTR Path, LPCSTR* Arguments, SOCKET* Socket)
+HRESULT ExecuteBinaryInDistribution(LSWSessionId Session, const GUID* Distro, LPCSTR Path, LPCSTR* Arguments, SOCKET* Socket)
 try
 {
     THROW_HR_IF(E_INVALIDARG, Distro == nullptr);
@@ -91,14 +91,14 @@ try
 
     auto result = session->CreateLinuxProcess(Distro, Path, Arguments, Socket);
 
-    WSL_LOG("PluginExecuteBinaryInDistributionCall", TraceLoggingValue(Path, "Path"), TraceLoggingValue(result, "Result"));
+    LSW_LOG("PluginExecuteBinaryInDistributionCall", TraceLoggingValue(Path, "Path"), TraceLoggingValue(result, "Result"));
 
     return result;
 }
 CATCH_RETURN();
 }
 
-static constexpr WSLPluginAPIV1 ApiV1 = {Version, &MountFolder, &ExecuteBinary, &PluginError, &ExecuteBinaryInDistribution};
+static constexpr LSWPluginAPIV1 ApiV1 = {Version, &MountFolder, &ExecuteBinary, &PluginError, &ExecuteBinaryInDistribution};
 
 void PluginManager::LoadPlugins()
 {
@@ -107,7 +107,7 @@ void PluginManager::LoadPlugins()
     const auto key = common::registry::CreateKey(HKEY_LOCAL_MACHINE, c_pluginPath, KEY_READ);
     const auto values = common::registry::EnumValues(key.get());
 
-    std::set<std::wstring, wsl::shared::string::CaseInsensitiveCompare> loaded;
+    std::set<std::wstring, lsw::shared::string::CaseInsensitiveCompare> loaded;
     for (const auto& e : values)
     {
         if (e.second != REG_SZ)
@@ -126,8 +126,8 @@ void PluginManager::LoadPlugins()
 
         auto loadResult = wil::ResultFromException(WI_DIAGNOSTICS_INFO, [&]() { LoadPlugin(e.first.c_str(), path.c_str()); });
 
-        // Logs when a WSL plugin is loaded, used for evaluating plugin populations
-        WSL_LOG_TELEMETRY(
+        // Logs when a LSW plugin is loaded, used for evaluating plugin populations
+        LSW_LOG_TELEMETRY(
             "PluginLoad",
             PDT_ProductAndServiceUsage,
             TraceLoggingValue(e.first.c_str(), "Name"),
@@ -148,9 +148,9 @@ void PluginManager::LoadPlugin(LPCWSTR Name, LPCWSTR ModulePath)
     // The handle to the module is kept open after validating the signature so the file can't be written to
     // after the signature check.
     wil::unique_hfile pluginHandle;
-    if constexpr (wsl::shared::OfficialBuild)
+    if constexpr (lsw::shared::OfficialBuild)
     {
-        pluginHandle = wsl::windows::common::wslutil::ValidateFileSignature(ModulePath);
+        pluginHandle = lsw::windows::common::lswutil::ValidateFileSignature(ModulePath);
         WI_ASSERT(pluginHandle.is_valid());
     }
 
@@ -160,8 +160,8 @@ void PluginManager::LoadPlugin(LPCWSTR Name, LPCWSTR ModulePath)
     plugin.module.reset(LoadLibrary(ModulePath));
     THROW_LAST_ERROR_IF_NULL(plugin.module);
 
-    const WSLPluginAPI_EntryPointV1 entryPoint =
-        reinterpret_cast<WSLPluginAPI_EntryPointV1>(GetProcAddress(plugin.module.get(), GSL_STRINGIFY(WSLPLUGINAPI_ENTRYPOINTV1)));
+    const LSWPluginAPI_EntryPointV1 entryPoint =
+        reinterpret_cast<LSWPluginAPI_EntryPointV1>(GetProcAddress(plugin.module.get(), GSL_STRINGIFY(LSWPLUGINAPI_ENTRYPOINTV1)));
 
     THROW_LAST_ERROR_IF_NULL(entryPoint);
     THROW_IF_FAILED_MSG(entryPoint(&ApiV1, &plugin.hooks), "Error returned by plugin: '%ls'", ModulePath);
@@ -169,7 +169,7 @@ void PluginManager::LoadPlugin(LPCWSTR Name, LPCWSTR ModulePath)
     m_plugins.emplace_back(std::move(plugin));
 }
 
-void PluginManager::OnVmStarted(const WSLSessionInformation* Session, const WSLVmCreationSettings* Settings)
+void PluginManager::OnVmStarted(const LSWSessionInformation* Session, const LSWVmCreationSettings* Settings)
 {
     ExecutionContext context(Context::Plugin);
 
@@ -177,7 +177,7 @@ void PluginManager::OnVmStarted(const WSLSessionInformation* Session, const WSLV
     {
         if (e.hooks.OnVMStarted != nullptr)
         {
-            WSL_LOG(
+            LSW_LOG(
                 "PluginOnVmStartedCall", TraceLoggingValue(e.name.c_str(), "Plugin"), TraceLoggingValue(Session->UserSid, "Sid"));
 
             ThrowIfPluginError(e.hooks.OnVMStarted(Session, Settings), Session->SessionId, e.name.c_str());
@@ -185,7 +185,7 @@ void PluginManager::OnVmStarted(const WSLSessionInformation* Session, const WSLV
     }
 }
 
-void PluginManager::OnVmStopping(const WSLSessionInformation* Session) const
+void PluginManager::OnVmStopping(const LSWSessionInformation* Session) const
 {
     ExecutionContext context(Context::Plugin);
 
@@ -193,7 +193,7 @@ void PluginManager::OnVmStopping(const WSLSessionInformation* Session) const
     {
         if (e.hooks.OnVMStopping != nullptr)
         {
-            WSL_LOG(
+            LSW_LOG(
                 "PluginOnVmStoppingCall", TraceLoggingValue(e.name.c_str(), "Plugin"), TraceLoggingValue(Session->UserSid, "Sid"));
 
             const auto result = e.hooks.OnVMStopping(Session);
@@ -202,7 +202,7 @@ void PluginManager::OnVmStopping(const WSLSessionInformation* Session) const
     }
 }
 
-void PluginManager::OnDistributionStarted(const WSLSessionInformation* Session, const WSLDistributionInformation* Distribution)
+void PluginManager::OnDistributionStarted(const LSWSessionInformation* Session, const LSWDistributionInformation* Distribution)
 {
     ExecutionContext context(Context::Plugin);
 
@@ -210,7 +210,7 @@ void PluginManager::OnDistributionStarted(const WSLSessionInformation* Session, 
     {
         if (e.hooks.OnDistributionStarted != nullptr)
         {
-            WSL_LOG(
+            LSW_LOG(
                 "PluginOnDistroStartedCall",
                 TraceLoggingValue(e.name.c_str(), "Plugin"),
                 TraceLoggingValue(Session->UserSid, "Sid"),
@@ -221,7 +221,7 @@ void PluginManager::OnDistributionStarted(const WSLSessionInformation* Session, 
     }
 }
 
-void PluginManager::OnDistributionStopping(const WSLSessionInformation* Session, const WSLDistributionInformation* Distribution) const
+void PluginManager::OnDistributionStopping(const LSWSessionInformation* Session, const LSWDistributionInformation* Distribution) const
 {
     ExecutionContext context(Context::Plugin);
 
@@ -229,7 +229,7 @@ void PluginManager::OnDistributionStopping(const WSLSessionInformation* Session,
     {
         if (e.hooks.OnDistributionStopping != nullptr)
         {
-            WSL_LOG(
+            LSW_LOG(
                 "PluginOnDistroStoppingCall",
                 TraceLoggingValue(e.name.c_str(), "Plugin"),
                 TraceLoggingValue(Session->UserSid, "Sid"),
@@ -241,7 +241,7 @@ void PluginManager::OnDistributionStopping(const WSLSessionInformation* Session,
     }
 }
 
-void PluginManager::OnDistributionRegistered(const WSLSessionInformation* Session, const WslOfflineDistributionInformation* Distribution) const
+void PluginManager::OnDistributionRegistered(const LSWSessionInformation* Session, const WslOfflineDistributionInformation* Distribution) const
 {
     ExecutionContext context(Context::Plugin);
 
@@ -249,7 +249,7 @@ void PluginManager::OnDistributionRegistered(const WSLSessionInformation* Sessio
     {
         if (e.hooks.OnDistributionRegistered != nullptr)
         {
-            WSL_LOG(
+            LSW_LOG(
                 "PluginOnDistributionRegisteredCall",
                 TraceLoggingValue(e.name.c_str(), "Plugin"),
                 TraceLoggingValue(Session->UserSid, "Sid"),
@@ -261,7 +261,7 @@ void PluginManager::OnDistributionRegistered(const WSLSessionInformation* Sessio
     }
 }
 
-void PluginManager::OnDistributionUnregistered(const WSLSessionInformation* Session, const WslOfflineDistributionInformation* Distribution) const
+void PluginManager::OnDistributionUnregistered(const LSWSessionInformation* Session, const WslOfflineDistributionInformation* Distribution) const
 {
     ExecutionContext context(Context::Plugin);
 
@@ -269,7 +269,7 @@ void PluginManager::OnDistributionUnregistered(const WSLSessionInformation* Sess
     {
         if (e.hooks.OnDistributionUnregistered != nullptr)
         {
-            WSL_LOG(
+            LSW_LOG(
                 "PluginOnDistributionUnregisteredCall",
                 TraceLoggingValue(e.name.c_str(), "Plugin"),
                 TraceLoggingValue(Session->UserSid, "Sid"),
@@ -281,7 +281,7 @@ void PluginManager::OnDistributionUnregistered(const WSLSessionInformation* Sess
     }
 }
 
-void PluginManager::ThrowIfPluginError(HRESULT Result, WSLSessionId Session, LPCWSTR Plugin)
+void PluginManager::ThrowIfPluginError(HRESULT Result, LSWSessionId Session, LPCWSTR Plugin)
 {
     const auto message = std::move(g_pluginErrorMessage);
     g_pluginErrorMessage.reset(); // std::move() doesn't clear the previous std::optional
@@ -290,11 +290,11 @@ void PluginManager::ThrowIfPluginError(HRESULT Result, WSLSessionId Session, LPC
     {
         if (message.has_value())
         {
-            THROW_HR_WITH_USER_ERROR(Result, wsl::shared::Localization::MessageFatalPluginErrorWithMessage(Plugin, message->c_str()));
+            THROW_HR_WITH_USER_ERROR(Result, lsw::shared::Localization::MessageFatalPluginErrorWithMessage(Plugin, message->c_str()));
         }
         else
         {
-            THROW_HR_WITH_USER_ERROR(Result, wsl::shared::Localization::MessageFatalPluginError(Plugin));
+            THROW_HR_WITH_USER_ERROR(Result, lsw::shared::Localization::MessageFatalPluginError(Plugin));
         }
     }
     else if (message.has_value())
@@ -311,13 +311,13 @@ void PluginManager::ThrowIfFatalPluginError() const
     {
         return;
     }
-    else if (m_pluginError->error == WSL_E_PLUGIN_REQUIRES_UPDATE)
+    else if (m_pluginError->error == LSW_E_PLUGIN_REQUIRES_UPDATE)
     {
         THROW_HR_WITH_USER_ERROR(
-            WSL_E_PLUGIN_REQUIRES_UPDATE, wsl::shared::Localization::MessagePluginRequiresUpdate(m_pluginError->plugin));
+            LSW_E_PLUGIN_REQUIRES_UPDATE, lsw::shared::Localization::MessagePluginRequiresUpdate(m_pluginError->plugin));
     }
     else
     {
-        THROW_HR_WITH_USER_ERROR(m_pluginError->error, wsl::shared::Localization::MessageFatalPluginError(m_pluginError->plugin));
+        THROW_HR_WITH_USER_ERROR(m_pluginError->error, lsw::shared::Localization::MessageFatalPluginError(m_pluginError->plugin));
     }
 }

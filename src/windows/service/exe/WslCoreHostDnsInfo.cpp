@@ -66,7 +66,7 @@ try
         return true;
     }
 
-    WSL_LOG("LoadIpHelperMethods (false): GetInterfaceDnsSettings is not present");
+    LSW_LOG("LoadIpHelperMethods (false): GetInterfaceDnsSettings is not present");
     return false;
 }
 catch (...)
@@ -75,7 +75,7 @@ catch (...)
     return false;
 }
 
-DWORD wsl::core::networking::GetBestInterface()
+DWORD lsw::core::networking::GetBestInterface()
 {
     DWORD bestInterface = 0;
     SOCKADDR_STORAGE address{};
@@ -89,15 +89,15 @@ DWORD wsl::core::networking::GetBestInterface()
         }
     }
 
-    WSL_LOG("wsl::core::networking::GetBestInterface [GetBestInterfaceEx]", TraceLoggingValue(bestInterface, "bestInterface"));
+    LSW_LOG("lsw::core::networking::GetBestInterface [GetBestInterfaceEx]", TraceLoggingValue(bestInterface, "bestInterface"));
 
     return bestInterface;
 }
 
-wsl::core::networking::DnsInfo wsl::core::networking::HostDnsInfo::GetDnsTunnelingSettings(const std::wstring& dnsTunnelingNameserver)
+lsw::core::networking::DnsInfo lsw::core::networking::HostDnsInfo::GetDnsTunnelingSettings(const std::wstring& dnsTunnelingNameserver)
 {
     DnsInfo dnsInfo;
-    dnsInfo.Servers.push_back(wsl::shared::string::WideToMultiByte(dnsTunnelingNameserver));
+    dnsInfo.Servers.push_back(lsw::shared::string::WideToMultiByte(dnsTunnelingNameserver));
 
     // All Windows DNS suffixes are configured in Linux when DNS tunneling is enabled
     dnsInfo.Domains = GetAllDnsSuffixes(AdapterAddresses::GetCurrent());
@@ -105,13 +105,13 @@ wsl::core::networking::DnsInfo wsl::core::networking::HostDnsInfo::GetDnsTunneli
     return dnsInfo;
 }
 
-std::vector<wsl::core::networking::IpAdapterAddress> wsl::core::networking::HostDnsInfo::GetAdapterAddresses()
+std::vector<lsw::core::networking::IpAdapterAddress> lsw::core::networking::HostDnsInfo::GetAdapterAddresses()
 {
     std::lock_guard<std::mutex> lock(m_lock);
     return m_addresses;
 }
 
-std::vector<std::string> wsl::core::networking::HostDnsInfo::GetDnsServerStrings(
+std::vector<std::string> lsw::core::networking::HostDnsInfo::GetDnsServerStrings(
     _In_ const PIP_ADAPTER_DNS_SERVER_ADDRESS& FirstDnsServer, _In_ USHORT IpFamilyFilter, _In_ USHORT MaxValues)
 {
     std::vector<std::string> DnsServerStrings;
@@ -146,7 +146,7 @@ std::vector<std::string> wsl::core::networking::HostDnsInfo::GetDnsServerStrings
     return DnsServerStrings;
 }
 
-std::vector<std::string> wsl::core::networking::HostDnsInfo::GetInterfaceDnsServers(const std::vector<IpAdapterAddress>& AdapterAddresses, _In_ DnsSettingsFlags Flags)
+std::vector<std::string> lsw::core::networking::HostDnsInfo::GetInterfaceDnsServers(const std::vector<IpAdapterAddress>& AdapterAddresses, _In_ DnsSettingsFlags Flags)
 {
     std::vector<std::string> DnsServers;
 
@@ -158,7 +158,7 @@ std::vector<std::string> wsl::core::networking::HostDnsInfo::GetInterfaceDnsServ
         USHORT MaxDnsServers = static_cast<USHORT>(MaxResolvConfDnsServers - DnsServers.size());
 
         // Include only primary DNS VPN server.
-        if ((MaxDnsServers > 1) && (wsl::core::networking::IsInterfaceTypeVpn(NextAddress->IfType)))
+        if ((MaxDnsServers > 1) && (lsw::core::networking::IsInterfaceTypeVpn(NextAddress->IfType)))
         {
             MaxDnsServers = 1;
         }
@@ -189,7 +189,7 @@ std::vector<std::string> wsl::core::networking::HostDnsInfo::GetInterfaceDnsServ
     return DnsServers;
 }
 
-std::vector<std::string> wsl::core::networking::HostDnsInfo::GetInterfaceDnsSuffixes(const std::vector<IpAdapterAddress>& AdapterAddresses)
+std::vector<std::string> lsw::core::networking::HostDnsInfo::GetInterfaceDnsSuffixes(const std::vector<IpAdapterAddress>& AdapterAddresses)
 {
     std::vector<std::string> DnsSuffixes;
     std::set<std::wstring> UniqueDnsSuffixes;
@@ -203,10 +203,10 @@ std::vector<std::string> wsl::core::networking::HostDnsInfo::GetInterfaceDnsSuff
         }
 
         if (std::ranges::find_if(UniqueDnsSuffixes, [&](const std::wstring& Suffix) {
-                return wsl::shared::string::IsEqual(Suffix, NewSuffix, true);
+                return lsw::shared::string::IsEqual(Suffix, NewSuffix, true);
             }) == UniqueDnsSuffixes.end())
         {
-            DnsSuffixes.emplace_back(wsl::shared::string::WideToMultiByte(NewSuffix));
+            DnsSuffixes.emplace_back(lsw::shared::string::WideToMultiByte(NewSuffix));
             UniqueDnsSuffixes.insert(NewSuffix);
         }
     };
@@ -231,7 +231,7 @@ std::vector<std::string> wsl::core::networking::HostDnsInfo::GetInterfaceDnsSuff
     return DnsSuffixes;
 }
 
-wsl::core::networking::DnsInfo wsl::core::networking::HostDnsInfo::GetDnsSettings(_In_ DnsSettingsFlags Flags)
+lsw::core::networking::DnsInfo lsw::core::networking::HostDnsInfo::GetDnsSettings(_In_ DnsSettingsFlags Flags)
 {
     std::vector<IpAdapterAddress> Addresses = GetAdapterAddresses();
 
@@ -241,7 +241,7 @@ wsl::core::networking::DnsInfo wsl::core::networking::HostDnsInfo::GetDnsSetting
         // Ignore interfaces that have no IP address or no DNS addresses.
         // Ignore hidden interfaces
         if ((Address->OperStatus != IfOperStatusUp) || (Address->IfType == IF_TYPE_SOFTWARE_LOOPBACK) || (Address->IfType == IF_TYPE_TUNNEL) ||
-            (!WI_IsFlagSet(Flags, DnsSettingsFlags::IncludeVpn) && wsl::core::networking::IsInterfaceTypeVpn(Address->IfType)) ||
+            (!WI_IsFlagSet(Flags, DnsSettingsFlags::IncludeVpn) && lsw::core::networking::IsInterfaceTypeVpn(Address->IfType)) ||
             (Address->FirstUnicastAddress == nullptr) || (Address->FirstDnsServerAddress == nullptr) || IsInterfaceHidden(Address->IfIndex))
         {
             return true;
@@ -258,8 +258,8 @@ wsl::core::networking::DnsInfo wsl::core::networking::HostDnsInfo::GetDnsSetting
     // Sort the remaining network interfaces, with the most preferable at index 0.
     std::sort(Addresses.begin(), Addresses.end(), [&](const IpAdapterAddress& First, const IpAdapterAddress& Second) {
         // VPN interface takes precedence.
-        const bool FirstIsVpn = wsl::core::networking::IsInterfaceTypeVpn(First->IfType);
-        const bool SecondIsVpn = wsl::core::networking::IsInterfaceTypeVpn(Second->IfType);
+        const bool FirstIsVpn = lsw::core::networking::IsInterfaceTypeVpn(First->IfType);
+        const bool SecondIsVpn = lsw::core::networking::IsInterfaceTypeVpn(Second->IfType);
         if (FirstIsVpn ^ SecondIsVpn)
         {
             // Give precedence to the first VPN interface.
@@ -326,13 +326,13 @@ wsl::core::networking::DnsInfo wsl::core::networking::HostDnsInfo::GetDnsSetting
     return DnsSettings;
 }
 
-void wsl::core::networking::HostDnsInfo::UpdateNetworkInformation()
+void lsw::core::networking::HostDnsInfo::UpdateNetworkInformation()
 {
     std::lock_guard<std::mutex> lock(m_lock);
     m_addresses = AdapterAddresses::GetCurrent();
 }
 
-std::string wsl::core::networking::GenerateResolvConf(_In_ const DnsInfo& Info)
+std::string lsw::core::networking::GenerateResolvConf(_In_ const DnsInfo& Info)
 {
     std::string contents{};
     if (!Info.Servers.empty())
@@ -359,15 +359,15 @@ std::string wsl::core::networking::GenerateResolvConf(_In_ const DnsInfo& Info)
         }
     }
 
-    WSL_LOG("wsl::core::networking::GenerateResolvConf", TraceLoggingValue(contents.c_str(), "resolvConf"));
+    LSW_LOG("lsw::core::networking::GenerateResolvConf", TraceLoggingValue(contents.c_str(), "resolvConf"));
 
     return contents;
 }
 
-std::vector<std::string> wsl::core::networking::GetAllDnsSuffixes(const std::vector<IpAdapterAddress>& AdapterAddresses)
+std::vector<std::string> lsw::core::networking::GetAllDnsSuffixes(const std::vector<IpAdapterAddress>& AdapterAddresses)
 {
     const auto com = wil::CoInitializeEx();
-    wsl::core::WmiService service(L"ROOT\\StandardCimv2");
+    lsw::core::WmiService service(L"ROOT\\StandardCimv2");
 
     // DNS suffixes will be configured in Linux in the following order, *similar* (not 100% the same) to the order in which Windows tries suffixes.
     //
@@ -384,16 +384,16 @@ std::vector<std::string> wsl::core::networking::GetAllDnsSuffixes(const std::vec
         }
 
         if (std::ranges::find_if(uniqueDnsSuffixes, [&](const std::wstring& suffix) {
-                return wsl::shared::string::IsEqual(suffix, newSuffix, true);
+                return lsw::shared::string::IsEqual(suffix, newSuffix, true);
             }) == uniqueDnsSuffixes.end())
         {
-            dnsSuffixes.emplace_back(wsl::shared::string::WideToMultiByte(newSuffix));
+            dnsSuffixes.emplace_back(lsw::shared::string::WideToMultiByte(newSuffix));
             uniqueDnsSuffixes.insert(newSuffix);
         }
     };
 
     // 1) Query global suffixes
-    wsl::core::WmiEnumerate enumDnsClientGlobalSetting(service);
+    lsw::core::WmiEnumerate enumDnsClientGlobalSetting(service);
 
     for (const auto& instance : enumDnsClientGlobalSetting.query(L"SELECT * FROM MSFT_DnsClientGlobalSetting"))
     {
@@ -441,7 +441,7 @@ std::vector<std::string> wsl::core::networking::GetAllDnsSuffixes(const std::vec
                 std::wstring separators = L", \t";
 
                 for (const auto& suffix :
-                     wsl::shared::string::SplitByMultipleSeparators(std::wstring{settings.SupplementalSearchList}, separators))
+                     lsw::shared::string::SplitByMultipleSeparators(std::wstring{settings.SupplementalSearchList}, separators))
                 {
                     AppendSuffix(suffix);
                 }
@@ -450,7 +450,7 @@ std::vector<std::string> wsl::core::networking::GetAllDnsSuffixes(const std::vec
     }
 
     // 3) Query per-interface suffixes
-    wsl::core::WmiEnumerate enumDnsClient(service);
+    lsw::core::WmiEnumerate enumDnsClient(service);
 
     for (const auto& instance : enumDnsClient.query(L"SELECT * FROM MSFT_DnsClient"))
     {
@@ -478,14 +478,14 @@ std::vector<std::string> wsl::core::networking::GetAllDnsSuffixes(const std::vec
     return dnsSuffixes;
 }
 
-wsl::core::networking::DnsSuffixRegistryWatcher::DnsSuffixRegistryWatcher(RegistryChangeCallback&& reportRegistryChange) :
+lsw::core::networking::DnsSuffixRegistryWatcher::DnsSuffixRegistryWatcher(RegistryChangeCallback&& reportRegistryChange) :
     m_reportRegistryChange(std::move(reportRegistryChange))
 {
-    std::vector<wistd::unique_ptr<wsl::windows::common::slim_registry_watcher>> localRegistryWatchers;
+    std::vector<wistd::unique_ptr<lsw::windows::common::slim_registry_watcher>> localRegistryWatchers;
 
     for (const auto& path : c_dnsSuffixesRegistryPaths)
     {
-        auto watcher = wil::make_unique_nothrow<wsl::windows::common::slim_registry_watcher>();
+        auto watcher = wil::make_unique_nothrow<lsw::windows::common::slim_registry_watcher>();
         THROW_HR_IF(E_OUTOFMEMORY, !watcher);
 
         THROW_IF_FAILED(watcher->create(HKEY_LOCAL_MACHINE, path.registryPath, path.isRecursive, [this](wil::RegistryChangeKind changeKind) {

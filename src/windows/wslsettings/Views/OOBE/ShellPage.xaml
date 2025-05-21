@@ -36,7 +36,7 @@
                 <ColumnDefinition Width="*" />
             </Grid.ColumnDefinitions>
             <Image Grid.Column="0"
-                   Source="/Assets/wsl.ico"
+                   Source="/Assets/lsw.ico"
                    VerticalAlignment="Center"
                    HorizontalAlignment="Left"
                    Width="16"
@@ -73,7 +73,7 @@
                 -->
                 <NavigationViewItem x:Uid="Settings_Shell_General" helpers:NavigationHelper.NavigateTo="WslSettings.ViewModels.OOBE.GeneralViewModel">
                     <NavigationViewItem.Icon>
-                        <BitmapIcon ShowAsMonochrome="False" UriSource="/Assets/wslbw.ico" />
+                        <BitmapIcon ShowAsMonochrome="False" UriSource="/Assets/lswbw.ico" />
                     </NavigationViewItem.Icon>
                 </NavigationViewItem>
                 <NavigationViewItem x:Uid="Settings_Shell_WorkingAcrossFileSystems" helpers:NavigationHelper.NavigateTo="WslSettings.ViewModels.OOBE.WorkingAcrossFileSystemsViewModel">

@@ -8,7 +8,7 @@ Module Name:
 
 Abstract:
 
-    This file contains WSL Core COM Advise/Unadvise functions.
+    This file contains LSW Core COM Advise/Unadvise functions.
 
 --*/
 
@@ -18,7 +18,7 @@ Abstract:
 #include <wil/com.h>
 #include <wil/resource.h>
 
-namespace wsl::core {
+namespace lsw::core {
 // This class encapsulates the non-obvious and sometimes non-trivial calls to register for COM callbacks
 // using the fairly standardized Advise ConnectionPoint interface
 class WslCoreAdviseHandler
@@ -95,4 +95,4 @@ private:
 
     std::vector<AdviseInstance> m_adviseInstances;
 };
-} // namespace wsl::core
+} // namespace lsw::core

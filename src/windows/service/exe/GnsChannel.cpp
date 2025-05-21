@@ -4,12 +4,12 @@
 #include "lxinitshared.h"
 #include "GnsChannel.h"
 
-using namespace wsl::shared;
-using wsl::core::GnsChannel;
+using namespace lsw::shared;
+using lsw::core::GnsChannel;
 
 GnsChannel::GnsChannel(wil::unique_socket&& socket) : m_channel(std::move(socket), "GNS", m_stopEvent.get())
 {
-    WSL_LOG("GnsChannel::GnsChannel", TraceLoggingValue(m_channel.Socket(), "socket"));
+    LSW_LOG("GnsChannel::GnsChannel", TraceLoggingValue(m_channel.Socket(), "socket"));
 }
 
 void GnsChannel::SendEndpointState(const hns::HNSEndpoint& Notification)
@@ -41,7 +41,7 @@ int GnsChannel::MessageReturnResult(LX_MESSAGE_TYPE Type, const std::string& Con
     }
 
     auto offset = offsetof(TMessage, Content);
-    wsl::shared::string::CopyToSpan(Content, messageSpan, offset);
+    lsw::shared::string::CopyToSpan(Content, messageSpan, offset);
     WI_ASSERT(messageSize == offset);
 
     return m_channel.Transaction<TMessage>(messageSpan).Result;
@@ -78,7 +78,7 @@ void GnsChannel::SendHnsNotification(_In_ LPCWSTR Notification, const GUID& Adap
     }
 
     auto AddAdapterId = [&](LX_GNS_NOTIFICATION& Message) { Message.AdapterId = AdapterId; };
-    Message<LX_GNS_NOTIFICATION>(LxGnsMessageNotification, wsl::shared::string::WideToMultiByte(Notification), AddAdapterId);
+    Message<LX_GNS_NOTIFICATION>(LxGnsMessageNotification, lsw::shared::string::WideToMultiByte(Notification), AddAdapterId);
 }
 
 // Network device messages built from the corresponding serialization functions
@@ -99,7 +99,7 @@ void GnsChannel::SendNetworkDeviceMessage(LX_MESSAGE_TYPE MessageType, LPCWSTR M
         MessageType == LxGnsMessageNoOp || MessageType == LxGnsMessageGlobalNetFilter ||
         MessageType == LxGnsMessageInterfaceNetFilter || MessageType == LxGnsMessageConnectTestRequest);
 
-    Message<LX_GNS_JSON_MESSAGE>(MessageType, wsl::shared::string::WideToMultiByte(MessageContent));
+    Message<LX_GNS_JSON_MESSAGE>(MessageType, lsw::shared::string::WideToMultiByte(MessageContent));
 }
 
 // Network device messages built from the corresponding serialization functions
@@ -120,11 +120,11 @@ int GnsChannel::SendNetworkDeviceMessageReturnResult(LX_MESSAGE_TYPE MessageType
         MessageType == LxGnsMessageNoOp || MessageType == LxGnsMessageGlobalNetFilter ||
         MessageType == LxGnsMessageInterfaceNetFilter || MessageType == LxGnsMessageConnectTestRequest);
 
-    return MessageReturnResult<LX_GNS_JSON_MESSAGE>(MessageType, wsl::shared::string::WideToMultiByte(MessageContent));
+    return MessageReturnResult<LX_GNS_JSON_MESSAGE>(MessageType, lsw::shared::string::WideToMultiByte(MessageContent));
 }
 
 void GnsChannel::Stop() const
 {
-    WSL_LOG("GnsChannel::Stop");
+    LSW_LOG("GnsChannel::Stop");
     m_stopEvent.SetEvent();
 }

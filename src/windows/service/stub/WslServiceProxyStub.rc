@@ -8,16 +8,16 @@ Module Name:
 
 Abstract:
 
-    This file contains resources for wslserviceproxystub.dll.
+    This file contains resources for lswserviceproxystub.dll.
 
 --*/
 
 #include <windows.h>
-#include "wslversioninfo.h"
+#include "lswversioninfo.h"
 
-#define VER_INTERNALNAME_STR "wslserviceproxystub.dll"
-#define VER_ORIGINALFILENAME_STR "wslserviceproxystub.dll"
+#define VER_INTERNALNAME_STR "lswserviceproxystub.dll"
+#define VER_ORIGINALFILENAME_STR "lswserviceproxystub.dll"
 
-#define VER_FILEDESCRIPTION_STR "WSL Service ProxyStub DLL"
+#define VER_FILEDESCRIPTION_STR "LSW Service ProxyStub DLL"
 
 #include <common.ver>

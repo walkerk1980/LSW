@@ -62,7 +62,7 @@ CreateLxProcessData LxssCreateProcess::ParseArguments(
 
     if ((ARGUMENT_PRESENT(NtPath)) && (LXSS_INTEROP_ENABLED(Flags)) && (WI_IsFlagSet(Flags, LXSS_DISTRO_FLAGS_APPEND_NT_PATH)))
     {
-        Parsed.NtPath = wsl::shared::string::WideToMultiByte(NtPath);
+        Parsed.NtPath = lsw::shared::string::WideToMultiByte(NtPath);
     }
 
     // Validate that the environment is a NUL-NUL-terminated string.
@@ -79,7 +79,7 @@ CreateLxProcessData LxssCreateProcess::ParseArguments(
                 break;
             }
 
-            Parsed.NtEnvironment.push_back(wsl::shared::string::WideToMultiByte(Current));
+            Parsed.NtEnvironment.push_back(lsw::shared::string::WideToMultiByte(Current));
             Index += Length + 1;
         }
     }
@@ -88,7 +88,7 @@ CreateLxProcessData LxssCreateProcess::ParseArguments(
 
     if (ARGUMENT_PRESENT(Username))
     {
-        Parsed.Username = wsl::shared::string::WideToMultiByte(Username);
+        Parsed.Username = lsw::shared::string::WideToMultiByte(Username);
     }
 
     // Initialize the current working directory.
@@ -98,7 +98,7 @@ CreateLxProcessData LxssCreateProcess::ParseArguments(
 
     if (ARGUMENT_PRESENT(CurrentWorkingDirectory))
     {
-        Parsed.CurrentWorkingDirectory = wsl::shared::string::WideToMultiByte(CurrentWorkingDirectory);
+        Parsed.CurrentWorkingDirectory = lsw::shared::string::WideToMultiByte(CurrentWorkingDirectory);
     }
 
     return Parsed;
@@ -215,7 +215,7 @@ std::vector<gsl::byte> LxssCreateProcess::CreateMessage(_In_ LX_MESSAGE_TYPE Mes
     //
 
     size_t Offset = offsetof(LX_INIT_CREATE_PROCESS_COMMON, Buffer);
-    Common->FilenameOffset = wsl::shared::string::CopyToSpan(CreateProcessData.Filename, CommonSpan, Offset);
+    Common->FilenameOffset = lsw::shared::string::CopyToSpan(CreateProcessData.Filename, CommonSpan, Offset);
 
     //
     // Populate the CurrentWorkingDirectory string.
@@ -223,7 +223,7 @@ std::vector<gsl::byte> LxssCreateProcess::CreateMessage(_In_ LX_MESSAGE_TYPE Mes
     // N.B. Checks for overflow were done earlier in this function.
     //
 
-    Common->CurrentWorkingDirectoryOffset = wsl::shared::string::CopyToSpan(CreateProcessData.CurrentWorkingDirectory, CommonSpan, Offset);
+    Common->CurrentWorkingDirectoryOffset = lsw::shared::string::CopyToSpan(CreateProcessData.CurrentWorkingDirectory, CommonSpan, Offset);
 
     //
     // Populate the CommmandLine strings.
@@ -237,7 +237,7 @@ std::vector<gsl::byte> LxssCreateProcess::CreateMessage(_In_ LX_MESSAGE_TYPE Mes
     {
         for (USHORT Index = 0; Index < Common->CommandLineCount; ++Index)
         {
-            wsl::shared::string::CopyToSpan(CreateProcessData.CommandLine[Index], CommonSpan, Offset);
+            lsw::shared::string::CopyToSpan(CreateProcessData.CommandLine[Index], CommonSpan, Offset);
         }
     }
     else
@@ -255,7 +255,7 @@ std::vector<gsl::byte> LxssCreateProcess::CreateMessage(_In_ LX_MESSAGE_TYPE Mes
     Common->EnvironmentCount = gsl::narrow_cast<USHORT>(CreateProcessData.Environment.size());
     for (size_t Index = 0; Index < CreateProcessData.Environment.size(); ++Index)
     {
-        wsl::shared::string::CopyToSpan(CreateProcessData.Environment[Index], CommonSpan, Offset);
+        lsw::shared::string::CopyToSpan(CreateProcessData.Environment[Index], CommonSpan, Offset);
     }
 
     //
@@ -270,7 +270,7 @@ std::vector<gsl::byte> LxssCreateProcess::CreateMessage(_In_ LX_MESSAGE_TYPE Mes
     {
         for (USHORT Index = 0; Index < Common->NtEnvironmentCount; ++Index)
         {
-            wsl::shared::string::CopyToSpan(CreateProcessData.NtEnvironment[Index], CommonSpan, Offset);
+            lsw::shared::string::CopyToSpan(CreateProcessData.NtEnvironment[Index], CommonSpan, Offset);
         }
     }
     else
@@ -288,13 +288,13 @@ std::vector<gsl::byte> LxssCreateProcess::CreateMessage(_In_ LX_MESSAGE_TYPE Mes
     // Populate the NtPath string.
     //
 
-    Common->NtPathOffset = wsl::shared::string::CopyToSpan(CreateProcessData.NtPath, CommonSpan, Offset);
+    Common->NtPathOffset = lsw::shared::string::CopyToSpan(CreateProcessData.NtPath, CommonSpan, Offset);
 
     //
     // Populate the Username string.
     //
 
-    Common->UsernameOffset = wsl::shared::string::CopyToSpan(CreateProcessData.Username, CommonSpan, Offset);
+    Common->UsernameOffset = lsw::shared::string::CopyToSpan(CreateProcessData.Username, CommonSpan, Offset);
 
     WI_ASSERT(
         ((MessageType == LxInitMessageCreateProcess) && (MessageSize == (Offset + offsetof(LX_INIT_CREATE_PROCESS, Common)))) ||

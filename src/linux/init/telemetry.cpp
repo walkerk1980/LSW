@@ -166,12 +166,12 @@ unsigned int StartTelemetryAgent()
         tv.tv_sec = 10;
         THROW_LAST_ERROR_IF(setsockopt(fd.get(), SOL_SOCKET, SO_RCVTIMEO, &tv, sizeof(tv)) < 0);
 
-        wsl::shared::SocketChannel channel({STDOUT_FILENO}, "Telemetry");
+        lsw::shared::SocketChannel channel({STDOUT_FILENO}, "Telemetry");
 
         std::map<std::string, size_t> events;
         std::optional<std::string> drvfsNotifyCommand;
 
-        // Schedule the next flush in 30 seconds so that some events are captured even if WSL shuts down quickly.
+        // Schedule the next flush in 30 seconds so that some events are captured even if LSW shuts down quickly.
         auto nextFlush = std::chrono::steady_clock::now() + std::chrono::seconds(30);
 
         // Begin reading netlink messages.
@@ -256,7 +256,7 @@ unsigned int StartTelemetryAgent()
                         content << executable << '/' << count << '/';
                     }
 
-                    wsl::shared::MessageWriter<LX_MINI_INIT_TELEMETRY_MESSAGE> message;
+                    lsw::shared::MessageWriter<LX_MINI_INIT_TELEMETRY_MESSAGE> message;
                     message->ShowDrvFsNotification = drvfsNotifyCommand.has_value();
                     message.WriteString(content.str());
 

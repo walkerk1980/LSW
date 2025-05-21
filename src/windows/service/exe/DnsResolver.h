@@ -6,7 +6,7 @@
 #include "WslCoreMessageQueue.h"
 #include "WslCoreNetworkingSupport.h"
 
-namespace wsl::core::networking {
+namespace lsw::core::networking {
 
 enum class DnsResolverFlags
 {
@@ -138,4 +138,4 @@ private:
     static std::optional<LxssDynamicFunction<decltype(DnsQueryRawResultFree)>> s_dnsQueryRawResultFree;
 };
 
-} // namespace wsl::core::networking
+} // namespace lsw::core::networking

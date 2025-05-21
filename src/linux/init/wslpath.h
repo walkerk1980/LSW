@@ -4,17 +4,17 @@ Copyright (c) Microsoft. All rights reserved.
 
 Module Name:
 
-    wslpath.h
+    lswpath.h
 
 Abstract:
 
-    This file contains wslpath function declarations.
+    This file contains lswpath function declarations.
 
 --*/
 
 #pragma once
 
-#define WSLPATH_NAME "wslpath"
+#define LSWPATH_NAME "lswpath"
 
 #define TRANSLATE_FLAG_ABSOLUTE (0x1)
 #define TRANSLATE_FLAG_RESOLVE_SYMLINKS (0x2)

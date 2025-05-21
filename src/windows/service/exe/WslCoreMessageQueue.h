@@ -21,7 +21,7 @@ Abstract:
 #include <windows.h>
 #include <wil/resource.h>
 
-namespace wsl::core {
+namespace lsw::core {
 // forward-declare classes that can instantiate a WslThreadPoolWaitableResult object
 class WslCoreMessageQueue;
 
@@ -356,4 +356,4 @@ private:
     }
     CATCH_LOG()
 };
-} // namespace wsl::core
+} // namespace lsw::core

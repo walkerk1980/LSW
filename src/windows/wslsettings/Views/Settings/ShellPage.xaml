@@ -36,7 +36,7 @@
                 <ColumnDefinition Width="*" />
             </Grid.ColumnDefinitions>
             <Image Grid.Column="0"
-                   Source="/Assets/wsl.ico"
+                   Source="/Assets/lsw.ico"
                    VerticalAlignment="Center"
                    HorizontalAlignment="Left"
                    Width="16"
@@ -122,9 +122,9 @@
                 TODO: Update item icons by updating FontIcon.Glyph properties.
                 https://docs.microsoft.com/windows/apps/design/style/segoe-fluent-icons-font#icon-list
                 -->
-                <NavigationViewItem x:Uid="Settings_Shell_LaunchWSL" Tag="LaunchWSL" SelectsOnInvoked="False">
+                <NavigationViewItem x:Uid="Settings_Shell_LaunchLSW" Tag="LaunchLSW" SelectsOnInvoked="False">
                     <NavigationViewItem.Icon>
-                        <BitmapIcon ShowAsMonochrome="False" UriSource="/Assets/wsl.ico" />
+                        <BitmapIcon ShowAsMonochrome="False" UriSource="/Assets/lsw.ico" />
                     </NavigationViewItem.Icon>
                 </NavigationViewItem>
                 <NavigationViewItem x:Uid="Settings_Shell_OOBE" Tag="OOBE" SelectsOnInvoked="False">

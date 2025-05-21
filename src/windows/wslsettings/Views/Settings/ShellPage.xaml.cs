@@ -37,7 +37,7 @@ public sealed partial class ShellPage : Page
 
         RegisterNavigationService();
 
-        // TODO: Set the title bar icon by updating /Assets/wsl.ico.
+        // TODO: Set the title bar icon by updating /Assets/lsw.ico.
         // A custom title bar is required for full window theme and Mica support.
         // https://docs.microsoft.com/windows/apps/develop/title-bar?tabs=winui3#full-customization
         App.MainWindow!.ExtendsContentIntoTitleBar = true;
@@ -89,9 +89,9 @@ public sealed partial class ShellPage : Page
     {
         switch (args.InvokedItemContainer.Tag)
         {
-            case "LaunchWSL":
-                var wslPath = Path.Combine(AppContext.BaseDirectory, "..", "wsl.exe");
-                await Task.Run(() => Process.Start(wslPath, "--cd ~"));
+            case "LaunchLSW":
+                var lswPath = Path.Combine(AppContext.BaseDirectory, "..", "lsw.exe");
+                await Task.Run(() => Process.Start(lswPath, "--cd ~"));
                 break;
             case "OOBE":
                 await Task.Run(() =>

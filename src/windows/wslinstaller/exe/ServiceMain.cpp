@@ -52,10 +52,10 @@ public:
 bool WslInstallerService::AutoInstallEnabled()
 try
 {
-    const auto key = wsl::windows::common::registry::OpenLxssMachineKey(KEY_READ);
+    const auto key = lsw::windows::common::registry::OpenLxssMachineKey(KEY_READ);
 
-    auto value = wsl::windows::common::registry::ReadDword(key.get(), L"MSI", L"AutoUpgradeViaMsix", 1);
-    WSL_LOG("AutoUpgradeViaMsix", TraceLoggingLevel(WINEVENT_LEVEL_INFO), TraceLoggingValue(value, "setting"));
+    auto value = lsw::windows::common::registry::ReadDword(key.get(), L"MSI", L"AutoUpgradeViaMsix", 1);
+    LSW_LOG("AutoUpgradeViaMsix", TraceLoggingLevel(WINEVENT_LEVEL_INFO), TraceLoggingValue(value, "setting"));
 
     return value == 1;
 }
@@ -68,10 +68,10 @@ catch (...)
 HRESULT WslInstallerService::OnServiceStarting()
 {
     wil::g_fResultFailFastUnknownExceptions = false;
-    wsl::windows::common::wslutil::ConfigureCrt();
+    lsw::windows::common::lswutil::ConfigureCrt();
 
-    WslTraceLoggingInitialize(WslServiceTelemetryProvider, !wsl::shared::OfficialBuild);
-    wsl::windows::common::security::ApplyProcessMitigationPolicies();
+    WslTraceLoggingInitialize(WslServiceTelemetryProvider, !lsw::shared::OfficialBuild);
+    lsw::windows::common::security::ApplyProcessMitigationPolicies();
 
     return S_OK;
 }
@@ -90,7 +90,7 @@ void Stop()
 
 HRESULT WslInstallerService::ServiceStarted()
 {
-    WSL_LOG("WslInstallServiceStarted", TraceLoggingLevel(WINEVENT_LEVEL_INFO));
+    LSW_LOG("WslInstallServiceStarted", TraceLoggingLevel(WINEVENT_LEVEL_INFO));
 
     if (AutoInstallEnabled())
     {
@@ -110,7 +110,7 @@ HRESULT WslInstallerService::ServiceStarted()
 
 void WslInstallerService::ServiceStopped()
 {
-    WSL_LOG("WslInstallServiceStopping", TraceLoggingLevel(WINEVENT_LEVEL_INFO));
+    LSW_LOG("WslInstallServiceStopping", TraceLoggingLevel(WINEVENT_LEVEL_INFO));
 
     g_stopEvent.SetEvent();
     ClearSessions();
